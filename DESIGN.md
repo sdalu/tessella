@@ -273,7 +273,11 @@ Where inkchart departs from unicode_plot, it does so on purpose:
   past 1000 stems raise `ArgumentError` naming them, where unicode_plot
   crashes, hangs, or draws a mistake.
 - **Display width.** Labels are measured in the columns a terminal
-  gives them (`Width`), so CJK labels keep the frame aligned.
+  gives them (`Width`), so CJK labels keep the frame aligned. Its
+  tables are a copy of the ascii-art skill's (artlint.rb's, generated
+  from Unicode 15.1), so the library and the lint that checks its
+  output count the same columns; copied, not required, because the
+  library has no dependency.
 
 The name: `inkplot` was the first choice and is taken on rubygems.org
 by an unrelated gem.

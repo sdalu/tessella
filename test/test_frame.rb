@@ -187,3 +187,22 @@ class TestFrameWideLabels < Minitest::Test
         assert_equal(1, Inkchart::Width.of("é"))
     end
 end
+
+# Width's tables are the ascii-art skill's (artlint.rb's, generated from
+# Unicode 15.1 East Asian Width): spot checks where a hand-made table
+# goes wrong.
+class TestWidthTables < Minitest::Test
+    def test_wide_emoji_outside_the_cjk_blocks_take_two
+        assert_equal(2, Inkchart::Width.of("⌚"))   # U+231A
+        assert_equal(2, Inkchart::Width.of("⭐"))   # U+2B50
+    end
+
+    def test_neutral_symbols_inside_cjk_neighbourhoods_take_one
+        assert_equal(1, Inkchart::Width.of("䷀"))   # U+4DC0, a hexagram
+    end
+
+    def test_invisible_format_characters_take_none
+        assert_equal(0, Inkchart::Width.of("⁠")) # word joiner
+        assert_equal(0, Inkchart::Width.of("﻿")) # zero-width no-break
+    end
+end
