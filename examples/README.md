@@ -51,6 +51,7 @@ All are shown with their output in
 | `cpu.txt`      | `chart --area`          | 60 load samples between 10 and 90             |
 | `growth.txt`   | `chart --xscale`        | x over four decades                           |
 | `hosts.csv`    | `chart --kind bar`      | three series per label, for grouped/stacked   |
+| `week.txt`     | `chart --kind heatmap`  | a load per day and per three hours            |
 | `neg.csv`      | `chart --kind bar`      | negative, positive and zero values            |
 | `normal.txt`   | `chart --kind histogram`| 200 roughly normal samples                    |
 | `samples.txt`  | `chart --kind box`      | three columns of samples                      |

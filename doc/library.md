@@ -21,6 +21,8 @@ Tessella.bar(labels, values, **opts)
 Tessella.histogram(values, bins: nil, closed: :left, **opts)
 Tessella.box(names, samples, **opts)     # samples: Array of Arrays
 Tessella.stem(values, other = nil, scale: nil, **opts)
+Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
+                 colormap: nil, min: nil, max: nil, **opts)
 
 chart.add(x = nil, y, name: nil, color: nil, mark: nil)  # => chart
 chart.to_s                  # => String, framed, "\n"-terminated

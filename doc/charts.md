@@ -2,7 +2,7 @@
 
 A chart turns numbers into a framed figure: a plot area of character
 cells, the y extremes on its left, the x extremes under it, a title
-above and a legend on the right. There are eight kinds:
+above and a legend on the right. There are nine kinds:
 
 | Kind        | Draws                                      | Input           |
 |-------------|--------------------------------------------|-----------------|
@@ -14,6 +14,7 @@ above and a legend on the right. There are eight kinds:
 | `histogram` | counts of samples per bin, as bars         | samples         |
 | `box`       | a box-and-whisker plot per sample set      | sets of samples |
 | `stem`      | a stem-and-leaf plot, as text              | values          |
+| `heatmap`   | a matrix as a grid of shaded cells         | rows of values  |
 
 Every example on this page is the command's output, byte for byte;
 the input files are in [examples/](../examples/), and every command
@@ -64,6 +65,7 @@ What each kind reads:
 | `histogram`                           | one column of samples (further columns are ignored)             |
 | `box`                                 | one or more columns, one box per column                         |
 | `stem`                                | one column; two for the back-to-back form                       |
+| `heatmap`                             | a label, then the row's values; a header names the columns      |
 
 ## The kinds
 
@@ -423,6 +425,74 @@ The decimal is 1 digit(s) to the right of |
 A plot that would need more than 1000 stems is refused: raise
 `--scale`.
 
+### heatmap
+
+A heatmap draws a matrix as a grid of cells, each shaded by its value
+along ` ░▒▓█`, with the row names on the left and a key on the right
+giving the range. `week.txt` is a load per day and per three hours:
+
+```text
+$ head -3 week.txt
+day 0h 3h 6h 9h 12h 15h 18h 21h
+mon 10 14 18 72 76 63 67 21
+tue 23 10 14 68 72 76 63 17
+```
+
+```text
+$ tessella chart --kind heatmap week.txt
+       ┌────────────────┐
+   mon │░░░░░░████▓▓██░░│ █ 76
+   tue │░░░░░░██████▓▓░░│
+   wed │░░░░░░▓▓██████░░│
+   thu │░░░░░░▓▓▓▓████░░│
+   fri │░░░░░░██▓▓▓▓██░░│
+   sat │      ▒▒▒▒▒▒▒▒  │
+   sun │      ▒▒▒▒▒▒▒▒  │   0
+       └────────────────┘
+       0h             21h
+```
+
+A cell is `--cell-width` columns wide, 2 by default (near square in a
+terminal). The column names go under the frame when each is narrower
+than a cell, else only the first and last, at the two ends, as in
+the map above. At four columns a cell, every name fits:
+
+```text
+$ tessella chart --kind heatmap --cell-width 4 week.txt
+       ┌────────────────────────────────┐
+   mon │░░░░░░░░░░░░████████▓▓▓▓████░░░░│ █ 76
+   tue │░░░░░░░░░░░░████████████▓▓▓▓░░░░│
+   wed │░░░░░░░░░░░░▓▓▓▓████████████░░░░│
+   thu │░░░░░░░░░░░░▓▓▓▓▓▓▓▓████████░░░░│
+   fri │░░░░░░░░░░░░████▓▓▓▓▓▓▓▓████░░░░│
+   sat │            ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    │
+   sun │            ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    │   0
+       └────────────────────────────────┘
+         0h  3h  6h  9h 12h 15h 18h 21h
+```
+
+Under `--ascii` the ramp is ` .:-=+*#%@`. Under `--color` each cell is
+a `█` coloured along a colormap, a viridis-like blend by default, or
+`--colormap C,C,...` stops in any [colour form](#colour); the key then
+says "max" and "min" in words. `--min` and `--max` fix the range, so
+maps drawn apart share one scale. A map of one row gives its key as
+`lo..hi`:
+
+```text
+$ printf 'x 1 2 3 4\n' | tessella chart --kind heatmap
+     ┌────────┐
+   x │  ░░▓▓██│ 1..4
+     └────────┘
+```
+
+The matrix sets the size, so `--width` and `--height` are refused. In
+Ruby:
+
+```ruby
+Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
+                 colormap: nil, min: nil, max: nil, **opts)
+```
+
 ## Orientation
 
 `--orientation horizontal|vertical` (`orientation:`) is the direction
@@ -713,6 +783,9 @@ corner-and-tick frame bar charts use, or `:none`.
 | `--track G\|none`           | `track: "G"`/`nil` | bar, histogram       |
 | `--orientation O`          | `orientation: :o`  | all but stem         |
 | `--blocks B`                | `blocks: :b`       | bar, histogram       |
+| `--cell-width N`            | `cell_width: N`    | heatmap              |
+| `--colormap C,C,...`        | `colormap: [...]`  | heatmap              |
+| `--min A`, `--max B`        | `min:`, `max:`     | heatmap              |
 
 The bar defaults are `fill: "█"`, `eighths: true`, `track: "·"`;
 under `ascii: true`, `#`, no eighths, and `.`.

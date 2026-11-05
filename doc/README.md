@@ -33,8 +33,8 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
 1. [Getting started](getting-started.md): install, a first chart, a
    first diagram, the library.
 2. [Charts](charts.md): line, scatter, stairs, density, bar,
-   histogram, box and stem; input formats, options, canvases, colour,
-   ASCII.
+   histogram, box, stem and heatmap; input formats, options,
+   canvases, colour, ASCII.
 3. [Composition](composition.md): blocks; frame, beside, stack,
    indent, caption, shadow, fill.
 4. Diagrams: [trees](tree.md), [tables](table.md),

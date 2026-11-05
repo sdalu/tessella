@@ -12,7 +12,7 @@ figure on stdout. Each has its own `--help`.
 
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|
-| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem | [charts](charts.md) |
+| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem, heatmap | [charts](charts.md) |
 | `compose`  | frame, beside, stack, indent, caption, shadow, fill | [composition](composition.md)  |
 | `tree`     | an indented outline as a tree              | [tree](tree.md)                |
 | `table`    | CSV or TSV rows as a table                 | [table](table.md)              |
@@ -84,12 +84,13 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--area] [--gradient C,C,...] [--blocks B]
                [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
+               [--cell-width N] [--colormap C,C,...] [--min A] [--max B]
                [file]
 ```
 
 | Option                 | Takes                                  | Default         |
 |------------------------|----------------------------------------|-----------------|
-| `--kind K`             | `line scatter stairs density bar histogram box stem` | `line` |
+| `--kind K`             | `line scatter stairs density bar histogram box stem heatmap` | `line` |
 | `--width N`            | plot area width, cells                 | 40              |
 | `--height N`           | plot area height, cells                | 15              |
 | `--title S`            | a title above the frame                |                 |
@@ -104,6 +105,9 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
 | `--orientation O`      | all but stem: value axis direction     | by kind         |
+| `--cell-width N`       | heatmap: columns a cell                | 2               |
+| `--colormap C,...`     | heatmap, with --color: colour stops    | viridis-like    |
+| `--min A`, `--max B`   | heatmap: fix the range                 | the data's      |
 | `--stacked`            | bar: series end to end, not grouped    | grouped         |
 | `--blocks B`           | bar, histogram: `eighths half block quadrant braille` | `eighths` |
 | `--area`               | line, stairs: fill under each series   | off             |
