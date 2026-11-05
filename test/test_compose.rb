@@ -273,13 +273,13 @@ end
 class TestFill < Minitest::Test
     def test_a_frame_fills_its_blank_interior_around_the_text
         assert_equal(["┌───┐", "│░x░│", "└───┘"],
-                     Tessella.frame("x", fill: :light).lines)
+                     Tessella.frame("x", fill: :light, halo: false).lines)
     end
 
     def test_only_enclosed_regions_fill
         fig = Tessella.beside(Tessella.frame("a", pad: 1), "b c")
         assert_equal("┌───┐ b c\n│:a:│\n└───┘\n",
-                     Tessella.fill(fig, pattern: ":").to_s)
+                     Tessella.fill(fig, pattern: ":", halo: false).to_s)
     end
 
     def test_a_pattern_tiles_diagonally
@@ -295,6 +295,31 @@ class TestFill < Minitest::Test
         end
         framed = Tessella.frame("x", ascii: true)
         assert_equal("+---+\n|:x:|\n+---+\n",
-                     Tessella.fill(framed, ascii: true).to_s)
+                     Tessella.fill(framed, ascii: true, halo: false).to_s)
+    end
+end
+
+# The fill's halo -- blank cells kept beside text -- and frame(fill:),
+# which fills only the background the frame adds.
+class TestFillHalo < Minitest::Test
+    BOX = "┌──────────┐\n│ Antenna  │\n│          │\n└──────────┘"
+
+    def test_a_halo_keeps_the_pattern_off_text
+        assert_equal("┌──────────┐\n│ Antenna ·│\n│··········│\n└──────────┘\n",
+                     Tessella.fill(BOX, pattern: :sparse).to_s)
+        assert_equal("┌──────────┐\n│ Antenna ·│\n│·       ··│\n└──────────┘\n",
+                     Tessella.fill(BOX, pattern: :sparse, halo: :around).to_s)
+        assert_includes(Tessella.fill(BOX, pattern: :sparse, halo: false).to_s,
+                        "│·Antenna··│")
+    end
+
+    def test_a_frame_fills_only_its_own_background
+        out = Tessella.frame(BOX, fill: :hatch).to_s
+        assert_includes(out, "│╱│ Antenna  │╱│")
+        assert_includes(out, "│╱│          │╱│")
+    end
+
+    def test_an_unknown_halo_is_refused
+        assert_raises(ArgumentError) { Tessella.fill(BOX, halo: :wide) }
     end
 end

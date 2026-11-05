@@ -6,27 +6,44 @@ module Tessella
     # figure's edge through blank cells is outside and stays blank;
     # every other blank cell -- inside a frame, a box, any closed
     # region -- takes the pattern, its glyphs tiled diagonally. Text
-    # and lines are never touched. The pattern is a name from
+    # and lines are never touched, and a halo of blank cells keeps the
+    # pattern off text (a glyph that is neither box drawing nor + - |):
+    # halo: true leaves the cell each side blank, :around the cells
+    # above and below too, false none. The pattern is a name from
     # Glyphs::PATTERNS (light, hatch, stipple, ...) or glyphs of one's
     # own, each one visible column and all of one width class; under
-    # ascii: true it must be ASCII (colons by default).
+    # ascii: true it must be ASCII (colons by default). frame(fill:)
+    # fills only the background the frame adds: what floods in from
+    # just inside its border, never a region the content encloses.
     module Compose
         FILL = :light
         ASCII_FILL = :colons
 
-        def self.fill(figure, pattern: nil, ascii: false)
+        HALOS = [true, false, :around].freeze
+        STRUCTURE = /[\u2500-\u257F+|-]/
+
+        def self.fill(figure, pattern: nil, ascii: false, halo: true)
             block, = blocks([figure], ascii)
             glyphs = pattern_glyphs!(pattern, ascii)
             grid = cell_grid(block)
-            Block.new(paint(grid, enclosed(grid), glyphs))
+            Block.new(paint(grid, haloed(grid, enclosed(grid), halo), glyphs))
         end
 
-        def self.paint(grid, inside, glyphs)
-            grid.each_with_index.map do |row, r|
-                row.each_with_index.map do |cell, c|
-                    inside[[r, c]] ? glyphs[(r + c) % glyphs.size] : cell
-                end.join
-            end
+        # The background a frame adds to a block it has just framed.
+        def self.fill_frame(framed, pattern, ascii, halo)
+            glyphs = pattern_glyphs!(pattern, ascii)
+            grid = cell_grid(framed)
+            region = flood(grid, inner_ring(grid))
+            Block.new(paint(grid, haloed(grid, region, halo), glyphs))
+        end
+
+        # The blank cells just inside a frame's border.
+        def self.inner_ring(grid)
+            last_r = grid.size - 2
+            last_c = grid.first.size - 2
+            ring = (1..last_r).flat_map { |r| [[r, 1], [r, last_c]] } +
+                   (1..last_c).flat_map { |c| [[1, c], [last_r, c]] }
+            ring.select { |r, c| grid[r][c] == " " }
         end
 
         def self.pattern_glyphs!(pattern, ascii)
@@ -70,9 +87,9 @@ module Tessella
             end
         end
 
-        def self.flood(grid)
+        def self.flood(grid, starts = edge_blanks(grid))
             seen = {}
-            todo = edge_blanks(grid)
+            todo = starts.dup
             until todo.empty?
                 r, c = todo.pop
                 next if seen[[r, c]]
@@ -95,6 +112,40 @@ module Tessella
             [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].select do |y, x|
                 y.between?(0, grid.size - 1) &&
                     x.between?(0, grid[y].size - 1) && grid[y][x] == " "
+            end
+        end
+    end
+
+    # The halo: blank cells fill keeps beside text, so a label keeps
+    # its word shape. Text is any glyph but box drawing and + - |.
+    module Compose
+        # The region less the cells a halo keeps blank around text.
+        def self.haloed(grid, region, halo)
+            unless HALOS.include?(halo)
+                raise ArgumentError, "halo must be true, false or :around: " \
+                                     "#{halo.inspect}"
+            end
+            return region unless halo
+
+            region.reject { |(r, c), _| near_text?(grid, r, c, halo) }
+        end
+
+        def self.near_text?(grid, r, c, halo)
+            near = [[r, c - 1], [r, c + 1]]
+            near += [[r - 1, c], [r + 1, c]] if halo == :around
+            near.any? { |y, x| text_cell?(grid, y, x) }
+        end
+
+        def self.text_cell?(grid, r, c)
+            cell = r.between?(0, grid.size - 1) && c >= 0 && grid[r][c]
+            cell && !["", " "].include?(cell) && !cell.match?(STRUCTURE)
+        end
+
+        def self.paint(grid, inside, glyphs)
+            grid.each_with_index.map do |row, r|
+                row.each_with_index.map do |cell, c|
+                    inside[[r, c]] ? glyphs[(r + c) % glyphs.size] : cell
+                end.join
             end
         end
     end

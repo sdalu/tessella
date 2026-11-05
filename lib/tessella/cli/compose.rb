@@ -13,9 +13,9 @@ module Tessella
 
         USAGE = <<~TEXT
             Usage: tessella compose frame  [--title T] [--style S] [--pad N]
-                                          [--fill P] BLOCK
+                                          [--fill P] [--halo H] BLOCK
                    tessella compose shadow [--glyph G] BLOCK
-                   tessella compose fill   [--pattern P] BLOCK
+                   tessella compose fill   [--pattern P] [--halo H] BLOCK
                    tessella compose beside [--gap N] [--align A] BLOCK...
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
                    tessella compose indent --prefix STR BLOCK
@@ -100,7 +100,8 @@ module Tessella
         def self.frame_call(blocks, o)
             Compose.frame(blocks.first, title: o[:title], style: o[:style],
                                         pad: o.fetch(:pad, 1), ascii: o[:ascii],
-                                        fill: o[:fill])
+                                        fill: o[:fill],
+                                        halo: o.fetch(:halo, true))
         end
 
         def self.beside_call(blocks, o)
@@ -119,7 +120,8 @@ module Tessella
         end
 
         def self.fill_call(blocks, o)
-            Compose.fill(blocks.first, pattern: o[:pattern], ascii: o[:ascii])
+            Compose.fill(blocks.first, pattern: o[:pattern], ascii: o[:ascii],
+                                       halo: o.fetch(:halo, true))
         end
 
         def self.shadow_call(blocks, o)

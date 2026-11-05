@@ -32,6 +32,8 @@ module Tessella
     # flag (ComposeOptions::FLAGS names which a subcommand takes).
     # Kept apart so ComposeOptions stays under budget.
     module ComposeFlags
+        HALO = { "sides" => true, "around" => :around, "none" => false }.freeze
+
         private
 
         def add_title
@@ -72,6 +74,18 @@ module Tessella
         def add_fill
             @parser.on("--fill P", "fill the inside: a pattern name or " \
                                    "glyphs") { @opts[:fill] = it }
+        end
+
+        # --halo sides|around|none, or --no-halo for none.
+        def add_halo
+            @parser.on("--[no-]halo [H]", "blanks kept by text: sides,",
+                       "around or none") do |h|
+                @opts[:halo] = h == false ? false : halo!(h || "sides")
+            end
+        end
+
+        def halo!(mode)
+            HALO.fetch(mode) { usage!("--halo must be sides, around or none") }
         end
 
         def add_pattern
@@ -115,10 +129,11 @@ module Tessella
         include ComposeFlags
 
         FLAGS = {
-            "frame" => %i[title style pad fill], "beside" => %i[gap align],
+            "frame" => %i[title style pad fill halo],
+            "beside" => %i[gap align],
             "stack" => %i[gap rule center], "indent" => %i[prefix],
             "caption" => %i[text above], "shadow" => %i[glyph],
-            "fill" => %i[pattern]
+            "fill" => %i[pattern halo]
         }.freeze
         REQUIRED = { "indent" => :prefix, "caption" => :text }.freeze
 

@@ -188,8 +188,13 @@ closed region -- leaving text, lines and the outside alone: a name
 from the registry (`light`, `medium`, `dark`, `solid`, `hatch`,
 `backhatch`, `cross`, `grid`, `stipple`, `sparse`, `dotted`, `dots`,
 `colons`, `hash`, `at`) or glyphs of one's own, tiled diagonally, all
-of one width class (`colons` by default under `ascii: true`).
-`frame(fig, fill:)` frames and fills in one call. Each takes `ascii:
+of one width class (`colons` by default under `ascii: true`). A halo
+keeps the pattern off text, so a label keeps its word shape:
+`halo: true` (the default) leaves the cell each side of a text glyph
+blank, `:around` the cells above and below too, `false` none; box
+drawing and `+ - |` are not text. `frame(fig, fill:, halo:)` frames
+and fills only the background the frame adds -- what floods in from
+just inside its border -- never a box the content draws. Each takes `ascii:
 true`, which draws ASCII glyphs and refuses non-ASCII content, and
 returns a `Block`
 (`lines`, `width`, `height`, `to_s`).
@@ -541,7 +546,8 @@ tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
-tessella compose fill    [--pattern P] BLOCK  (frame takes --fill P)
+tessella compose fill    [--pattern P] [--halo sides|around|none] BLOCK
+                         (frame takes --fill P and --halo; --no-halo)
 ```
 
 Each BLOCK is a file, or `-` for stdin (once). `--style` takes a
