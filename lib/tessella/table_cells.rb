@@ -17,6 +17,10 @@ module Tessella
 
             def self.width(cell_lines) = cell_lines.map { Width.of(it) }.max
 
+            # A markdown cell: tabs as blanks, a | escaped, as a GFM pipe
+            # table needs.
+            def self.md_cell(text) = Table.sanitize(text).gsub("|", "\\|")
+
             # One row of cells (each an Array of lines) as Arrays of
             # line strings, one Array per output line.
             def self.rows_of(row)
@@ -46,6 +50,44 @@ module Tessella
 
                 raise ArgumentError,
                       "markdown has no multi-line cells and no width: fitting"
+            end
+        end
+
+        # A framed table's glyphs and widths under the width target:
+        # under :cjk a Unicode glyph takes two columns, so widths go in
+        # whole glyphs and edges are padded to the widest glyph.
+        module Edges
+            # width: as Fit counts it, one column a border glyph: less, under
+            # :cjk, the columns its two-column glyphs and the rounding of
+            # each column to whole glyphs may add.
+            def self.fit_width(fit, g, widths)
+                unit = unit(g)
+                fit[:width] &&
+                    (fit[:width] - (((2 * widths.size) + 1) * (unit - 1)))
+            end
+
+            # The style's glyphs, an edge or joint narrower than the widest
+            # glyph padded to its columns, so a minimal table's blanks and
+            # its narrow ╶ ╷ keep up with its two-column rules under :cjk
+            # (the runs, h and sep_h, are repeated to the column instead).
+            def self.glyphs(style)
+                g = Glyphs.fetch(style)
+                unit = unit(g)
+                g.to_h do |role, glyph|
+                    runs = %i[h sep_h].include?(role)
+                    [role, runs ? glyph : Width.ljust(glyph, unit)]
+                end
+            end
+
+            def self.unit(g) = g.values.map { Width.of(it) }.max
+
+            # The widths, the last column widened when the title would not
+            # fit the span with a blank either side.
+            def self.titled(widths, title, g)
+                return widths unless title
+
+                short = Width.of(title) + 2 - Render.span_width(widths, g[:cs])
+                short.positive? ? [*widths[..-2], widths[-1] + short] : widths
             end
         end
 

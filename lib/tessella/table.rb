@@ -206,7 +206,7 @@ module Tessella
 
             def self.md_padded_row(cells, widths, aligns)
                 cells.each_index.map do |i|
-                    Render.pad_cell(Table.sanitize(cells[i]), widths[i],
+                    Render.pad_cell(Cells.md_cell(cells[i]), widths[i],
                                     aligns[i])
                 end
             end
@@ -267,12 +267,14 @@ module Tessella
 
         # rubocop:disable-next Metrics/ParameterLists
         def self.framed(style, grid, head, aligns, title, fit)
+            g = Edges.glyphs(style)
             widths = Cells.column_widths(grid)
-            grid, widths = Fit.apply(grid, widths, fit[:width],
+            room = Edges.fit_width(fit, g, widths)
+            grid, widths = Fit.apply(grid, widths, room,
                                      fit.fetch(:min_width, MIN_WIDTH))
             head_row, *body = head ? grid : [nil, *grid]
             layout = Layout.new(widths, aligns, title_text(title))
-            Block.new(render(style, Cells.header(head_row, fit[:color]), body,
+            Block.new(render(g, Cells.header(head_row, fit[:color]), body,
                              layout))
         end
 
@@ -292,7 +294,8 @@ module Tessella
 
         def self.check_rows!(rows)
             check_ragged!(rows)
-            raise ArgumentError, "no rows to tabulate" if rows.empty?
+            raise ArgumentError, "no rows to tabulate" if
+                rows.empty? || rows.first.empty?
         end
 
         def self.check_ragged!(rows)
@@ -319,13 +322,14 @@ module Tessella
         end
 
         def self.column_width(head, body, i)
-            cells = body.map { |row| sanitize(row[i]) }
-            cells << sanitize(head[i]) if head
+            cells = body.map { |row| Cells.md_cell(row[i]) }
+            cells << Cells.md_cell(head[i]) if head
             cells.map { |c| Width.of(c) }.max + 2
         end
 
         # A custom set stays itself, checked as ASCII under ascii:
-        # true; a named style gives way to :ascii there.
+        # true; a named style gives way to :ascii there, but markdown,
+        # which is ASCII already.
         def self.resolve_style!(style, ascii)
             if Borders.custom?(style)
                 Glyphs.custom(style)
@@ -333,7 +337,7 @@ module Tessella
                 return style
             end
             sym = style.nil? ? :light : normalize_style!(style)
-            ascii ? :ascii : sym
+            ascii && sym != :markdown ? :ascii : sym
         end
 
         def self.normalize_style!(style)
@@ -346,11 +350,11 @@ module Tessella
         # Each column a whole number of border glyphs wide, so under
         # target :cjk, where a Unicode one takes two columns, the
         # borders meet the cells.
-        def self.render(style, head, body, layout)
+        def self.render(g, head, body, layout)
             aligns = layout.aligns
-            g = Glyphs.fetch(style)
-            unit = Width.of(g[:h])
-            widths = layout.widths.map { Width.round_up(it, unit) }
+            unit = Edges.unit(g)
+            widths = Edges.titled(layout.widths, layout.title, g)
+                          .map { Width.round_up(it, unit) }
             padded_head = head && Render.build_row(head, widths, aligns)
             padded_body = body.map { |r| Render.build_row(r, widths, aligns) }
             Render.render_box(g, padded_head, padded_body, widths,
