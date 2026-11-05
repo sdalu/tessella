@@ -455,3 +455,37 @@ class TestTableCells < Minitest::Test
         end
     end
 end
+
+# A custom border set for a table: eleven glyphs, the frame's six and
+# the tees (top_t bot_t sep_l sep_t sep_r).
+class TestTableCustomBorders < Minitest::Test
+    def test_eleven_glyphs_draw_the_table
+        out = Tessella.table([%w[a b], %w[1 2]], style: "╒╕╘╛═│╤╧╞╪╡")
+        assert_equal(<<~OUT, out.to_s)
+            ╒═══╤═══╕
+            │ a │ b │
+            ╞═══╪═══╡
+            │ 1 │ 2 │
+            ╘═══╧═══╛
+        OUT
+    end
+
+    def test_six_glyphs_are_not_enough_for_a_table
+        error = assert_raises(ArgumentError) do
+            Tessella.table([%w[a]], style: "╒╕╘╛═│")
+        end
+        assert_match(/needs 11 glyphs/, error.message)
+    end
+
+    def test_the_command_takes_glyphs_and_refuses_a_short_set
+        out = StringIO.new
+        err = StringIO.new
+        run = lambda do |style|
+            Tessella::CLI.run(["table", "--style", style],
+                              stdin: StringIO.new("a,b\n"), stdout: out,
+                              stderr: err)
+        end
+        assert_equal(0, run.call("╒╕╘╛═│╤╧╞╪╡"))
+        assert_equal(2, run.call("╒╕╘╛═│"))
+    end
+end

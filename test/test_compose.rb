@@ -200,6 +200,34 @@ class TestComposeCLI < Minitest::Test
     end
 end
 
+# A custom border set: a Set, or six glyphs in Set order.
+class TestFrameCustomBorders < Minitest::Test
+    def test_a_glyph_string_or_a_set_draws_the_frame
+        assert_equal("*==*\n!ab!\n*==*\n",
+                     Tessella.frame("ab", style: "****=!", pad: 0).to_s)
+        set = Tessella::Borders::Set.new("╓", "╖", "╙", "╜", "─", "║")
+        assert_equal("╓──╖\n║ab║\n╙──╜\n",
+                     Tessella.frame("ab", style: set, pad: 0).to_s)
+    end
+
+    def test_a_bad_set_is_refused_naming_it
+        ["**=!", "****=\t", "****=漢"].each do |spec|
+            assert_raises(ArgumentError, spec) do
+                Tessella.frame("ab", style: spec)
+            end
+        end
+    end
+
+    def test_under_ascii_a_custom_set_must_be_ascii
+        assert_equal("*==*\n!ab!\n*==*\n",
+                     Tessella.frame("ab", style: "****=!", pad: 0,
+                                          ascii: true).to_s)
+        assert_raises(ArgumentError) do
+            Tessella.frame("ab", style: "╒╕╘╛═│", ascii: true)
+        end
+    end
+end
+
 # stack's gap: N blank rows between blocks, or N on each side of a rule.
 class TestStackGap < Minitest::Test
     def test_gap_without_a_rule_is_n_rows_between

@@ -44,7 +44,13 @@ module Tessella
         end
 
         def add_title = @parser.on("--title T") { @opts[:title] = it }
-        def add_style = @parser.on("--style S") { @opts[:style] = it.to_sym }
+
+        def add_style
+            @parser.on("--style S") do |s|
+                @opts[:style] = Borders.custom?(s) ? s : s.to_sym
+            end
+        end
+
         def add_pad = add_count("--pad", :pad)
         def add_gap = add_count("--gap", :gap)
         def add_center = @parser.on("--center") { @opts[:center] = true }
@@ -83,11 +89,18 @@ module Tessella
         def check_style!
             style = @opts[:style]
             return unless style
+            return check_custom_style!(style) if Borders.custom?(style)
 
             usage!("unknown --style #{style}") unless
                 Borders::STYLES.key?(style)
             usage!("--style #{style} conflicts with --ascii") if
                 @opts[:ascii] && style != :ascii
+        end
+
+        def check_custom_style!(style)
+            Borders.custom(style, ascii: @opts[:ascii])
+        rescue ArgumentError => e
+            usage!(e.message)
         end
     end
 

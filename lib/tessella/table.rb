@@ -35,6 +35,7 @@ module Tessella
 
             def self.fetch(style)
                 return MINIMAL if style == :minimal
+                return custom(style) if Borders.custom?(style)
 
                 b = Borders.fetch(style)
                 TEES.fetch(style).merge(tl: b.tl, tr: b.tr, bl: b.bl,
@@ -306,7 +307,14 @@ module Tessella
             cells.map { |c| Width.of(c) }.max + 2
         end
 
+        # A custom set stays itself, checked as ASCII under ascii:
+        # true; a named style gives way to :ascii there.
         def self.resolve_style!(style, ascii)
+            if Borders.custom?(style)
+                Glyphs.custom(style)
+                Borders.custom(style, ascii: ascii)
+                return style
+            end
             sym = style.nil? ? :light : normalize_style!(style)
             ascii ? :ascii : sym
         end
@@ -456,8 +464,9 @@ module Tessella
         end
     end
 
-    # Under ascii: true, the check that every cell and the title are
-    # ASCII.
+    # A custom border set for a table (Borders): eleven glyphs, the six
+    # of a frame and the five tees; and, under ascii: true, the check
+    # that every cell and the title are ASCII.
     module Table
         def self.check_ascii!(rows, title)
             Check.ascii!(title, "title")
@@ -465,6 +474,20 @@ module Tessella
                 row.each_with_index do |cell, c|
                     Check.ascii!(cell, "row #{r + 1}, column #{c + 1}")
                 end
+            end
+        end
+
+        module Glyphs
+            # An 11-glyph set: the six of a frame, and the five tees.
+            def self.custom(style)
+                b, tees = Borders.custom(style)
+                unless tees
+                    raise ArgumentError, "a table's border set needs 11 " \
+                                         "glyphs, its tees after the six " \
+                                         "of a frame: #{style.inspect}"
+                end
+                tees.merge(tl: b.tl, tr: b.tr, bl: b.bl, br: b.br, h: b.h,
+                           sep_h: b.h, cl: b.v, cs: b.v, cr: b.v)
             end
         end
     end

@@ -18,6 +18,8 @@ module Tessella
         def parse(argv)
             @parser.parse!(argv)
             raise TableCLI::UsageError, "too many arguments" if argv.size > 1
+
+            check_custom_style!
             [@opts, argv]
         end
 
@@ -40,6 +42,25 @@ module Tessella
             op.on("--align SPEC") { |s| @opts[:align] = align!(s) }
         end
 
+        # A name, or a glyph set checked as a table's (11 glyphs).
+        def style!(spec, names)
+            return spec.to_sym if names.include?(spec)
+
+            usage!("unknown --style #{spec}") unless Borders.custom?(spec)
+            Table::Glyphs.custom(spec)
+            spec
+        rescue ArgumentError => e
+            usage!(e.message)
+        end
+
+        def check_custom_style!
+            style = @opts[:style]
+            Borders.custom(style, ascii: @opts[:ascii]) if
+                Borders.custom?(style)
+        rescue ArgumentError => e
+            usage!(e.message)
+        end
+
         def align!(spec)
             usage!("--align must be letters l, r or c") unless
                 /\A[lrc]+\z/i.match?(spec)
@@ -48,8 +69,10 @@ module Tessella
 
         def add_style(op)
             names = Table::STYLE_NAMES.map(&:to_s)
-            op.on("--style S", names, names.join(", ")) do |s|
-                @opts[:style] = s.to_sym
+            op.on("--style S", "#{names.join(", ")},",
+                  "or 11 glyphs: tl tr bl br h v top_t bot_t",
+                  "sep_l sep_t sep_r") do |s|
+                @opts[:style] = style!(s, names)
             end
             op.on("--ascii") { @opts[:ascii] = true }
             op.on("--title TEXT") { |t| @opts[:title] = t }
@@ -77,7 +100,7 @@ module Tessella
 
         BANNER = <<~TEXT
             Usage: tessella table [options] [file]  (stdin if none)
-                --tsv --no-header --align SPEC --style NAME --ascii
+                --tsv --no-header --align SPEC --style NAME|GLYPHS --ascii
                 --title TEXT --max-width N
         TEXT
 

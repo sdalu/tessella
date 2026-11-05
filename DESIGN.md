@@ -121,6 +121,15 @@ stack's `gap:` without a rule is N blank rows between blocks, as
 compose.rb's help said, where its code put 2N (N on each side of a
 rule that was not there).
 
+Besides its named sets, `Borders` takes a custom one: a
+`Borders::Set` or a String of six glyphs in its order (`tl tr bl br
+h v`), or eleven for a table, whose last five are its tees (`top_t
+bot_t sep_l sep_t sep_r`). A String that is a style's name is that
+style; each glyph must be one visible column, and ASCII under `ascii:
+true`. Named styles keep their rule under `ascii: true` (a frame
+refuses them, a table draws `ascii`), but a custom set is never
+silently replaced: it is drawn if ASCII and refused if not.
+
 ## Diagram modules
 
 `tree`, `table`, `bitfield`, `wave` and `seq` began as the ascii-art

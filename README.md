@@ -104,7 +104,9 @@ puts Tessella.beside(fig, Tessella.caption("note", text: "n"),
 ```
 
 `frame(fig, title:, style:, pad:)` boxes one figure (style `:light`,
-`:heavy`, `:double`, `:rounded` or `:ascii`); `beside(*figs, gap:,
+`:heavy`, `:double`, `:rounded` or `:ascii`, or a custom set: six
+glyphs `tl tr bl br h v`, as in `style: "╓╖╙╜─║"`, or a
+`Tessella::Borders::Set`); `beside(*figs, gap:,
 align:)` sets figures side by side (align `:top`, `:middle`,
 `:bottom`); `stack(*figs, gap:, rule:, center:)` sets them one under
 another; `indent(fig, prefix:)` prefixes every line (an empty line
@@ -138,7 +140,9 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   forest unless `root:` names one root for them.
 - **table**: rows of Strings, the first the header unless `header:
   false`; styles `:light`, `:heavy`, `:double`, `:rounded`, `:ascii`,
-  `:minimal` (dividers only) and `:markdown` (a GitHub pipe table). A
+  `:minimal` (dividers only) and `:markdown` (a GitHub pipe table), or
+  a custom set of eleven glyphs, a frame's six then the tees `top_t
+  bot_t sep_l sep_t sep_r` (`"╒╕╘╛═│╤╧╞╪╡"`). A
   column of numbers right-aligns; `align:` ("lrc", one letter per
   column) overrides; it also takes an Array of `:left`, `:right`,
   `:center`. `Table.parse` reads CSV (RFC 4180 quoting) or, with `tsv:
@@ -309,7 +313,8 @@ tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 ```
 
-Each BLOCK is a file, or `-` for stdin (once). Every subcommand also
+Each BLOCK is a file, or `-` for stdin (once). `--style` takes a
+style's name or six glyphs, as `style:` does. Every subcommand also
 takes `--ascii` and `--max-width N`. Bad input -- a missing file, an
 empty block, a tab, a non-ASCII byte under `--ascii`, output wider
 than `--max-width` -- exits 1 naming the block and line; a usage
@@ -325,7 +330,7 @@ $ tessella compose frame --title Load plot.txt
 
 ```text
 tessella tree     [--style S] [--ascii] [--root NAME] [file]
-tessella table    [--tsv] [--no-header] [--style S] [--ascii]
+tessella table    [--tsv] [--no-header] [--style S|GLYPHS] [--ascii]
                    [--align SPEC] [--title T] [file]
 tessella bitfield [--word N] [--octets] [--no-ruler] [--abbrev] [file]
 tessella wave     [--period N] [--ascii] [--ruler] [file]
