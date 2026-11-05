@@ -196,6 +196,13 @@ decoder by the bytes' own signature:
   required RMagick would be a C extension built against ImageMagick at
   install, the kind of dependency the project exists to avoid.
 
+`style: :octant` (`image_octant.rb`) adds Unicode 16's octants,
+2x4 solid pixels per cell: the block holds 230 of the 256 patterns
+in bit order, the other 26 being older glyphs (`█ ▀ ▌`, the
+quadrants, quarter blocks), so the table is computed from that rule
+and a 26-entry list, checked against the Unicode 16 names. Named
+ramps come from the glyph registry.
+
 The rendering is the skill's img2art.rb, ported byte for byte (182
 cases): its sampling, dithering (Floyd-Steinberg, Atkinson, Bayer) and
 glyph tables. Where it differs, it keeps a library rule: a blank

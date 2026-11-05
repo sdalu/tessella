@@ -28,10 +28,12 @@ module Tessella
                 .pack("U")
             end
         end.freeze
-        STYLES = %i[ramp blocks half quadrant sextant braille edges].freeze
+        STYLES = %i[ramp blocks half quadrant sextant braille octant
+                    edges].freeze
         DITHERS = %i[none fs atkinson bayer].freeze
         SUBCELL = { ramp: [1, 1], blocks: [1, 1], half: [1, 2],
                     quadrant: [2, 2], sextant: [2, 3], braille: [2, 4],
+                    octant: [2, 4],
                     edges: [1, 1] }.freeze
         DEFAULTS = { style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                      threshold: 0.5, dither: :fs, invert: false,
@@ -106,8 +108,12 @@ module Tessella
                 Check.positive!(@opts[:gamma], "gamma")
             end
 
+            # A ramp named in the glyph registry (ramp, blocks, long,
+            # hatch), else the glyphs given; a name wins.
             def resolve_ramp
                 ramp = @opts[:ramp]
+                named = ramp && Tessella::Glyphs::RAMPS[Borders.name(ramp)]
+                return named if named
                 return check_custom_ramp!(ramp) if ramp
 
                 Image::RAMPS.fetch(@opts[:style], Image::RAMPS[:ramp])
@@ -299,6 +305,8 @@ module Tessella
     # and its per-style methods.
     module Image
         class Glyphs
+            include OctantGlyph
+
             SOBEL_X = [[-1, -1, -1], [-1, 0, -2], [-1, 1, -1],
                        [1, -1, 1], [1, 0, 2], [1, 1, 1]].freeze
             SOBEL_Y = [[-1, -1, -1], [0, -1, -2], [1, -1, -1],
@@ -319,6 +327,7 @@ module Tessella
                 when :quadrant then quadrant(cx, cy)
                 when :sextant  then sextant(cx, cy)
                 when :braille  then braille(cx, cy)
+                when :octant   then octant(cx, cy)
                 when :edges    then edge(cx, cy)
                 else                tone(cx, cy)
                 end

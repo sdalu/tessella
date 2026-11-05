@@ -423,3 +423,40 @@ class TestPnmHeader < Minitest::Test
         assert_match(/above maxval 255/, error.message)
     end
 end
+
+# style: :octant (Unicode 16, 2x4 solid pixels per cell) and the
+# registry's named ramps (ramp, blocks, long, hatch).
+class TestImageOctantsAndRamps < Minitest::Test
+    O = Tessella::Image::OCTANT
+    # An 8x8 picture, white in its central 4x4.
+    DISC = begin
+        px = (0...64).map do |i|
+            (i % 8).between?(2, 5) && (i / 8).between?(2, 5) ? 255 : 0
+        end
+        "P2\n8 8\n255\n#{px.join(" ")}\n".freeze
+    end
+
+    def test_the_octant_table_covers_every_pattern_once
+        assert_equal(256, O.uniq.size)
+        octants = O.select { (0x1CD00..0x1CDE5).cover?(it.ord) }
+        assert_equal(230, octants.size)
+        assert_equal(octants.sort, octants)
+        assert_equal("\u{1CD00}", O[4]) # BLOCK OCTANT-3: cell 3 alone
+        assert_equal(%w[▀ ▌ █], [O[15], O[85], O[255]])
+    end
+
+    def test_an_octant_picture
+        assert_equal(" ▄▄\n ▀▀\n",
+                     Tessella.image(DISC, style: :octant, width: 4).to_s)
+    end
+
+    def test_a_named_ramp_wins_over_the_same_glyphs
+        long = Tessella::Glyphs::RAMPS[:long]
+        assert_equal(70, long.length)
+        assert_equal(Tessella.image(DISC, ramp: :long, width: 8).to_s,
+                     Tessella.image(DISC, ramp: "long", width: 8).to_s)
+        assert_includes(Tessella.image(DISC, ramp: :long, width: 8).to_s,
+                        "$")
+        assert_includes(Tessella.image(DISC, ramp: " x", width: 8).to_s, "x")
+    end
+end

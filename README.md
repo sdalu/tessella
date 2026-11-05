@@ -264,12 +264,17 @@ PGM/PPM and PNG are decoded with nothing installed; any other format
 installed and never required, and without it is refused with the
 `magick IMAGE pgm:- | tessella image` pipe as the way round. Styles
 trade tone for resolution: `ramp` and `blocks` give one tone per cell,
-`half`, `quadrant`, `sextant` and `braille` pack 2 to 8 pixels into a
-cell, and `edges` draws Sobel contours as `─ │ ╱ ╲`. `dither:` is
-`:none`, `:fs` (Floyd-Steinberg), `:atkinson` or `:bayer`; `invert:
-true` is for a light background. `ascii: true` allows only the `ramp`
-style with an ASCII ramp. A picture that renders blank is refused,
-naming the threshold to lower.
+`half`, `quadrant`, `sextant`, `braille` and `octant` pack 2 to 8
+pixels into a cell (`octant` is Unicode 16, drawn by the newest
+terminals only, Ghostty and its like), and `edges` draws Sobel
+contours as `─ │ ╱ ╲`. `ramp:` is glyphs light to dense, or a name
+from the glyph registry: `ramp` (` .:-=+*#%@`), `blocks`, `long` (a
+70-glyph ASCII ramp, for finer tone) or `hatch`; a name wins over
+the same letters. `dither:` is `:none`, `:fs` (Floyd-Steinberg),
+`:atkinson` or `:bayer`; `invert: true` is for a light background.
+`ascii: true` allows only the `ramp` style with an ASCII ramp. A
+picture that renders blank is refused, naming the threshold to
+lower.
 
 ### Linting
 

@@ -121,7 +121,7 @@ module Tessella
         class Options
             include NumericOptions
 
-            STYLES = %w[ramp blocks half quadrant sextant braille edges]
+            STYLES = %w[ramp blocks half quadrant sextant braille octant edges]
                      .freeze
             DITHERS = %w[none fs atkinson bayer].freeze
 
@@ -173,7 +173,8 @@ module Tessella
             def add_style
                 @parser.on("--style S", STYLES,
                            "ramp, blocks, half, quadrant,",
-                           "sextant, braille or edges") do |s|
+                           "sextant, braille, octant (Unicode 16)",
+                           "or edges") do |s|
                     @opts[:style] = s.to_sym
                 end
             end
@@ -186,7 +187,8 @@ module Tessella
             end
 
             def add_ramp
-                @parser.on("--ramp STR", "tone glyphs, light to dense") do |r|
+                @parser.on("--ramp STR", "tone glyphs, light to dense, or a",
+                           "name: ramp, blocks, long, hatch") do |r|
                     @opts[:ramp] = r
                 end
             end
