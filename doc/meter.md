@@ -6,12 +6,13 @@ status report, a column of them in a dashboard.
 
 ```ruby
 Tessella.meter(fraction, style: :block, width: 20, title: nil,
-               label: true, brackets: true, ascii: false)   # => Block
+               title_width: nil, label: true, brackets: true,
+               ascii: false)                                # => Block
 ```
 
 ```text
-tessella meter [--style S] [--width N] [--title T] [--no-label]
-               [--no-brackets] [--ascii] FRACTION
+tessella meter [--style S] [--width N] [--title T] [--title-width N]
+               [--no-label] [--no-brackets] [--ascii] FRACTION
 ```
 
 `FRACTION` is a number from 0 to 1, or a percentage, `45%`.
@@ -43,8 +44,7 @@ meter sets in the [registry](glyphs.md#the-registry):
 
 ```text
 $ for s in arrow chevron classic rectangle wave block box circle star; do \
-    tessella meter --style $s --width 12 \
-      --title "$(printf '%-9s' $s)" 0.6; \
+    tessella meter --style $s --width 12 --title $s --title-width 9 0.6; \
   done
 arrow     [▸▸▸▸▸▸▸▹▹▹▹▹] 60 %
 chevron   [›››››››     ] 60 %
@@ -86,13 +86,15 @@ $ tessella meter --ascii 0.5
 ## A status board
 
 Meters are blocks like any figure, so they stack and frame.
-`disks.sh` reads `name fraction` lines and draws one meter each,
-their titles padded to one width so the bars line up:
+`--title-width N` (`title_width:`) pads a title to N columns, so a
+column of meters lines up; a longer title is refused (exit 2).
+`disks.sh` reads `name fraction` lines and draws one meter each:
 
 ```sh
 #!/bin/sh
-# examples/disks.sh -- one meter per line of "name fraction", aligned
-# by their titles and framed: a small status board.
+# examples/disks.sh -- one meter per line of "name fraction", their
+# titles padded to one width so the bars line up, framed: a small
+# status board.
 # usage: sh disks.sh [file]   (default disks.txt)
 set -eu
 
@@ -103,7 +105,7 @@ while read -r name fraction; do
     case $name in
         '' | '#'*) continue ;;
     esac
-    tessella meter --width 16 --title "$(printf '%-6s' "$name")" \
+    tessella meter --width 16 --title "$name" --title-width 6 \
         -- "$fraction"
 done < "$input" |
     tessella compose frame --title disks -

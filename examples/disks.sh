@@ -1,6 +1,7 @@
 #!/bin/sh
-# examples/disks.sh -- one meter per line of "name fraction", aligned
-# by their titles and framed: a small status board.
+# examples/disks.sh -- one meter per line of "name fraction", their
+# titles padded to one width so the bars line up, framed: a small
+# status board.
 # usage: sh disks.sh [file]   (default disks.txt)
 set -eu
 
@@ -11,7 +12,7 @@ while read -r name fraction; do
     case $name in
         '' | '#'*) continue ;;
     esac
-    tessella meter --width 16 --title "$(printf '%-6s' "$name")" \
+    tessella meter --width 16 --title "$name" --title-width 6 \
         -- "$fraction"
 done < "$input" |
     tessella compose frame --title disks -

@@ -65,7 +65,8 @@ Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                threshold: 0.5, dither: :fs, invert: false,
                edge_threshold: 0.3, ascii: false)
 Tessella.meter(fraction, style: :block, width: 20, title: nil,
-               label: true, brackets: true, ascii: false)
+               title_width: nil, label: true, brackets: true,
+               ascii: false)
 Tessella.sparkline(values, width: nil, min: nil, max: nil, ascii: false)
 Tessella.rule(width: 78, ornament: nil, style: :light, ascii: false)
 Tessella.text(str, style:, strict: false, ascii: false)  # => String
