@@ -21,6 +21,7 @@ figure on stdout. Each has its own `--help`.
 | `seq`      | a sequence diagram                         | [seq](seq.md)                  |
 | `image`    | a picture as text                          | [images](images.md)            |
 | `lint`     | checks a text figure, drawn or hand-made   | [lint](lint.md)                |
+| `sparkline` | a one-line chart, one cell a value        | [sparkline](sparkline.md)      |
 | `meter`    | a one-line progress bar or gauge           | [meter](meter.md)              |
 | `rule`     | a divider, with an optional ornament       | [rule](rule.md)                |
 | `text`     | letters in a Unicode style: bold, script…  | [text](text.md)                |
@@ -77,7 +78,7 @@ tessella seq: output is 41 columns, over --max-width 30
 ```text
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
-               [--canvas C] [--xscale F] [--ascii] [--color]
+               [--canvas C] [--xscale F] [--yscale F] [--ascii] [--color]
                [--style post|pre] [--orientation horizontal|vertical]
                [--area] [--gradient C,C,...] [--blocks B]
                [--bins N] [--closed left|right]
@@ -97,6 +98,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--ylim A,B`           | y limits                               | from the data   |
 | `--canvas C`           | `braille block quadrant half dot ascii density` | `braille` |
 | `--xscale F`           | `ln log2 log10`                        |                 |
+| `--yscale F`           | plotted kinds: `ln log2 log10`         |                 |
 | `--ascii`              | ASCII only                             | off             |
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
@@ -118,13 +120,13 @@ The input format, column by kind, is in
 
 ```text
 tessella compose frame   [--title T] [--style S] [--pad N] [--fill P]
-                         BLOCK
+                         [--halo H] BLOCK
 tessella compose beside  [--gap N] [--align top|middle|bottom] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
-tessella compose fill    [--pattern P] BLOCK
+tessella compose fill    [--pattern P] [--halo H] BLOCK
 ```
 
 All take `--ascii` and `--max-width N`. A BLOCK is a file, or `-` for

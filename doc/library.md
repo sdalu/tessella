@@ -36,14 +36,14 @@ of a back-to-back plot. `opts`, their defaults, and the bar options
 
 ```ruby
 Tessella.frame(fig, title: nil, style: nil, pad: 1, fill: nil,
-               ascii: false)
+               halo: true, ascii: false)
 Tessella.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
 Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
                ascii: false)
 Tessella.indent(fig, prefix:, ascii: false)
 Tessella.caption(fig, text:, above: false, ascii: false)
 Tessella.shadow(fig, glyph: nil, ascii: false)
-Tessella.fill(fig, pattern: nil, ascii: false)
+Tessella.fill(fig, pattern: nil, halo: true, ascii: false)
 ```
 
 Each takes any figure (a `Block`, a `String`, a chart) and returns a
@@ -66,13 +66,15 @@ Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                edge_threshold: 0.3, ascii: false)
 Tessella.meter(fraction, style: :block, width: 20, title: nil,
                label: true, brackets: true, ascii: false)
+Tessella.sparkline(values, width: nil, min: nil, max: nil, ascii: false)
 Tessella.rule(width: 78, ornament: nil, style: :light, ascii: false)
 Tessella.text(str, style:, strict: false, ascii: false)  # => String
 ```
 
 The figures return a `Block`. Pages: [tree](tree.md), [table](table.md),
 [bitfield](bitfield.md), [wave](wave.md), [seq](seq.md),
-[images](images.md), [meter](meter.md), [rule](rule.md),
+[images](images.md), [sparkline](sparkline.md), [meter](meter.md),
+[rule](rule.md),
 [text](text.md). `text` returns a String, not a Block.
 
 ### Lint

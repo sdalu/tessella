@@ -159,9 +159,9 @@ $ tessella compose frame --ascii --style '****=!' note.txt
 $ tessella compose frame --ascii --style '╓╖╙╜─║' note.txt
 tessella compose: border glyph ╓ conflicts with ascii: true
 Usage: tessella compose frame  [--title T] [--style S] [--pad N]
-                              [--fill P] BLOCK
+                              [--fill P] [--halo H] BLOCK
        tessella compose shadow [--glyph G] BLOCK
-       tessella compose fill   [--pattern P] BLOCK
+       tessella compose fill   [--pattern P] [--halo H] BLOCK
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK
@@ -316,35 +316,66 @@ the figure stays lint-clean.
 ## fill
 
 ```ruby
-Tessella.fill(fig, pattern: nil, ascii: false)
-Tessella.frame(fig, ..., fill: nil)
+Tessella.fill(fig, pattern: nil, halo: true, ascii: false)
+Tessella.frame(fig, ..., fill: nil, halo: true)
 ```
 
-Fills every enclosed blank cell with a pattern. What is enclosed is
-what a flood from the figure's edge, through blank cells, cannot
-reach; text, lines and everything outside are left as they are. The
-blanks between words inside a box are enclosed too, so a pattern
-behind text reads as a texture:
-
-```text
-$ tessella compose frame --fill light note.txt
-┌─────────────────┐
-│░ruby░is░12░kLOC░│
-│░c░is░the░bulk░░░│
-└─────────────────┘
-```
-
-`frame`'s `fill:` (`--fill P`) fills the inside of the frame it
-draws; `fill` works on any figure, here two hand-drawn boxes in
-`boxes.txt`. The space between them is not enclosed, so it stays
-blank:
+Fills every enclosed blank cell with a pattern: inside a box, a
+frame, any closed region. What is enclosed is what a flood from the
+figure's edge, through blank cells, cannot reach; text, lines and
+everything outside are left as they are. Here two hand-drawn boxes in
+`boxes.txt`: the space between them is not enclosed, so it stays
+blank.
 
 ```text
 $ tessella compose fill --pattern stipple boxes.txt
 ┌────┐  ┌────┐
-│∴∵∴∵│──│∴ok∵│
+│∴∵∴∵│──│ ok │
 └────┘  └────┘
 ```
+
+`frame`'s `fill:` (`--fill P`) fills only the background the frame
+adds, flooding from just inside its border; boxes the content draws
+keep their own inside:
+
+```text
+$ tessella compose frame --fill light --pad 2 boxes.txt
+┌──────────────────┐
+│░░┌────┐░░┌────┐░░│
+│░░│    │──│ ok │░░│
+│░░└────┘░░└────┘░░│
+└──────────────────┘
+```
+
+### The halo
+
+A pattern packed against letters makes them hard to read, so the fill
+keeps a halo of blanks around text: by default (`halo: true`,
+`--halo sides`) the cell on each side of a text glyph stays blank, so
+a word keeps its shape and the gap between words survives:
+
+```text
+$ tessella compose frame --fill light --pad 3 note.txt
+┌─────────────────────┐
+│░░ ruby is 12 kLOC ░░│
+│░░ c is the bulk ░░░░│
+└─────────────────────┘
+```
+
+`--halo around` (`halo: :around`) also keeps the cells above and
+below text blank; `--halo none` or `--no-halo` (`halo: false`) fills
+right up to the letters, and between words:
+
+```text
+$ tessella compose frame --fill light --pad 3 --halo none note.txt
+┌─────────────────────┐
+│░░░ruby░is░12░kLOC░░░│
+│░░░c░is░the░bulk░░░░░│
+└─────────────────────┘
+```
+
+Text is any glyph but box drawing and `+ - |`, so lines and borders
+take the pattern right up to them.
 
 A pattern is a name from the registry (`light`, the default, `medium`,
 `dark`, `solid`, `hatch`, `backhatch`, `cross`, `grid`, `stipple`,
@@ -363,11 +394,11 @@ Under `ascii: true` the pattern must be ASCII, and the default is
 `colons`:
 
 ```text
-$ tessella compose frame --ascii --fill hash note.txt
-+-----------------+
-|#ruby#is#12#kLOC#|
-|#c#is#the#bulk###|
-+-----------------+
+$ tessella compose frame --ascii --fill hash --pad 3 note.txt
++---------------------+
+|## ruby is 12 kLOC ##|
+|## c is the bulk ####|
++---------------------+
 ```
 
 ## ASCII
@@ -439,15 +470,16 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
 
 ```text
 tessella compose frame   [--title T] [--style S] [--pad N] [--fill P]
-                         BLOCK
+                         [--halo H] BLOCK
 tessella compose beside  [--gap N] [--align A] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
-tessella compose fill    [--pattern P] BLOCK
+tessella compose fill    [--pattern P] [--halo H] BLOCK
 ```
 
+`--halo` is `sides`, `around` or `none`; `--no-halo` is `none`.
 Each BLOCK is a file, or `-` for stdin (once). Every subcommand also
 takes `--ascii`, and `--max-width N` to refuse a result wider than N
 columns.
@@ -476,9 +508,9 @@ other than `ascii` with `--ascii`, the wrong number of blocks.
 $ tessella compose beside plot.txt
 tessella compose: beside takes at least two BLOCKs
 Usage: tessella compose frame  [--title T] [--style S] [--pad N]
-                              [--fill P] BLOCK
+                              [--fill P] [--halo H] BLOCK
        tessella compose shadow [--glyph G] BLOCK
-       tessella compose fill   [--pattern P] BLOCK
+       tessella compose fill   [--pattern P] [--halo H] BLOCK
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK

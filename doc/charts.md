@@ -568,6 +568,7 @@ whitespace to a text tool.
 | `--ylim A,B`        | `ylim: [a, b]`        | the data's extent, rounded     |
 | `--canvas C`        | `canvas: :c`          | `braille` (`ascii` with ASCII) |
 | `--xscale F`        | `xscale: :f`          | none                           |
+| `--yscale F`        | `yscale: :f`          | none (plotted kinds only)      |
 | `--ascii`           | `ascii: true`         | off                            |
 | `--color`           | `color: true`         | off                            |
 | (none)              | `border: :box`        | by kind                        |
@@ -577,7 +578,10 @@ labels, frame and legend add to it. A limit of `0,0` means "from the
 data", as if none were given.
 
 `--xscale ln|log2|log10` runs every x through the transform before
-limits and drawing, so the axis reads in the transformed unit:
+limits and drawing, so the axis reads in the transformed unit (1 to
+1000 under `log10` reads 0 to 3, as unicode_plot's axes do).
+`--yscale` does the same to y, for line, scatter, stairs and density
+only:
 
 ```text
 $ tessella chart --xscale log10 --width 30 --height 6 \

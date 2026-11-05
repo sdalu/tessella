@@ -41,7 +41,8 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
    [bit fields](bitfield.md), [timing diagrams](wave.md),
    [sequence diagrams](seq.md).
 5. [Pictures](images.md): images as text.
-6. One-liners: [meters](meter.md), progress bars and gauges;
+6. One-liners: [sparklines](sparkline.md), charts one line high;
+   [meters](meter.md), progress bars and gauges;
    [rules](rule.md), dividers; [text styles](text.md), Unicode's
    styled alphabets.
 7. [Linting](lint.md): checking a figure, drawn or hand-made, for
