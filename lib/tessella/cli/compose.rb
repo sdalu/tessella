@@ -13,6 +13,7 @@ module Tessella
 
         USAGE = <<~TEXT
             Usage: tessella compose frame  [--title T] [--style S] [--pad N] BLOCK
+                   tessella compose shadow [--glyph G] BLOCK
                    tessella compose beside [--gap N] [--align A] BLOCK...
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
                    tessella compose indent --prefix STR BLOCK
@@ -74,7 +75,7 @@ module Tessella
     # The five subcommands: how many blocks each takes, and the call
     # that composes them.
     module ComposeCommands
-        ARITY = { "frame" => 1, "indent" => 1, "caption" => 1,
+        ARITY = { "frame" => 1, "indent" => 1, "caption" => 1, "shadow" => 1,
                   "beside" => 2.., "stack" => 2.. }.freeze
 
         def self.fetch(sub)
@@ -111,6 +112,10 @@ module Tessella
 
         def self.indent_call(blocks, o)
             Compose.indent(blocks.first, prefix: o[:prefix], ascii: o[:ascii])
+        end
+
+        def self.shadow_call(blocks, o)
+            Compose.shadow(blocks.first, glyph: o[:glyph], ascii: o[:ascii])
         end
 
         def self.caption_call(blocks, o)

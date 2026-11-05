@@ -176,7 +176,10 @@ align:)` sets figures side by side (align `:top`, `:middle`,
 `:bottom`); `stack(*figs, gap:, rule:, center:)` sets them one under
 another; `indent(fig, prefix:)` prefixes every line (an empty line
 gets the prefix without its trailing blank); `caption(fig, text:,
-above:)` adds a centred line. Each takes `ascii: true`, which draws
+above:)` adds a centred line; `shadow(fig, glyph:)` adds a drop
+shadow, `░` (`#` under `ascii: true`) one column right of every row
+but the first and a bottom bar one row down reaching that column --
+the geometry `tessella lint` checks. Each takes `ascii: true`, which draws
 ASCII glyphs and refuses non-ASCII content, and returns a `Block`
 (`lines`, `width`, `height`, `to_s`).
 
@@ -448,6 +451,7 @@ tessella compose beside  [--gap N] [--align A] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
+tessella compose shadow  [--glyph G] BLOCK
 ```
 
 Each BLOCK is a file, or `-` for stdin (once). `--style` takes a

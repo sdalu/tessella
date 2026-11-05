@@ -34,7 +34,7 @@ module Tessella
         FLAGS = {
             "frame" => %i[title style pad], "beside" => %i[gap align],
             "stack" => %i[gap rule center], "indent" => %i[prefix],
-            "caption" => %i[text above]
+            "caption" => %i[text above], "shadow" => %i[glyph]
         }.freeze
         REQUIRED = { "indent" => :prefix, "caption" => :text }.freeze
 
@@ -107,8 +107,12 @@ module Tessella
             end
         end
 
-        def add_text
-            @parser.on("--text T", "the caption") { |t| @opts[:text] = t }
+        def add_text = @parser.on("--text T", "caption") { @opts[:text] = it }
+
+        def add_glyph
+            @parser.on("--glyph G", "shadow glyph (░; # with --ascii)") do |g|
+                @opts[:glyph] = g
+            end
         end
 
         def add_above

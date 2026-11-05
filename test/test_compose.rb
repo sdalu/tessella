@@ -242,3 +242,28 @@ class TestStackGap < Minitest::Test
                      Tessella.stack("a", "b", gap: 1, rule: "=").lines)
     end
 end
+
+# shadow: ░ one column right of every row but the first, and a bottom
+# bar from one column in to the shadow column -- the geometry the lint
+# checks, so a shadowed frame lints clean.
+class TestShadow < Minitest::Test
+    def test_the_shadow_hangs_right_and_below
+        assert_equal(["┌──┐", "│ab│░", "└──┘░", " ░░░░"],
+                     Tessella.shadow(Tessella.frame("ab", pad: 0)).lines)
+    end
+
+    def test_a_shadowed_frame_lints_clean
+        fig = Tessella.shadow(Tessella.frame("ab\ncd", title: "t"))
+        assert_predicate(Tessella.lint(fig.to_s), :clean?)
+    end
+
+    def test_ascii_and_a_glyph_of_ones_own
+        assert_equal("+-+\n|x|#\n+-+#\n ###\n",
+                     Tessella.shadow("+-+\n|x|\n+-+", ascii: true).to_s)
+        assert_includes(Tessella.shadow("ab\ncd", glyph: "▒").to_s, "▒")
+        assert_raises(ArgumentError) { Tessella.shadow("ab", glyph: "░░") }
+        assert_raises(ArgumentError) do
+            Tessella.shadow("ab", glyph: "░", ascii: true)
+        end
+    end
+end
