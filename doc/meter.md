@@ -7,12 +7,14 @@ status report, a column of them in a dashboard.
 ```ruby
 Tessella.meter(fraction, style: :block, width: 20, title: nil,
                title_width: nil, label: true, brackets: true,
+               orientation: :horizontal, height: 8,
                ascii: false)                                # => Block
 ```
 
 ```text
 tessella meter [--style S] [--width N] [--title T] [--title-width N]
-               [--no-label] [--no-brackets] [--ascii] FRACTION
+               [--no-label] [--no-brackets] [--ascii]
+               [--orientation horizontal|vertical] [--height N] FRACTION
 ```
 
 `FRACTION` is a number from 0 to 1, or a percentage, `45%`.
@@ -72,6 +74,81 @@ $ tessella meter --style '▰▱' 0.33
 ```text
 $ tessella meter --style '■░' 0.5
 tessella meter: meter style "■░" mixes width classes: A, N
+```
+
+## Upright meters
+
+`--orientation vertical` stands the bar up: a column `--height` cells
+tall (8 by default), filled from the bottom, between `─` caps (`-`
+under `--ascii`, none with `--no-brackets`), the title centred above
+and the percentage below. The block style tops its column with an
+eighth, `▁` to `▇`. An upright meter takes `--height`, not
+`--width`, and the other way round across; either one in the wrong
+orientation is a usage error.
+
+```text
+$ tessella meter --orientation vertical --height 6 --title cpu 0.62
+cpu
+ ─
+ ·
+ ·
+ ▆
+ █
+ █
+ █
+ ─
+62 %
+```
+
+Upright meters stand side by side with `compose beside`, their
+bottoms aligned. `gauges.sh` draws one per line of `disks.txt`:
+
+```sh
+#!/bin/sh
+# examples/gauges.sh -- upright meters side by side, one per line of
+# "name fraction", bottoms aligned: a row of gauges.
+# usage: sh gauges.sh [file]   (default disks.txt)
+set -eu
+
+cd -- "$(dirname -- "$0")" || exit 1
+input=${1:-disks.txt}
+
+tmpdir=
+cleanup() { [ -z "$tmpdir" ] || rm -rf -- "$tmpdir"; }
+trap cleanup EXIT INT HUP TERM
+tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/gauges.XXXXXX") || exit 1
+
+n=0
+while read -r name fraction; do
+    case $name in
+        '' | '#'*) continue ;;
+    esac
+    n=$((n + 1))
+    tessella meter --orientation vertical --height 6 --title "$name" \
+        -- "$fraction" > "$tmpdir/$n"
+done < "$input"
+
+set --
+i=1
+while [ "$i" -le "$n" ]; do
+    set -- "$@" "$tmpdir/$i"
+    i=$((i + 1))
+done
+tessella compose beside --gap 3 --align bottom "$@"
+```
+
+```text
+$ sh gauges.sh
+ /     /home   /var   /tmp
+ ─       ─      ─      ─
+ ·       ▂      ·      ·
+ ·       █      ·      ·
+ ▆       █      ·      ·
+ █       █      ·      ·
+ █       █      ▇      ·
+ █       █      █      ▂
+ ─       ─      ─      ─
+62 %   87 %    31 %   4 %
 ```
 
 ## ASCII

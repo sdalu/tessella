@@ -38,6 +38,7 @@ from any directory. `tessella` must be on `PATH`:
 | `rfc.sh`     | an RFC-style figure: seq and bitfield, ASCII, indented   |
 | `status.sh`  | exit 1 (bad data) told apart from exit 2 (bad call)      |
 | `disks.sh`   | one meter per input line, titles aligned, framed         |
+| `gauges.sh`  | upright meters side by side, one per input line          |
 | `dashboard.sh` | a chart, a table, meters, a sparkline in a framed grid |
 
 All are shown with their output in

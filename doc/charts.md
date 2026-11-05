@@ -158,6 +158,24 @@ $ tessella chart --area --ascii --width 30 --height 6 cpu.txt
       0                             60
 ```
 
+`--canvas eighths` fills one bar per character instead, in eighths
+of a cell, `▁` to `█` (`▏` to `█` sideways): coarser across than
+braille, finer up. It is for areas only (`--canvas eighths` without
+`--area` is a usage error) and takes no `--threshold`.
+
+```text
+$ tessella chart --area --canvas eighths --width 30 --height 6 cpu.txt
+      ┌──────────────────────────────┐
+   90 │   ▅▇█▇▄             ▁▅▇█▇▄   │
+      │ ▂██████▇▁          ▃██████▆  │
+      │▃█████████▂        ▄█████████▁│
+      │███████████▃      ▅███████████│
+      │████████████▅▁  ▁▆████████████│
+    0 │██████████████▆▆██████████████│
+      └──────────────────────────────┘
+      0                             60
+```
+
 With `--ylim` the floor moves up, so the variation fills the height:
 
 ```text
@@ -331,6 +349,12 @@ Each series has a fill of its own, from twelve: `█ ▓ ▒ ░ ╳ ╱ ╲ ∴
 ◆ ·`, or `# = + @ * : . o % & ~ x` under `--ascii`. So a chart holds
 at most 12 series; a 13th is refused. Only a `█` series ends in an
 eighth. Bars of several series need values of 0 or more.
+
+Under `--color`, where two stacked series meet inside a cell, that
+cell is split to the eighth: an eighths glyph in the first series'
+colour on the second's as background, so the boundary falls exactly
+where the values put it. Without colour the cell keeps the plain
+glyph of one series.
 
 ```text
 $ tessella chart --kind bar --stacked --ascii --width 30 hosts.csv
@@ -849,6 +873,7 @@ each holding a few pixels. `--canvas` picks it:
 | `braille` | 2 × 4           | braille patterns (default)   |
 | `block`   | 2 × 2           | quadrant blocks `▘▝▀▖▌▞▛…` (also named `quadrant`) |
 | `half`    | 1 × 2           | half blocks `▀ ▄ █`          |
+| `eighths` | 1 × 8           | `▁`…`█`, for `--area` only   |
 | `dot`     | 1 × 2           | `'` `.` `:`                  |
 | `ascii`   | 3 × 3           | ASCII strokes `- \| / \ "`…  |
 | `density` | 1 × 2           | shades by hit count          |

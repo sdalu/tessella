@@ -101,7 +101,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--ylabel S`           | a label left of the y axis             |                 |
 | `--xlim A,B`           | x limits                               | from the data   |
 | `--ylim A,B`           | y limits                               | from the data   |
-| `--canvas C`           | `braille block quadrant half dot ascii density` | `braille` |
+| `--canvas C`           | `braille block quadrant half eighths dot ascii density` | `braille` |
 | `--xscale F`           | `ln log2 log10`                        |                 |
 | `--yscale F`           | plotted kinds: `ln log2 log10`         |                 |
 | `--xdate [FMT]`        | plotted kinds: x as ISO 8601 dates     | format by span  |
