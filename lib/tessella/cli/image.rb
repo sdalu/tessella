@@ -78,12 +78,49 @@ module Tessella
         end
     end
 
+    # `tessella image`'s numeric options, kept apart so Options stays
+    # under budget.
+    class ImageCLI
+        module NumericOptions
+            private
+
+            def add_width
+                @parser.on("--width N", Integer, "columns (default 78)") do |n|
+                    @opts[:width] = n
+                end
+            end
+
+            def add_gamma
+                @parser.on("--gamma F", Float,
+                           "tone curve (default 1.0)") do |f|
+                    @opts[:gamma] = f
+                end
+            end
+
+            def add_threshold
+                @parser.on("--threshold F", Float,
+                           "on/off cut, 0..1 (default 0.5)") do |f|
+                    @opts[:threshold] = f
+                end
+            end
+
+            def add_edge_threshold
+                @parser.on("--edge-threshold F", Float,
+                           "edge strength to draw (default 0.3)") do |f|
+                    @opts[:edge_threshold] = f
+                end
+            end
+        end
+    end
+
     # Parses argv into Tessella.image's options plus :max_width and
     # the one file argument, or nil for stdin. Raises Halt for
     # --help, or lets OptionParser::ParseError escape for a bad flag,
     # missing argument, or disallowed --style/--dither value.
     class ImageCLI
         class Options
+            include NumericOptions
+
             STYLES = %w[ramp blocks half quadrant sextant braille edges]
                      .freeze
             DITHERS = %w[none fs atkinson bayer].freeze
@@ -134,45 +171,47 @@ module Tessella
             end
 
             def add_style
-                @parser.on("--style S", STYLES) { |s| @opts[:style] = s.to_sym }
+                @parser.on("--style S", STYLES,
+                           "ramp, blocks, half, quadrant,",
+                           "sextant, braille or edges") do |s|
+                    @opts[:style] = s.to_sym
+                end
             end
 
             def add_dither
-                @parser.on("--dither M", DITHERS) do |m|
+                @parser.on("--dither M", DITHERS, "none, fs (Floyd-Steinberg),",
+                           "atkinson or bayer") do |m|
                     @opts[:dither] = m.to_sym
                 end
             end
 
-            def add_width
-                @parser.on("--width N", Integer) { @opts[:width] = it }
-            end
-
-            def add_gamma
-                @parser.on("--gamma F", Float) { @opts[:gamma] = it }
-            end
-
-            def add_threshold
-                @parser.on("--threshold F", Float) { @opts[:threshold] = it }
-            end
-
-            def add_edge_threshold
-                @parser.on("--edge-threshold F", Float) do |f|
-                    @opts[:edge_threshold] = f
+            def add_ramp
+                @parser.on("--ramp STR", "tone glyphs, light to dense") do |r|
+                    @opts[:ramp] = r
                 end
             end
 
-            def add_ramp = @parser.on("--ramp STR") { @opts[:ramp] = it }
+            def add_invert
+                @parser.on("--invert", "for a light background") do
+                    @opts[:invert] = true
+                end
+            end
 
-            def add_invert = @parser.on("--invert") { @opts[:invert] = true }
-
-            def add_ascii = @parser.on("--ascii") { @opts[:ascii] = true }
+            def add_ascii
+                @parser.on("--ascii", "ASCII only (ramp style, ASCII ramp)") do
+                    @opts[:ascii] = true
+                end
+            end
 
             def add_max_width
-                @parser.on("--max-width N", Integer) { @opts[:max_width] = it }
+                @parser.on("--max-width N", Integer,
+                           "refuse lines wider than N") do |n|
+                    @opts[:max_width] = n
+                end
             end
 
             def add_help
-                @parser.on("--help") do
+                @parser.on("--help", "print this help") do
                     raise ImageCLI::Halt.new(0, @parser.to_s)
                 end
             end

@@ -8,6 +8,8 @@ module Tessella
     class ComposeCLI
         class UsageError < StandardError; end
         class DataError < StandardError; end
+        # Raised by a subcommand's --help, carrying its text.
+        class Help < StandardError; end
 
         USAGE = <<~TEXT
             Usage: tessella compose frame  [--title T] [--style S] [--pad N] BLOCK
@@ -23,10 +25,19 @@ module Tessella
 
             stdout.print(draw(argv.dup, stdin))
             0
+        rescue Help => e
+            stdout.print(e.message)
+            0
         rescue UsageError, OptionParser::ParseError => e
             fail_with(stderr, e.message, 2)
         rescue DataError => e
             fail_with(stderr, e.message, 1)
+        end
+
+        # A subcommand's own line out of USAGE.
+        def self.usage_line(sub)
+            line = USAGE.lines.find { it.include?("compose #{sub} ") }
+            "Usage: #{line.strip.delete_prefix("Usage: ")}"
         end
 
         def self.help(stdout)
