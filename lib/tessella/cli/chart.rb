@@ -168,7 +168,8 @@ module Tessella
                 @parser.on("--orientation O", %w[horizontal vertical]) do |v|
                     @opts[:orientation] = v.to_sym
                 end
-                @parser.on("--blocks B", %w[eighths braille block]) do |v|
+                blocks = %w[eighths braille block quadrant]
+                @parser.on("--blocks B", blocks) do |v|
                     @opts[:blocks] = v.to_sym
                 end
             end

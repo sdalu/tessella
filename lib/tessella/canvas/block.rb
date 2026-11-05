@@ -34,5 +34,7 @@ module Tessella
         end
 
         register(:block, Block)
+        # The image module's name for the same 2x2 quadrant glyphs.
+        register(:quadrant, Block)
     end
 end

@@ -8,7 +8,7 @@ module Tessella
     # vertical), block two. Values must be zero or more. Kept apart
     # from Bar so Bar's own class body stays under budget.
     module BarLayouts
-        BLOCKS = %i[eighths braille block].freeze
+        BLOCKS = %i[eighths braille block quadrant].freeze
         ORIENTATIONS = %i[horizontal vertical].freeze
 
         private

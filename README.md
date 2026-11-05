@@ -113,10 +113,12 @@ the glyph the bars are built of: `:eighths` (the default; `▁` to `█`
 up a column, one column per character), `:braille` (one dot column
 per bar, so two columns per character, 4 steps per cell; or, kept
 horizontal, four bars per text row, each row named by the bars it
-holds) or `:block` (two per character, 2 steps). Both need values of
+holds) or `:block`, also named `:quadrant` (the 2x2 quadrant glyphs,
+as `canvas: :quadrant` for an area fill: two per character, 2
+steps). Both need values of
 0 or more; `:braille` and `:block` refuse `ascii: true`, `fill:`,
 `eighths:` and `track:`. On the command line: `--orientation
-horizontal|vertical` and `--blocks eighths|braille|block`.
+horizontal|vertical` and `--blocks eighths|braille|block|quadrant`.
 
 ```text
 $ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
@@ -357,7 +359,8 @@ $ tessella chart --kind bar --ascii --width 30 langs.csv
 Common to every kind: `--kind
 line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
-`--xlim A,B`, `--ylim A,B`, `--canvas braille|block|dot|ascii|density`,
+`--xlim A,B`, `--ylim A,B`,
+`--canvas braille|block|quadrant|dot|ascii|density`,
 `--ascii`, `--color`, `--xscale ln|log2|log10`.
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);

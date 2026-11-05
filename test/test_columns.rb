@@ -39,6 +39,19 @@ class TestColumns < Minitest::Test
         assert_equal(["▛"], body(chart))
     end
 
+    def test_quadrant_is_the_block_glyphs_by_their_image_name
+        cols = lambda do |blocks|
+            body(Tessella.bar(%w[a b], [2, 1], blocks: blocks, height: 1,
+                                               orientation: :vertical,
+                                               width: 1))
+        end
+        assert_equal(["▙"], cols.call(:quadrant))
+        assert_equal(cols.call(:block), cols.call(:quadrant))
+        line = Tessella.line([1, 2], area: true, canvas: :quadrant)
+        assert_equal(Tessella.line([1, 2], area: true, canvas: :block).to_s,
+                     line.to_s)
+    end
+
     def test_a_vertical_histogram_names_its_axis_ends_and_frequency
         out = Tessella.histogram([1, 2, 2, 3, 3, 3], bins: 3,
                                                      orientation: :vertical,
