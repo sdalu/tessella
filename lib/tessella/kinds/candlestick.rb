@@ -1,15 +1,39 @@
 # frozen_string_literal: true
 
 module Tessella
+    # The x labels under a candlestick chart: the first and last x, as
+    # dates when x holds times (xdate: or the span's format, as on a date
+    # axis). Kept apart so Candlestick stays under budget.
+    module CandleLabels
+        private
+
+        def x_label(value)
+            return Axis.label(value) unless DateAxis.time?(value)
+
+            Time.at(DateAxis.seconds(value)).utc.strftime(x_format)
+        end
+
+        def x_format
+            return @opts[:xdate] if @opts[:xdate].is_a?(String)
+
+            seconds = @x.map { DateAxis.seconds(it) }
+            span = seconds.max - seconds.min
+            DateAxis::SPANS.find { |least, _| span >= least }.last
+        end
+    end
+
     # Candlesticks (DESIGN.md, "Chart and kinds"): an open/high/low/
-    # close series, a column a candle (a blank column between candles
-    # when the width allows). The wick │ runs from low to high; the body
-    # from open to close is █ for an up candle (close at or above open),
-    # ▒ for a down one, ─ when open and close share a row; under
-    # color: true up is green and down red. The value axis is on the
-    # left; under the frame, the first and last x -- dates when x holds
-    # times, as on a date axis.
+    # close series spread over width: (40 by default), each candle as
+    # wide as its share of the width allows, a blank column between
+    # candles -- a column each and no gap when they do not fit. The
+    # wick │ runs from low to high in the candle's middle column; the
+    # body from open to close fills the candle: █ for an up candle
+    # (close at or above open), ▒ for a down one, ─ when open and close
+    # share a row; under color: true up is green and down red. The
+    # value axis is on the left, the first and last x under the frame.
     class Candlestick < Chart
+        include CandleLabels
+
         OPTIONS = (Chart::OPTIONS - %i[canvas xscale xlim] +
                    %i[xdate]).freeze
         PRICES = %i[open high low close].freeze
@@ -68,15 +92,29 @@ module Tessella
 
         def gap = (2 * @candles.size) - 1 <= width ? 1 : 0
 
+        # Columns a candle: its share of the width, less the gap.
+        def candle_width
+            [((width + gap) / @candles.size) - gap, 1].max
+        end
+
         def body
             lo, hi = limits
             rows = Array.new(height) { [] }
             @candles.each_with_index do |candle, i|
                 rows.each { it << Cell.blank } if i.positive? && gap == 1
                 column = candle_column(candle, lo, hi)
-                rows.each_with_index { |row, r| row << column[r] }
+                rows.each_with_index { |row, r| row.concat(widen(column[r])) }
             end
             rows
+        end
+
+        # A cell across the candle's width: a body fills it, a wick
+        # stays one column, in the middle.
+        def widen(cell)
+            cw = candle_width
+            return Array.new(cw) { cell } unless cell.char == glyphs[:wick]
+
+            Array.new(cw) { it == (cw - 1) / 2 ? cell : Cell.blank }
         end
 
         def candle_column(candle, lo, hi)
@@ -115,21 +153,6 @@ module Tessella
               ylabel: @opts[:ylabel],
               left: { 0 => Axis.tick(hi), (height - 1) => Axis.tick(lo) },
               bottom: [x_label(@x.first), x_label(@x.last)] }
-        end
-
-        def x_label(value)
-            return Axis.label(value) unless DateAxis.time?(value)
-
-            Time.at(DateAxis.seconds(value)).utc.strftime(x_format)
-        end
-
-        # xdate:'s format, or the one a date axis picks for the span.
-        def x_format
-            return @opts[:xdate] if @opts[:xdate].is_a?(String)
-
-            seconds = @x.map { DateAxis.seconds(it) }
-            span = seconds.max - seconds.min
-            DateAxis::SPANS.find { |least, _| span >= least }.last
         end
     end
 

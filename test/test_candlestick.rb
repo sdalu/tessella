@@ -11,13 +11,13 @@ class TestCandlestick < Minitest::Test
 
     def test_an_up_and_a_down_candle
         out = Tessella.candlestick(open: [1, 3], high: [4, 4], low: [0, 0],
-                                   close: [3, 1], height: 5)
+                                   close: [3, 1], height: 5, width: 3)
         assert_equal(["│ │", "█ ▒", "█ ▒", "█ ▒", "│ │"], body(out))
     end
 
     def test_a_flat_body_and_ascii
         out = Tessella.candlestick(open: [2], high: [4], low: [0], close: [2],
-                                   height: 3, ascii: true)
+                                   height: 3, width: 1, ascii: true)
         assert_equal(%w[| - |], out.to_s.lines[1..-3].map { it[/\|(.)\|/, 1] })
     end
 
@@ -25,10 +25,20 @@ class TestCandlestick < Minitest::Test
         days = [Time.utc(2026, 11, 2), Time.utc(2026, 11, 3)]
         out = Tessella.candlestick(days, open: [1, 3], high: [4, 4],
                                          low: [0, 0], close: [3, 1],
-                                         height: 3, color: true).to_s
+                                         height: 3, width: 3,
+                                         color: true).to_s
         assert_includes(out, "\e[32m")
         assert_includes(out, "\e[31m")
         assert_includes(out.lines.last, "2026-11-02 2026-11-03")
+    end
+
+    # Candles share the width: a body fills its candle, a wick stays in
+    # the middle column.
+    def test_candles_spread_over_the_width
+        out = Tessella.candlestick(open: [1, 3], high: [4, 4], low: [0, 0],
+                                   close: [3, 1], height: 5, width: 7)
+        assert_equal([" │   │ ", "███ ▒▒▒", "███ ▒▒▒", "███ ▒▒▒",
+                      " │   │ "], body(out))
     end
 
     def test_refusals
