@@ -62,7 +62,7 @@ module Tessella
             s = share(v, lo, hi)
             if @color_on
                 color = Color::Gradient.at(colormap, (s * 255).round, 256)
-                return Cell.new(char: "█", color: color)
+                return Cell.new(char: @ascii ? "#" : "█", color: color)
             end
             Cell.new(char: ramp[(s * (ramp.length - 1)).round], color: nil)
         end

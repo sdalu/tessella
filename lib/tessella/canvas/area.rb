@@ -73,7 +73,7 @@ module Tessella
 
                     share = (value - @xlo).fdiv(@xhi - @xlo).clamp(0.0, 1.0)
                     (share * pixel_width).round.times do |px|
-                        set_sub_pixel(px, py, shade_across(color, px))
+                        set_sub_pixel(px, py, shade_across(color, px, py))
                     end
                 end
             end
@@ -93,8 +93,11 @@ module Tessella
                 [hi - step, hi]
             end
 
-            def shade_across(color, px)
+            # A callable of (row, col), as threshold: gives, or of the
+            # one coordinate a gradient runs along.
+            def shade_across(color, px, py)
                 return color unless color.respond_to?(:call)
+                return cell_color(color, px, py) if color.arity == 2
 
                 color.call(px / x_pixel_per_char)
             end
@@ -135,12 +138,13 @@ module Tessella
 
             def fill_column(px, top, color)
                 (top...pixel_height).each do |py|
-                    set_sub_pixel(px, py, shade(color, py))
+                    set_sub_pixel(px, py, shade(color, px, py))
                 end
             end
 
-            def shade(color, py)
+            def shade(color, px, py)
                 return color unless color.respond_to?(:call)
+                return cell_color(color, px, py) if color.arity == 2
 
                 color.call(py / y_pixel_per_char)
             end

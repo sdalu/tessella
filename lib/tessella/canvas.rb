@@ -11,8 +11,10 @@ module Tessella
             return unless x.between?(@xlo, @xhi) && y.between?(@ylo, @yhi)
 
             px, py = to_pixel(x, y).map(&:floor)
-            i = cell_index(clip(px, pixel_width), clip(py, pixel_height))
-            @overlay[i] = Cell.new(char: char, color: color)
+            px = clip(px, pixel_width)
+            py = clip(py, pixel_height)
+            @overlay[cell_index(px, py)] =
+                Cell.new(char: char, color: cell_color(color, px, py))
         end
 
         def annotate(col, row, text, color: nil)
@@ -147,7 +149,7 @@ module Tessella
             i = cell_index(px, py)
             @grid[i] = encode(@grid[i], px % x_pixel_per_char,
                               py % y_pixel_per_char)
-            @colors[i] = color
+            @colors[i] = color unless color.nil?
         end
 
         # Overridden by density.rb, D1.

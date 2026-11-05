@@ -38,8 +38,14 @@ module Tessella
 
         def draw_or_mark(canvas, series)
             super
-            bounds = @errors&.[](@series.index { it.equal?(series) })
+            bounds = @errors&.[](series_index(series))
             draw_errors(canvas, series, bounds) if bounds
+        end
+
+        # The series by its data, not its identity: threshold: draws a
+        # recoloured copy (Series#with keeps the same x and y Arrays).
+        def series_index(series)
+            @series.index { it.x.equal?(series.x) && it.y.equal?(series.y) }
         end
 
         def draw_errors(canvas, series, bounds)
