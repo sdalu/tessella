@@ -52,6 +52,9 @@ lib/ascii_art/version.rb    VERSION, the one place it is written
 lib/ascii_art/error.rb      AsciiArt::Error < StandardError
 lib/ascii_art/check.rb      the argument checks every kind shares
 lib/ascii_art/width.rb      display width: columns a terminal gives text
+lib/ascii_art/borders.rb    border glyph sets: light heavy double rounded ascii
+lib/ascii_art/block.rb      AsciiArt::Block: a finished figure as lines
+lib/ascii_art/compose.rb    frame, beside, stack, indent, caption
 lib/ascii_art/cell.rb       AsciiArt::Cell (Data: char, color), Cell.blank
 lib/ascii_art/stats.rb      binning, percentiles, transforms
 lib/ascii_art/axis.rb       limits, nice rounding, number labels
@@ -62,11 +65,43 @@ lib/ascii_art/frame.rb      border, labels, title, legend, render
 lib/ascii_art/chart.rb      shared options, series, render entry
 lib/ascii_art/kinds/*.rb    one file per kind
 lib/ascii_art/chart_cli.rb  `ascii-art chart`: options, input, one chart
+lib/ascii_art/compose_cli.rb     `ascii-art compose`: subcommands, exits
+lib/ascii_art/compose_options.rb its options, and the block reader
 lib/ascii_art/cli.rb        `ascii-art`: dispatches on the command
 exe/ascii-art               the command line
 tools/bundle.rb             single-file build for vendoring
 test/                       minitest; test/oracle.rb loads unicode_plot
 ```
+
+## Blocks and composition
+
+Every module's result can become an `AsciiArt::Block`: a finished
+figure as lines of text, measured in display columns (`Width`, which
+also skips ANSI colour codes, so a coloured chart composes by what it
+shows). Composition takes any figure -- a Block, a String, a chart --
+through `Block.from`, and returns a Block:
+
+```ruby
+AsciiArt.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
+AsciiArt.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
+AsciiArt.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
+               ascii: false)
+AsciiArt.indent(fig, prefix:, ascii: false)
+AsciiArt.caption(fig, text:, above: false, ascii: false)
+block.lines; block.width; block.height; block.to_s
+block.check_width!(max)     # ArgumentError naming the line and width
+```
+
+A block is never rewritten, only padded on the right, so its own
+alignment survives every composition; stack's `center:` is the one
+shift, of a whole block at once. A block's trailing blank lines are
+dropped, a tab is refused (its width belongs to the viewer), and so
+is an empty block. Border glyphs come from `Borders`, shared with
+every framed figure; under `ascii: true` the set is `ascii` and any
+other style, block or text holding a non-ASCII character is refused
+rather than rewritten. These rules, and the exact output, are the
+ascii-art skill's compose.rb's, which `ascii-art compose` replaces
+byte for byte; its lint pass stays in the skill.
 
 ## Stats and Axis
 

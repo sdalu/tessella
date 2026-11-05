@@ -89,6 +89,28 @@ under `ascii: true` or `eighths: false`:
 `AsciiArt.stem` refuses a scale that is not positive, and a plot
 that would need more than 1000 stems, one line each (raise `scale:`).
 
+### Composing figures
+
+Any figure -- a chart, a String of lines, a `Block` -- composes into
+one, measured in display columns (CJK counts two, colour codes none):
+
+```ruby
+plot = AsciiArt.bar(%w[ruby c], [12, 30], width: 20)
+fig = AsciiArt.frame(plot, title: "Load", style: :rounded)
+puts AsciiArt.beside(fig, AsciiArt.caption("note", text: "n"),
+                     align: :middle)
+```
+
+`frame(fig, title:, style:, pad:)` boxes one figure (style `:light`,
+`:heavy`, `:double`, `:rounded` or `:ascii`); `beside(*figs, gap:,
+align:)` sets figures side by side (align `:top`, `:middle`,
+`:bottom`); `stack(*figs, gap:, rule:, center:)` sets them one under
+another; `indent(fig, prefix:)` prefixes every line (an empty line
+gets the prefix without its trailing blank); `caption(fig, text:,
+above:)` adds a centred line. Each takes `ascii: true`, which draws
+ASCII glyphs and refuses non-ASCII content, and returns a `Block`
+(`lines`, `width`, `height`, `to_s`).
+
 ## The `ascii-art` command
 
 ```text
@@ -96,8 +118,8 @@ ascii-art COMMAND [options] [file]
 ascii-art chart [options] [file]
 ```
 
-The first argument names the command; `ascii-art --help` lists them,
-and `chart` is the one there is. `ascii-art --version` prints the
+The first argument names the command; `ascii-art --help` lists them:
+`chart` and `compose`. `ascii-art --version` prints the
 version. No command, or an unknown one, is a usage error (exit 2).
 
 Reads one file argument or stdin (blank lines and `#` comments
@@ -189,6 +211,28 @@ ASCII from the first byte: `+ - |` for the frame, `#` for bars, and an
 ASCII glyph set for the plotted canvas instead of Unicode braille,
 block or dot cells — no part draws Unicode and lets a later pass
 rewrite it.
+
+### `ascii-art compose`
+
+```text
+ascii-art compose frame   [--title T] [--style S] [--pad N] BLOCK
+ascii-art compose beside  [--gap N] [--align A] BLOCK...
+ascii-art compose stack   [--gap N] [--rule C] [--center] BLOCK...
+ascii-art compose indent  --prefix STR BLOCK
+ascii-art compose caption --text T [--above] BLOCK
+```
+
+Each BLOCK is a file, or `-` for stdin (once). Every subcommand also
+takes `--ascii` and `--max-width N`. Bad input -- a missing file, an
+empty block, a tab, a non-ASCII byte under `--ascii`, output wider
+than `--max-width` -- exits 1 naming the block and line; a usage
+mistake (an unknown style or align, `--style` other than ascii with
+`--ascii`, a wrong number of blocks) exits 2.
+
+```text
+$ ascii-art chart --kind bar --width 20 langs.csv > plot.txt
+$ ascii-art compose frame --title Load plot.txt
+```
 
 ## Relation to unicode_plot
 

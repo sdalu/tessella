@@ -54,8 +54,21 @@ module AsciiArt
             0x2060..0x206F, 0xFE00..0xFE0F, 0xFE20..0xFE2F, 0xFEFF..0xFEFF
         ].freeze
 
+        # An ANSI colour sequence (a chart drawn with color: true) takes
+        # no column.
+        ANSI = /\e\[[0-9;]*m/
+
         def self.of(text)
-            text.to_s.each_char.sum { char(it.ord) }
+            text.to_s.gsub(ANSI, "").each_char.sum { char(it.ord) }
+        end
+
+        def self.pad(count) = " " * [count, 0].max
+        def self.ljust(text, cols) = text + pad(cols - of(text))
+        def self.rjust(text, cols) = pad(cols - of(text)) + text
+
+        def self.center(text, cols)
+            gap = cols - of(text)
+            pad(gap / 2) + text + pad(gap - (gap / 2))
         end
 
         def self.char(code)

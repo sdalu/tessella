@@ -6,7 +6,7 @@ module AsciiArt
     # own options and --help. The command is the first argument, so a
     # module's options never collide with another's.
     class CLI
-        COMMANDS = { "chart" => ChartCLI }.freeze
+        COMMANDS = { "chart" => ChartCLI, "compose" => ComposeCLI }.freeze
 
         USAGE = <<~TEXT
             Usage: ascii-art COMMAND [options] [file]
@@ -14,6 +14,8 @@ module AsciiArt
             Commands:
               chart    line, scatter, stairs, density, bar, histogram,
                        box and stem charts (ascii-art chart --help)
+              compose  frame, beside, stack, indent, caption: assemble
+                       blocks into one figure (ascii-art compose --help)
 
             ascii-art --version prints the version.
         TEXT
