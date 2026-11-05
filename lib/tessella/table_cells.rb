@@ -17,6 +17,11 @@ module Tessella
 
             def self.width(cell_lines) = cell_lines.map { Width.of(it) }.max
 
+            # A title: one line, tabs as blanks.
+            def self.title_text(title)
+                title && Table.sanitize(Compose.text!("title", title, false))
+            end
+
             # A markdown cell: tabs as blanks, a | escaped, as a GFM pipe
             # table needs.
             def self.md_cell(text) = Table.sanitize(text).gsub("|", "\\|")

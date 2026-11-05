@@ -273,7 +273,7 @@ module Tessella
             grid, widths = Fit.apply(grid, widths, room,
                                      fit.fetch(:min_width, MIN_WIDTH))
             head_row, *body = head ? grid : [nil, *grid]
-            layout = Layout.new(widths, aligns, title_text(title))
+            layout = Layout.new(widths, aligns, Cells.title_text(title))
             Block.new(render(g, Cells.header(head_row, fit[:color]), body,
                              layout))
         end
@@ -281,11 +281,9 @@ module Tessella
         def self.markdown(head, body, aligns, title, fit)
             Cells.check_markdown!(head, body, fit)
             widths = compute_widths(head, body, (head || body.first).size)
-            layout = Layout.new(widths, aligns, title_text(title))
+            layout = Layout.new(widths, aligns, Cells.title_text(title))
             Block.new(Markdown.render(head, body, layout))
         end
-
-        def self.title_text(title) = title && sanitize(title)
 
         def self.split(rows, header)
             check_rows!(rows)

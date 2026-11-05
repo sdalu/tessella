@@ -25,16 +25,17 @@ module Tessella
         def self.fill(figure, pattern: nil, ascii: Target.ascii?, halo: true)
             block, = blocks([figure], ascii)
             glyphs = pattern_glyphs!(pattern, ascii)
-            grid = cell_grid(block)
-            Block.new(paint(grid, haloed(grid, enclosed(grid), halo), glyphs))
+            grid, codes = cell_grid(block)
+            inside = haloed(grid, enclosed(grid), halo)
+            Block.new(paint(grid, codes, inside, glyphs))
         end
 
         # The background a frame adds to a block it has just framed.
         def self.fill_frame(framed, pattern, ascii, halo)
             glyphs = pattern_glyphs!(pattern, ascii)
-            grid = cell_grid(framed)
+            grid, codes = cell_grid(framed)
             region = flood(grid, inner_ring(grid))
-            Block.new(paint(grid, haloed(grid, region, halo), glyphs))
+            Block.new(paint(grid, codes, haloed(grid, region, halo), glyphs))
         end
 
         # The blank cells just inside a frame's border.
@@ -66,15 +67,33 @@ module Tessella
             name.to_s
         end
 
+        SGR = /\e\[[0-9;]*m/
+        TOKEN = /(?:#{SGR})*(?:\X|\z)/o
+
         # The block as rows of one-column cells, a wide glyph (a grapheme
         # cluster, an emoji sequence or an accented letter whole) and an
-        # empty tail cell after it, every row the block's width.
+        # empty tail cell after it, every row the block's width; and
+        # the colour codes before each cell ({ [r, c] => codes }, a
+        # row's trailing ones at [r, :end]), set aside so a coloured
+        # block is measured and filled by what it shows.
         def self.cell_grid(block)
-            block.lines.map do |line|
-                cells = line.each_grapheme_cluster.flat_map do |g|
-                    [g, *Array.new([Width.cluster(g) - 1, 0].max, "")]
-                end
+            codes = {}
+            grid = block.lines.each_with_index.map do |line, r|
+                cells = row_cells(line, r, codes)
                 cells + Array.new(block.width - cells.size, " ")
+            end
+            [grid, codes]
+        end
+
+        def self.row_cells(line, r, codes)
+            line.scan(TOKEN).each_with_object([]) do |token, cells|
+                lead = token[/\A(?:#{SGR})*/o]
+                glyph = token.delete_prefix(lead)
+                next codes[[r, :end]] = lead if glyph.empty?
+
+                codes[[r, cells.size]] = lead unless lead.empty?
+                cells << glyph
+                cells.concat(Array.new([Width.cluster(glyph) - 1, 0].max, ""))
             end
         end
 
@@ -142,11 +161,13 @@ module Tessella
             cell && !["", " "].include?(cell) && !cell.match?(STRUCTURE)
         end
 
-        def self.paint(grid, inside, glyphs)
+        def self.paint(grid, codes, inside, glyphs)
             grid.each_with_index.map do |row, r|
-                row.each_with_index.map do |cell, c|
-                    inside[[r, c]] ? glyphs[(r + c) % glyphs.size] : cell
-                end.join
+                painted = row.each_with_index.map do |cell, c|
+                    fill = glyphs[(r + c) % glyphs.size]
+                    "#{codes[[r, c]]}#{inside[[r, c]] ? fill : cell}"
+                end
+                painted.join + codes[[r, :end]].to_s
             end
         end
     end

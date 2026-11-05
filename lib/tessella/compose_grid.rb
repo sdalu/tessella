@@ -18,15 +18,17 @@ module Tessella
             o = GRID.merge(layout)
             Check.positive_integer!(o[:columns], "columns")
             rows = blocks(figures, ascii).each_slice(o[:columns]).map do |row|
-                grid_row(row, o)
+                grid_row(row, o, ascii)
             end
-            rows.size == 1 ? rows.first : stack(*rows, gap: o[:row_gap])
+            return rows.first if rows.size == 1
+
+            stack(*rows, gap: o[:row_gap], ascii: ascii)
         end
 
-        def self.grid_row(row, o)
+        def self.grid_row(row, o, ascii)
             return row.first if row.size == 1
 
-            beside(*row, gap: o[:gap], align: o[:align])
+            beside(*row, gap: o[:gap], align: o[:align], ascii: ascii)
         end
     end
 

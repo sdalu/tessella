@@ -33,7 +33,7 @@ module Tessella
                 raise ArgumentError, "#{what} must be one visible column: " \
                                      "#{glyph.inspect}"
             end
-            text!(what, glyph, ascii)
+            structure!(what, glyph, ascii)
         end
     end
 

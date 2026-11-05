@@ -34,7 +34,7 @@ class TestWidth < Minitest::Test
     # when wide, so every row is the block's width.
     def test_the_fill_grid_counts_clusters
         block = Tessella::Compose.frame("👨‍👩‍👧 é")
-        grid = Tessella::Compose.cell_grid(block)
+        grid, = Tessella::Compose.cell_grid(block)
         assert(grid.all? { it.size == block.width })
     end
 

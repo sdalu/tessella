@@ -15,7 +15,7 @@ module Tessella
         def self.blocks(figures, ascii)
             figures.each_with_index.map do |figure, i|
                 block = Block.from(figure)
-                if ascii && !block.ascii?
+                if ascii && !block.ascii? && !Target.text_free?
                     raise ArgumentError,
                           "block #{i + 1} is non-ASCII under ascii: true"
                 end
@@ -23,9 +23,22 @@ module Tessella
             end
         end
 
+        # Text drawn into a figure: one line, and ASCII under ascii:
+        # true -- but under :cjk, where ascii: only means the structure.
         def self.text!(name, text, ascii)
+            if text.to_s.include?("\n")
+                raise ArgumentError, "#{name} must be one line: #{text.inspect}"
+            end
             return text unless ascii && !text.to_s.ascii_only? &&
                                !Target.text_free?
+
+            raise ArgumentError, "#{name} is non-ASCII under ascii: true"
+        end
+
+        # A glyph of the structure (a rule, a shadow, a pattern): ASCII
+        # under ascii: true, whatever the target.
+        def self.structure!(name, glyph, ascii)
+            return glyph unless ascii && !glyph.to_s.ascii_only?
 
             raise ArgumentError, "#{name} is non-ASCII under ascii: true"
         end
@@ -158,7 +171,7 @@ module Tessella
                       "rule must be one character: #{rule.inspect}"
             end
 
-            text!("rule", rule, ascii)
+            structure!("rule", rule, ascii)
         end
 
         def self.centred(block, width)
@@ -173,7 +186,7 @@ module Tessella
         # gap blank rows between blocks, or gap on each side of a rule.
         def self.separator(gap, rule, width)
             rows = [""] * count!("gap", gap)
-            rule ? rows + [rule * width] + rows : rows
+            rule ? rows + [Width.run(rule, width)] + rows : rows
         end
 
         def self.joined(blocks, separator)
