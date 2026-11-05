@@ -20,7 +20,8 @@ Tessella.alphabet(source)  # => "ascii", or "utf-8 <classes>"
 ```text
 tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
               [--web] [--no-wide] [--ascii] [--allow-mixed]
-              [--fences] [--geometry] [--border GLYPHS]... [file ...]
+              [--fences] [--geometry] [--border GLYPHS]...
+              [--target T] [file ...]
 tessella lint --alphabet [file ...]
 ```
 
@@ -151,6 +152,15 @@ wide.txt:2: wide char U+672C 本
 wide.txt:2: wide char U+8A9E 語
 ```
 
+```text
+$ printf '+---+\n|é  |\n+---+\n' | tessella lint --target cjk
+stdin:2: ambiguous U+00E9 é on aligned row (cjk target: 2 columns)
+```
+
+- `--target term|cjk|web`: measure with a [width target](targets.md)'s
+  widths. `web` is `--web`, and lets a glyph followed by U+FE0E pass;
+  `cjk` names an ambiguous glyph that is not box drawing on a row
+  that must line up, since it takes two columns there.
 - `--web`: a page in a browser. Glyphs some web renderers draw as
   emoji, or two cells wide, are flagged.
 - `--ascii`: every non-ASCII glyph is a finding (it implies

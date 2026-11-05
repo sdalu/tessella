@@ -146,7 +146,19 @@ The display width of a string: the columns a terminal gives it, wide
 characters two, combining marks and ANSI escapes none. Every figure
 is measured with it, which is why CJK labels line up.
 `Tessella::Width.class_of(char)` is a character's width class, `:N`,
-`:A` or `:W`; see [glyph sets](glyphs.md).
+`:A` or `:W`; see [glyph sets](glyphs.md). Width counts grapheme
+clusters: an emoji sequence joined by ZWJ, or skin-toned, is one
+glyph, two columns wide.
+
+### Width targets
+
+```ruby
+Tessella.target = :cjk           # :term (default), :cjk or :web
+Tessella::Target.with(:web) { ... }
+```
+
+The target the figures are drawn for, per fiber; see
+[width targets](targets.md).
 
 ### `Tessella::Glyphs`
 

@@ -38,23 +38,25 @@ drawn with it stops lining up there.
 ## The registry
 
 `tessella glyphs` lists every named set the library draws with: its
-kind, its name, its classes, and its glyphs. A kind narrows it to one
-kind:
+kind, its name, its classes, the [width targets](targets.md) it is
+safe for, and its glyphs. Every set suits `term`; a set suits `cjk`
+when it holds no ambiguous glyph, and `web` when it holds no wide or
+emoji-capable one. A kind narrows the list to one kind:
 
 <!-- tessella: allow-mixed -->
 ```text
 $ tessella glyphs border
-border   light              A    ┌┐└┘─│
-border   heavy              A    ┏┓┗┛━┃
-border   double             A    ╔╗╚╝═║
-border   rounded            A    ╭╮╰╯─│
-border   dashed             A    ┌┐└┘┄┆
-border   dashed_fine        A    ┌┐└┘┈┊
-border   heavy_dashed       A    ┏┓┗┛┅┇
-border   heavy_dashed_fine  A    ┏┓┗┛┉┋
-border   double_h           A    ╒╕╘╛═│
-border   double_v           A    ╓╖╙╜─║
-border   ascii              N    ++++-|
+border   light              A    term web      ┌┐└┘─│
+border   heavy              A    term web      ┏┓┗┛━┃
+border   double             A    term web      ╔╗╚╝═║
+border   rounded            A    term web      ╭╮╰╯─│
+border   dashed             A    term web      ┌┐└┘┄┆
+border   dashed_fine        A    term web      ┌┐└┘┈┊
+border   heavy_dashed       A    term web      ┏┓┗┛┅┇
+border   heavy_dashed_fine  A    term web      ┏┓┗┛┉┋
+border   double_h           A    term web      ╒╕╘╛═│
+border   double_v           A    term web      ╓╖╙╜─║
+border   ascii              N    term cjk web  ++++-|
 ```
 
 A kind and a name list one set glyph by glyph, with code points:
@@ -72,25 +74,42 @@ ambiguous. In a CJK terminal its lightest tone is half as wide as the
 others.
 
 From Ruby, `Tessella::Glyphs.fetch(kind, name)` returns a `GlyphSet`
-(`kind`, `name`, `glyphs`, `note`, `classes`, `mixed?`), and
+(`kind`, `name`, `glyphs`, `note`, `classes`, `mixed?`, `targets`),
+`Tessella::Glyphs.targets(glyphs)` the targets any glyphs suit, and
 `Tessella::Glyphs.all` every set. An unknown kind or name raises
 `ArgumentError`, listing the names there are. A name may say `-` for
 `_`.
 
+`--target T` lists only the sets safe for a target, here the meter
+styles a CJK terminal draws as counted:
+
+```text
+$ tessella glyphs --target cjk meter
+meter    arrow              N    term cjk web  ▸▹
+meter    chevron            N    term cjk web  ›
+meter    classic            N    term cjk web  =
+meter    rectangle          N    term cjk web  ▮▯
+meter    wave               N    term cjk web  ~_
+meter    blade              N    term cjk web  ▰▱  (patchy font coverage)
+meter    button             N    term cjk web  ⦿⦾  (patchy font coverage)
+```
+
 ## Checking a set of one's own
 
-`--check GLYPHS` classifies any glyphs: it prints their class, and
-exits 1 when they are mixed, so a build can refuse a glyph set before
-a figure uses it:
+`--check GLYPHS` classifies any glyphs: it prints their class and the
+targets they are safe for, and exits 1 when they are mixed, so a
+build can refuse a glyph set before a figure uses it:
 
 ```text
 $ tessella glyphs --check '┌┐└┘─│'
 A
+safe for: term web
 ```
 
 ```text
 $ tessella glyphs --check '░▒▓█'
 mixed: N A
+safe for: term web
 ```
 
 The [lint](lint.md) measures widths with the same tables, so what

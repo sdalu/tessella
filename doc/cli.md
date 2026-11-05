@@ -1,14 +1,16 @@
 # The `tessella` command
 
 ```text
-tessella COMMAND [options] [file]
+tessella [--target T] COMMAND [options] [file]
 tessella --help
 tessella --version
 ```
 
 The first argument names the command. Each command reads one file,
 or stdin when none is given (`compose` reads several), and prints one
-figure on stdout. Each has its own `--help`.
+figure on stdout. Each has its own `--help`. `--target term|cjk|web`,
+before the command, or `TESSELLA_TARGET` in the environment, draws
+for a [width target](targets.md).
 
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|
@@ -57,7 +59,7 @@ Usage: tessella chart [options] [file]
 ```text
 $ tessella 2>&1 | head -2
 tessella: no command
-Usage: tessella COMMAND [options] [file]
+Usage: tessella [--target T] COMMAND [options] [file]
 ```
 
 ## `--max-width N`

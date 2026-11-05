@@ -49,6 +49,8 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
    what breaks it on someone else's screen.
 8. [Glyph sets](glyphs.md): width classes, the named glyph sets, and
    checking a set of one's own.
+9. [Width targets](targets.md): drawing for a Western terminal, a CJK
+   one, or a browser.
 
 ## Reference
 
