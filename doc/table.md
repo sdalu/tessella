@@ -186,23 +186,26 @@ $ tessella table --ascii --style '****=!+++++' langs.csv
 These two are library options, not command-line flags.
 
 A cell holding `"\n"` draws on several lines within its row,
-top-aligned. `width: N` fits the framed table to N columns: it
-narrows the widest column and word-wraps that column's cells, a word
-too long for the column breaking inside.
+top-aligned. `width: N` fits the framed table to N columns. It
+narrows the widest column one column at a time, then whichever is
+widest by then, so wide columns come down together and a narrow one
+is never cut first. The narrowed columns' cells are word-wrapped, a
+word too long for its column breaking inside.
 
 ```ruby
 # frozen_string_literal: true
 
-# examples/fit.rb: a table fitted to 40 columns; its widest column
-# wraps, and a cell holding a newline keeps its own lines. Fitted to
-# 20, it is refused, naming the width it needs.
+# examples/fit.rb: a table fitted to a width. At 40 columns only the
+# widest column narrows and wraps; at 26 it has come down to the next
+# widest, and both narrow together. A cell holding a newline keeps its
+# own lines. Fitted to 20, the table is refused, naming the width it
+# needs.
 require "tessella"
 
 rows = Tessella::Table.parse(File.read("kinds.csv"))
 rows << ["box", "none", "quartiles\nand whiskers"]
-puts Tessella.table(rows, width: 40)
-begin
-    Tessella.table(rows, width: 20)
+[40, 26, 20].each do |width|
+    puts Tessella.table(rows, width: width)
 rescue ArgumentError => e
     puts e.message
 end
@@ -222,12 +225,41 @@ $ ruby fit.rb
 │ box  │ none    │ quartiles           │
 │      │         │ and whiskers        │
 └──────┴─────────┴─────────────────────┘
-table needs 25 columns at the least (min_width 4)
+┌──────┬────────┬────────┐
+│ kind │ canvas │ notes  │
+├──────┼────────┼────────┤
+│ line │ braill │ joins  │
+│      │ e      │ points │
+│      │        │ , one  │
+│      │        │ series │
+│      │        │ per    │
+│      │        │ column │
+│ bar  │ none   │ negati │
+│      │        │ ve     │
+│      │        │ values │
+│      │        │ split  │
+│      │        │ at     │
+│      │        │ zero   │
+│ stem │ none   │ back-t │
+│      │        │ o-back │
+│      │        │ with   │
+│      │        │ two    │
+│      │        │ column │
+│      │        │ s      │
+│ box  │ none   │ quarti │
+│      │        │ les    │
+│      │        │ and    │
+│      │        │ whiske │
+│      │        │ rs     │
+└──────┴────────┴────────┘
+table needs 22 columns at the least (min_width 4)
 ```
 
-Below `min_width:` columns of text (4 by default) in the narrowed
-column, the table is refused rather than drawn narrower than asked,
-and the message names the width it needs: the last line above.
+No column narrows below `min_width:` (4 by default), or below its
+own width when that is smaller. When every column is at that floor
+and the table is still too wide, it is refused rather than drawn
+wider than asked, and the message names the width it needs: the last
+line above.
 
 The `markdown` style refuses multi-line cells and `width:`: a pipe
 table cannot hold either.
