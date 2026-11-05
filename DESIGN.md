@@ -94,6 +94,8 @@ canvas.lines(xs, ys, color: nil)         # joins consecutive points
 canvas.rows                              # => Array (top row first) of
     # Array of Inkchart::Cell (Data: char, color); char " " is blank
 canvas.annotate(col, row, text, color: nil)  # writes text into cells
+canvas.mark(x, y, char, color: nil)  # char in the cell holding (x, y),
+    # over what the cell draws; outside the limits: nothing
 ```
 
 Colour per cell: the last colour drawn into a cell wins. `:ascii` and
@@ -129,7 +131,8 @@ Inkchart::Color::NAMES            # :red :green :yellow :blue :magenta
 chart = Inkchart.line(x = nil, y, name: nil, **opts)  # also scatter,
                                             #   stairs, density; name:
                                             #   names the first series
-chart.add(x = nil, y, name: nil, color: nil) # another series
+chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another
+                                            #   series
 Inkchart.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
 Inkchart.bar(labels, values, **opts)
@@ -161,7 +164,11 @@ or density does not) -- and may override `default_canvas_type`,
 y = 0 axis lines draw when in range; density's own default is off, as
 unicode_plot's densityplot sets `grid: false` where lineplot and
 scatterplot leave it `true`), or `add` itself, as stairs does to turn
-its points into a step path before the series is stored. Density
+its points into a step path before the series is stored. A series
+added with `mark:` skips `draw_series`: the base writes the glyph with
+`canvas.mark` at each point (stairs stores such a series unstepped),
+so every grid kind marks points the same way, and a mark sits over a
+line in the same chart rather than needing a chart kind of its own. Density
 always draws on the `:density` canvas, ignoring any `canvas:` option,
 and forwards `ascii:` to it as that canvas's own ascii sign set rather
 than switching to the `:ascii` canvas type.

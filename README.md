@@ -33,7 +33,7 @@ require "inkchart"
 
 chart = Inkchart.line(x = nil, y, name: nil, **opts)   # also scatter,
                                              #   stairs, density
-chart.add(x = nil, y, name: nil, color: nil)           # another series
+chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another series
 Inkchart.stairs(x = nil, y, style: :post, **opts)       # or style: :pre
 Inkchart.bar(labels, values, **opts)
 Inkchart.histogram(values, bins: nil, closed: :left, **opts)
@@ -51,6 +51,14 @@ width 40, height 15, canvas `:braille` (`:ascii` when `ascii: true`),
 through a transform (`:ln`, `:log2`, `:log10`; `nil` the identity)
 before limits and drawing. An unknown option, canvas, xscale name, or
 (for stairs) style raises `ArgumentError` naming it.
+
+`mark:` (on `add`, and on `Inkchart.line`, `.scatter`, `.stairs` and
+`.density` for the first series) draws that series as one glyph in
+the cell of each point, over whatever the cell holds, instead of the
+kind's own line or dots: `chart.add(xs, ys, name: "measured", mark:
+"●")` marks measured points on a fitted curve. The glyph is one
+character, ASCII under `ascii: true`; the legend shows it before the
+series' name. Bar, histogram, box and stem take no `mark:`.
 
 Bar and histogram take three more options, all optional: `fill:` the
 bar glyph (`█` by default, `#` under `ascii: true`), `eighths:` draw

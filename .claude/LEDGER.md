@@ -52,6 +52,8 @@ Decisions:
 - 2026-11-05 — standard-library requires (optparse, for the CLI) live in lib/inkchart.rb above the parts, and tools/bundle.rb carries them into the single file; CLI logic in lib/inkchart/cli.rb so the bundled copy holds it — by me
 - 2026-11-05 — Axis.tick for axis extremes (whole Float without .0, as unicode_plot) beside Axis.label for values as given — P1 found limits are always Floats, so label alone printed 10.0 on every axis — by me
 - 2026-11-05 — HISTORY.md dropped: its real history (vendoring rejected, the original ASCII glyph rule, the departures from unicode_plot with reasons, the name) moved to DESIGN.md "Why it is shaped so", which links unicode_plot; the rest restated README and DESIGN — by user
+- 2026-11-05 — first commit, local only: no remote, no tag yet — by user
+- 2026-11-05 — add(mark:) for ClimatControl's measured points: a marked series is drawn as one glyph per point in place of the kind's own drawing (a second add gives line plus marks), one character, ASCII under ascii: true, legend prefixed; grid kinds only; VERSION 0.2.0 — asked by user, design mine
 
 Pieces:
 - P0 [kept: interface judgment, verified] — scaffold the repo (git init, gemspec, Makefile per make, minitest harness, oracle harness) and write the internal interfaces the other pieces share: Canvas (pixel grid → rows), Stats (bins, percentiles, density, scales), Layout (frame, axes, title, legend, colour) — evidence: DESIGN.md; make check 23 files no offences; make tests 3/3; make bundle parses and loads

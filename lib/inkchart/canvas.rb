@@ -1,12 +1,38 @@
 # frozen_string_literal: true
 
 module Inkchart
+    # Glyphs written over a canvas's cells, whatever those cells draw:
+    # text (annotate) and point marks (mark). Kept apart from Canvas so
+    # Canvas's own class body stays under budget.
+    module Overlay
+        # char in the cell holding (x, y), over whatever that cell
+        # draws; outside the limits, nothing.
+        def mark(x, y, char, color: nil)
+            return unless x.between?(@xlo, @xhi) && y.between?(@ylo, @yhi)
+
+            px, py = to_pixel(x, y).map(&:floor)
+            i = cell_index(clip(px, pixel_width), clip(py, pixel_height))
+            @overlay[i] = Cell.new(char: char, color: color)
+        end
+
+        def annotate(col, row, text, color: nil)
+            text.each_char.with_index do |ch, i|
+                next unless (col + i).between?(0, width - 1) &&
+                            row.between?(0, height - 1)
+                @overlay[(row * width) + col + i] =
+                    Cell.new(char: ch, color: color)
+            end
+        end
+    end
+
     # A grid of character cells a chart draws data into: data
     # coordinates map onto pixels, pixel (0, 0) is the bottom-left, and
     # sub-pixels pack into one Cell per character (DESIGN.md, Canvas).
     # Concrete sub-pixel layouts live in canvas/*.rb, each registering
     # itself under its type with Canvas.register.
     class Canvas
+        include Overlay
+
         def self.types = (@types ||= {})
         def self.register(type, klass) = (types[type] = klass)
 
@@ -58,15 +84,6 @@ module Inkchart
         def lines(xs, ys, color: nil)
             (0...(xs.size - 1)).each do |i|
                 line(xs[i], ys[i], xs[i + 1], ys[i + 1], color: color)
-            end
-        end
-
-        def annotate(col, row, text, color: nil)
-            text.each_char.with_index do |ch, i|
-                next unless (col + i).between?(0, width - 1) &&
-                            row.between?(0, height - 1)
-                @overlay[(row * width) + col + i] =
-                    Cell.new(char: ch, color: color)
             end
         end
 

@@ -36,7 +36,10 @@ module Inkchart
             super(**)
         end
 
-        def add(*args, name: nil, color: nil)
+        # A marked series marks the points given, not the step corners.
+        def add(*args, name: nil, color: nil, mark: nil)
+            return super if mark
+
             x, y = args.length == 1 ? [nil, *args] : args
             xs = Array(x || (1..y.length))
             sx, sy = step_coords(xs, Array(y))
@@ -81,29 +84,31 @@ module Inkchart
     end
 
     # (x = nil, y, **opts): a new Line chart with one series.
-    def self.line(*, name: nil, **)
-        add_series(Line.new(**), *, name: name)
+    def self.line(*, name: nil, mark: nil, **)
+        add_series(Line.new(**), *, name: name, mark: mark)
     end
 
     # (x = nil, y, **opts): a new Scatter chart with one series.
-    def self.scatter(*, name: nil, **)
-        add_series(Scatter.new(**), *, name: name)
+    def self.scatter(*, name: nil, mark: nil, **)
+        add_series(Scatter.new(**), *, name: name, mark: mark)
     end
 
     # (x = nil, y, style: :post, **opts): a new Stairs chart, style:
     # :pre or :post.
-    def self.stairs(*, style: :post, name: nil, **)
-        add_series(Stairs.new(style: style, **), *, name: name)
+    def self.stairs(*, style: :post, name: nil, mark: nil, **)
+        add_series(Stairs.new(style: style, **), *, name: name,
+                                                    mark: mark)
     end
 
     # (x = nil, y, **opts): a new Density chart with one series.
-    def self.density(*, name: nil, **)
-        add_series(Density.new(**), *, name: name)
+    def self.density(*, name: nil, mark: nil, **)
+        add_series(Density.new(**), *, name: name, mark: mark)
     end
 
-    # name: names the first series, as add's name: names the others
-    def self.add_series(chart, *, name: nil)
-        chart.add(*, name: name)
+    # name: and mark: apply to the first series, as add's do to the
+    # others
+    def self.add_series(chart, *, name: nil, mark: nil)
+        chart.add(*, name: name, mark: mark)
         chart
     end
     private_class_method :add_series

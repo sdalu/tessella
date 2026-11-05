@@ -1,6 +1,36 @@
 # frozen_string_literal: true
 
 module Inkchart
+    # Marked series (add's mark:): one glyph in the cell of each point,
+    # in place of the kind's own drawing. Kept apart from Chart so
+    # Chart's own class body stays under budget.
+    module Marks
+        private
+
+        def check_mark!(mark)
+            return if mark.nil?
+            unless mark.is_a?(String) && mark.length == 1
+                raise ArgumentError,
+                      "mark must be one character: #{mark.inspect}"
+            end
+            return unless @ascii && !mark.ascii_only?
+
+            raise ArgumentError,
+                  "mark must be ASCII under ascii: true: #{mark.inspect}"
+        end
+
+        def draw_or_mark(canvas, series)
+            return draw_series(canvas, series) unless series.mark
+
+            series.x.zip(series.y).each do |x, y|
+                canvas.mark(x, y, series.mark, color: series.color)
+            end
+        end
+
+        # A marked series shows its glyph before its name.
+        def legend(series) = [series.mark, series.name].compact.join(" ")
+    end
+
     # Shared machinery behind every chart kind (DESIGN.md, "Chart and
     # kinds"): option handling and defaults, series bookkeeping, colour
     # cycling over Color::NAMES, canvas and frame assembly, and
@@ -8,13 +38,15 @@ module Inkchart
     # and may override default_canvas_type, canvas_type, default_border,
     # draw_grid? or add itself (Stairs reshapes its points there).
     class Chart
+        include Marks
+
         DEFAULT_WIDTH = 40
         DEFAULT_HEIGHT = 15
 
         OPTIONS = %i[title xlabel ylabel width height xlim ylim canvas
                      ascii color border xscale].freeze
 
-        Series = Data.define(:x, :y, :name, :color)
+        Series = Data.define(:x, :y, :name, :color, :mark)
 
         def initialize(**opts)
             check_options!(opts)
@@ -27,11 +59,14 @@ module Inkchart
             @next_color = 0
         end
 
-        def add(*args, name: nil, color: nil)
+        # mark: a one-character glyph drawn in the cell of each point,
+        # instead of the kind's own drawing of the series.
+        def add(*args, name: nil, color: nil, mark: nil)
+            check_mark!(mark)
             x, y = args.length == 1 ? [nil, *args] : args
             xs = Array(x || (1..y.length)).map(&@xscale)
             @series << Series.new(x: xs, y: Array(y), name: name,
-                                  color: color || auto_color)
+                                  color: color || auto_color, mark: mark)
             self
         end
 
@@ -79,7 +114,7 @@ module Inkchart
                      **canvas_extra }
             canvas = Canvas.build(canvas_type, **opts)
             draw_axes(canvas, xl, yl)
-            @series.each { draw_series(canvas, it) }
+            @series.each { draw_or_mark(canvas, it) }
             canvas
         end
 
@@ -112,7 +147,7 @@ module Inkchart
 
         def right_labels
             named = @series.reject { |s| s.name.to_s.empty? }
-            named.each_with_index.to_h { |s, i| [i, s.name.to_s] }
+            named.each_with_index.to_h { |s, i| [i, legend(s)] }
         end
     end
 end
