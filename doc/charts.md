@@ -2,7 +2,7 @@
 
 A chart turns numbers into a framed figure: a plot area of character
 cells, the y extremes on its left, the x extremes under it, a title
-above and a legend on the right. There are nine kinds:
+above and a legend on the right. There are ten kinds:
 
 | Kind        | Draws                                      | Input           |
 |-------------|--------------------------------------------|-----------------|
@@ -15,6 +15,7 @@ above and a legend on the right. There are nine kinds:
 | `box`       | a box-and-whisker plot per sample set      | sets of samples |
 | `stem`      | a stem-and-leaf plot, as text              | values          |
 | `heatmap`   | a matrix as a grid of shaded cells         | rows of values  |
+| `candlestick` | open, high, low, close per x, as candles | x, four prices  |
 
 Every example on this page is the command's output, byte for byte;
 the input files are in [examples/](../examples/), and every command
@@ -66,6 +67,7 @@ What each kind reads:
 | `box`                                 | one or more columns, one box per column                         |
 | `stem`                                | one column; two for the back-to-back form                       |
 | `heatmap`                             | a label, then the row's values; a header names the columns      |
+| `candlestick`                         | x, open, high, low, close                                       |
 
 ## The kinds
 
@@ -496,6 +498,70 @@ Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
                  colormap: nil, min: nil, max: nil, **opts)
 ```
 
+### candlestick
+
+A candlestick chart draws, per x, the range a price moved in (the
+wick, `│`, from low to high) and where it opened and closed (the
+body). An up candle, closing at or above its open, is `█`; a down
+one `▒`; one that closes where it opened, `─`. Under `--color` up is
+green and down red. `ohlc.txt` is a week of prices, x as ISO dates:
+
+```text
+$ cat ohlc.txt
+date open high low close
+2026-11-02 100 104 98 103
+2026-11-03 103 107 101 102
+2026-11-04 102 103 95 96
+2026-11-05 96 99 94 98
+2026-11-06 98 105 97 104
+2026-11-09 104 106 102 104
+```
+
+```text
+$ tessella chart --kind candlestick --xdate --width 30 --height 8 ohlc.txt
+       ┌─────────────────────────────┐
+   110 │                             │
+       │      │                   │  │
+       │████ ▒▒▒▒  │        ████ ────│
+       │████ ▒▒▒▒ ▒▒▒▒      ████  │  │
+       │████      ▒▒▒▒ ████ ████     │
+       │          ▒▒▒▒ ████  │       │
+       │                │            │
+    90 │                             │
+       └─────────────────────────────┘
+       2026-11-02           2026-11-09
+```
+
+The candles share the width, each as wide as its share allows with a
+blank column between (one column each and no gap when they do not
+fit), the wick in the middle column. The first and last x go under
+the frame, as dates with `--xdate` (formatted as on a
+[date axis](#dates-on-the-x-axis)). Under `--ascii` an up candle is
+`#`, a down one `=`:
+
+```text
+$ tessella chart --kind candlestick --xdate --ascii \
+    --width 30 --height 8 ohlc.txt
+       +-----------------------------+
+   110 |                             |
+       |      |                   |  |
+       |#### ====  |        #### ----|
+       |#### ==== ====      ####  |  |
+       |####      ==== #### ####     |
+       |          ==== ####  |       |
+       |                |            |
+    90 |                             |
+       +-----------------------------+
+       2026-11-02           2026-11-09
+```
+
+A low above the open or the close, or a high below them, is refused.
+In Ruby:
+
+```ruby
+Tessella.candlestick(x, open:, high:, low:, close:, **opts)
+```
+
 ## Orientation
 
 `--orientation horizontal|vertical` (`orientation:`) is the direction
@@ -741,6 +807,8 @@ whitespace to a text tool.
 | `--yscale F`        | `yscale: :f`          | none (plotted kinds only)      |
 | `--xdate [FMT]`     | `xdate: "FMT"`        | by span (plotted kinds only)   |
 | `--yerr`            | `yerr: [...]`         | none (line, scatter)           |
+| `--threshold N`     | `threshold: n`        | none (line, scatter, stairs)   |
+| `--above C`, `--below C` | `above:`, `below:` | red; the series' colour      |
 | `--ascii`           | `ascii: true`         | off                            |
 | `--color`           | `color: true`         | off                            |
 | (none)              | `border: :box`        | by kind                        |
@@ -948,6 +1016,31 @@ bar:
 Tessella.scatter([1, 2, 3], [2, 3, 5], yerr: [[0.5, 0.2, 1], [1, 0.4, 0.5]],
                  mark: "●", width: 20, height: 6)
 ```
+
+## Thresholds
+
+`--threshold N` (line, scatter, stairs) draws a dashed rule at N
+across the plot, readable without colour, and the value axis takes N
+in. Under `--color` the cells beyond it take `--above C` (red by
+default) and the rest `--below C` (the series' own colour unless
+given), each in any [colour form](#colour). Sideways the rule runs
+down the plot.
+
+```text
+$ tessella chart --threshold 70 --width 30 --height 6 cpu.txt
+      ┌──────────────────────────────┐
+   90 │  ⢀⡔⠉⠉⠑⣄             ⢀⠖⠉⠉⠑⣄   │
+      │⠄⢄⠎⠄⠄⠄⠄⠌⢧⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢤⠏⠄⠄⠄⠄⠌⢆⠄⠤│
+      │⢠⠋       ⢣         ⣰⠃      ⠈⢦ │
+      │⠈        ⠈⢧       ⢠⠃        ⠈⢇│
+      │           ⢣⡀    ⡰⠃          ⠈│
+   10 │            ⠱⢄⣀⣀⠜⠁            │
+      └──────────────────────────────┘
+      0                             60
+```
+
+On the braille canvas the rule is the row of single dots, `⠄`, at 70.
+In Ruby: `threshold: 70, above: :red, below: :green`.
 
 ## Several series, and marks
 

@@ -38,6 +38,7 @@ from any directory. `tessella` must be on `PATH`:
 | `rfc.sh`     | an RFC-style figure: seq and bitfield, ASCII, indented   |
 | `status.sh`  | exit 1 (bad data) told apart from exit 2 (bad call)      |
 | `disks.sh`   | one meter per input line, titles aligned, framed         |
+| `dashboard.sh` | a chart, a table, meters, a sparkline in a framed grid |
 
 All are shown with their output in
 [doc/cli.md](../doc/cli.md#scripts).
@@ -51,6 +52,7 @@ All are shown with their output in
 | `cpu.txt`      | `chart --area`          | 60 load samples between 10 and 90             |
 | `temps.txt`    | `chart --xdate`         | a month of daily temperatures, ISO dates      |
 | `dose.txt`     | `chart --yerr`          | x, y and an error per point                   |
+| `ohlc.txt`     | `chart --kind candlestick` | a week of open/high/low/close prices       |
 | `growth.txt`   | `chart --xscale`        | x over four decades                           |
 | `hosts.csv`    | `chart --kind bar`      | three series per label, for grouped/stacked   |
 | `week.txt`     | `chart --kind heatmap`  | a load per day and per three hours            |

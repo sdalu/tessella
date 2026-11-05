@@ -12,8 +12,8 @@ figure on stdout. Each has its own `--help`.
 
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|
-| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem, heatmap | [charts](charts.md) |
-| `compose`  | frame, beside, stack, indent, caption, shadow, fill | [composition](composition.md)  |
+| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem, heatmap, candlestick | [charts](charts.md) |
+| `compose`  | frame, beside, stack, grid, indent, caption, shadow, fill | [composition](composition.md)  |
 | `tree`     | an indented outline as a tree              | [tree](tree.md)                |
 | `table`    | CSV or TSV rows as a table                 | [table](table.md)              |
 | `bitfield` | an RFC-style packet or register layout     | [bitfield](bitfield.md)        |
@@ -79,7 +79,8 @@ tessella seq: output is 41 columns, over --max-width 30
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
                [--canvas C] [--xscale F] [--yscale F] [--xdate [FMT]]
-               [--yerr] [--ascii] [--color]
+               [--yerr] [--threshold N] [--above C] [--below C]
+               [--ascii] [--color]
                [--style post|pre] [--stacked]
                [--orientation horizontal|vertical]
                [--area] [--gradient C,C,...] [--blocks B]
@@ -91,7 +92,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 
 | Option                 | Takes                                  | Default         |
 |------------------------|----------------------------------------|-----------------|
-| `--kind K`             | `line scatter stairs density bar histogram box stem heatmap` | `line` |
+| `--kind K`             | `line scatter stairs density bar histogram box stem heatmap candlestick` | `line` |
 | `--width N`            | plot area width, cells                 | 40              |
 | `--height N`           | plot area height, cells                | 15              |
 | `--title S`            | a title above the frame                |                 |
@@ -104,6 +105,8 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--yscale F`           | plotted kinds: `ln log2 log10`         |                 |
 | `--xdate [FMT]`        | plotted kinds: x as ISO 8601 dates     | format by span  |
 | `--yerr`               | line, scatter: third column is the error | off           |
+| `--threshold N`        | line, scatter, stairs: a dashed rule at N | none          |
+| `--above C`, `--below C` | with --color: colours beyond and short of N | red; series |
 | `--ascii`              | ASCII only                             | off             |
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
@@ -122,7 +125,8 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--no-eighths`         | bar, histogram: whole cells only       |                 |
 | `--track G`            | bar, histogram: track glyph, or `none` | `·` (`.`)       |
 
-The input format, column by kind, is in
+`tessella chart --help` lists the kinds with the columns each reads,
+and describes every option. The input format, column by kind, is in
 [charts](charts.md#the-input-format).
 
 ## `tessella compose`
@@ -136,6 +140,8 @@ tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
 tessella compose fill    [--pattern P] [--halo H] BLOCK
+tessella compose grid    [--columns N] [--gap N] [--row-gap N] [--align A]
+                         BLOCK...
 ```
 
 All take `--ascii` and `--max-width N`. A BLOCK is a file, or `-` for

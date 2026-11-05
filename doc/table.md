@@ -17,8 +17,11 @@ tessella table [--tsv] [--no-header] [--style S] [--ascii]
 
 ## Input
 
-`rows` is an Array of Arrays of Strings, the first row the header
-unless `header: false`. `Table.parse` reads CSV with RFC 4180 quoting
+`rows` is an Array of Arrays of Strings or numbers, the first row the
+header unless `header: false`. A number is drawn as written (`12`,
+`7.5`), and a column of them right-aligns; any other value is refused
+by its position: "row 2, column 1: a cell must be a String or a
+number: nil". `Table.parse` reads CSV with RFC 4180 quoting
 (a quoted field may hold commas, doubled quotes and newlines), or
 tab-separated text with `tsv: true`. The command line reads CSV by
 default and TSV with `--tsv`.

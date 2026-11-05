@@ -162,6 +162,8 @@ Usage: tessella compose frame  [--title T] [--style S] [--pad N]
                               [--fill P] [--halo H] BLOCK
        tessella compose shadow [--glyph G] BLOCK
        tessella compose fill   [--pattern P] [--halo H] BLOCK
+       tessella compose grid   [--columns N] [--gap N] [--row-gap N]
+                              [--align A] BLOCK...
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK
@@ -191,6 +193,65 @@ $ tessella compose beside --gap 3 --align middle plot.txt note.txt
       c ┤████████████████ 30     c is the bulk
    rust ┤████············ 7.5
         └                    ┘
+```
+
+## grid
+
+```ruby
+Tessella.grid(fig, fig, ..., columns: 2, gap: 2, row_gap: 1,
+              align: :top, ascii: false)
+```
+
+Lays figures out in rows of `columns:`, each row side by side and
+the rows stacked, every column as wide as its widest figure: a
+dashboard of charts, tables, meters and sparklines. A short last row
+stays short. `gap:` is the blank columns between figures in a row,
+`row_gap:` the blank rows between rows, and `align:` places a shorter
+figure in its row, as `beside` does.
+
+```sh
+#!/bin/sh
+# examples/dashboard.sh -- a dashboard: a chart, a table, meters and a
+# sparkline, each drawn to a file and laid out two to a row by
+# `compose grid`, then framed.
+# usage: sh dashboard.sh
+set -eu
+
+cd -- "$(dirname -- "$0")" || exit 1
+
+tmpdir=
+cleanup() { [ -z "$tmpdir" ] || rm -rf -- "$tmpdir"; }
+trap cleanup EXIT INT HUP TERM
+tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dashboard.XXXXXX") || exit 1
+
+tessella chart --kind bar --width 16 langs.csv > "$tmpdir/1"
+tessella table --style rounded langs.csv > "$tmpdir/2"
+{
+    tessella meter --width 12 --title cpu --title-width 4 0.62
+    tessella meter --width 12 --title disk --title-width 4 0.87
+} > "$tmpdir/3"
+tessella sparkline --width 20 < cpu.txt |
+    tessella compose caption --text 'cpu, last hour' - > "$tmpdir/4"
+tessella compose grid --columns 2 --gap 3 --align middle \
+    "$tmpdir/1" "$tmpdir/2" "$tmpdir/3" "$tmpdir/4" |
+    tessella compose frame --title status -
+```
+
+```text
+$ sh dashboard.sh
+┌──────────────────── status ─────────────────────┐
+│                              ╭──────┬─────╮     │
+│         ┌                ┐   │ lang │ loc │     │
+│    ruby ┤████▊······· 12     ├──────┼─────┤     │
+│       c ┤████████████ 30     │ ruby │  12 │     │
+│    rust ┤███········· 7.5    │ c    │  30 │     │
+│         └                ┘   │ rust │ 7.5 │     │
+│                              ╰──────┴─────╯     │
+│                                                 │
+│ cpu  [███████▌····] 62 %   ▅▇██▇▆▄▃▂▁▁▃▄▆▇██▇▅▄ │
+│ disk [██████████▌·] 87 %                        │
+│                               cpu, last hour    │
+└─────────────────────────────────────────────────┘
 ```
 
 ## stack
@@ -477,6 +538,8 @@ tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
 tessella compose fill    [--pattern P] [--halo H] BLOCK
+tessella compose grid    [--columns N] [--gap N] [--row-gap N] [--align A]
+                         BLOCK...
 ```
 
 `--halo` is `sides`, `around` or `none`; `--no-halo` is `none`.
@@ -506,11 +569,13 @@ other than `ascii` with `--ascii`, the wrong number of blocks.
 
 ```text
 $ tessella compose beside plot.txt
-tessella compose: beside takes at least two BLOCKs
+tessella compose: beside takes at least 2 BLOCKs
 Usage: tessella compose frame  [--title T] [--style S] [--pad N]
                               [--fill P] [--halo H] BLOCK
        tessella compose shadow [--glyph G] BLOCK
        tessella compose fill   [--pattern P] [--halo H] BLOCK
+       tessella compose grid   [--columns N] [--gap N] [--row-gap N]
+                              [--align A] BLOCK...
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK

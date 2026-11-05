@@ -23,6 +23,7 @@ Tessella.box(names, samples, **opts)     # samples: Array of Arrays
 Tessella.stem(values, other = nil, scale: nil, **opts)
 Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
                  colormap: nil, min: nil, max: nil, **opts)
+Tessella.candlestick(x, open:, high:, low:, close:, **opts)
 
 chart.add(x = nil, y, name: nil, color: nil, mark: nil)  # => chart
 chart.to_s                  # => String, framed, "\n"-terminated
@@ -42,6 +43,8 @@ Tessella.frame(fig, title: nil, style: nil, pad: 1, fill: nil,
 Tessella.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
 Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
                ascii: false)
+Tessella.grid(fig, fig, ..., columns: 2, gap: 2, row_gap: 1,
+              align: :top, ascii: false)
 Tessella.indent(fig, prefix:, ascii: false)
 Tessella.caption(fig, text:, above: false, ascii: false)
 Tessella.shadow(fig, glyph: nil, ascii: false)
