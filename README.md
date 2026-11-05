@@ -171,6 +171,29 @@ On the command line, a bar row with more than two columns is a label
 and a value a series, named by the header; `--stacked` stacks them,
 and a row of another width is bad input (exit 1).
 
+`Tessella.heatmap(matrix, xlabels:, ylabels:)` draws a matrix as a
+grid of cells, each `cell_width:` columns wide (2 by default, near
+square in a terminal), shaded by value along ` ░▒▓█` (` .:-=+*#%@`
+in ASCII), or, under `color: true`, as `█` coloured along a colormap
+-- a viridis-like blend by default, or `colormap:` stops as any
+gradient takes. Row names go on the left, column names under the
+frame when each is narrower than a cell, and a key on the right gives
+the range; `min:` and `max:` fix it, so maps drawn apart share one
+scale. The matrix sets the size, so `width:` and `height:` are
+refused. On the command line, `--kind heatmap` reads a row a label
+then its values, a header naming the columns, with `--cell-width N`,
+`--colormap C,C,...`, `--min A` and `--max B`.
+
+```text
+$ printf 'host mon tue wed thu\nalpha 1 3 5 2\nbeta 4 6 8 9\n' |
+  tessella chart --kind heatmap --cell-width 4
+         ┌────────────────┐
+   alpha │    ░░░░▒▒▒▒░░░░│ █ 9
+    beta │▒▒▒▒▓▓▓▓████████│   1
+         └────────────────┘
+          mon tue wed thu
+```
+
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
 each box stands three columns wide, whiskers running up and down
 (`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
@@ -525,7 +548,8 @@ $ tessella chart --kind bar --ascii --width 30 langs.csv
 ### Options
 
 Common to every kind: `--kind
-line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
+line|scatter|stairs|density|bar|histogram|box|stem|heatmap` (default
+`line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
 `--canvas braille|block|quadrant|half|dot|ascii|density`,

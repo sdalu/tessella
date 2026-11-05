@@ -12,6 +12,7 @@ require "optparse"
 require_relative "../tessella"
 
 require_relative "cli/chart"
+require_relative "cli/chart_heatmap"
 require_relative "cli/compose"
 require_relative "cli/compose_options"
 require_relative "cli/tree"

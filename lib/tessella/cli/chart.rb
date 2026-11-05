@@ -80,14 +80,34 @@ module Tessella
         end
     end
 
+    # The heatmap's flags, kept apart so Options stays under budget.
+    class ChartCLI
+        module HeatmapFlags
+            private
+
+            def add_heatmap
+                @parser.on("--cell-width N", Integer) do |n|
+                    @opts[:cell_width] = n
+                end
+                @parser.on("--colormap C,C", Array) do |v|
+                    @opts[:colormap] = v.map { Color.parse(it) }
+                end
+                @parser.on("--min A") { @opts[:min] = num(it) }
+                @parser.on("--max B") { @opts[:max] = num(it) }
+            end
+        end
+    end
+
     # Parses argv into the options CLI.run acts on: :kind plus every
     # key ChartOpts and KindOptions know about. Raises Halt for
     # --help/--version, or lets OptionParser::ParseError escape for a
     # bad flag, missing argument, or disallowed value.
     class ChartCLI
         class Options
+            include HeatmapFlags
+
             KINDS = %w[line scatter stairs density bar histogram box
-                       stem].freeze
+                       stem heatmap].freeze
 
             def self.parse(argv)
                 new.parse(argv)
@@ -176,6 +196,7 @@ module Tessella
             end
 
             def add_bar_specific
+                add_heatmap
                 add_layout
                 @parser.on("--stacked") { @opts[:stacked] = true }
                 @parser.on("--fill G") { |v| @opts[:fill] = v }
@@ -274,6 +295,7 @@ module Tessella
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
                 box: %i[orientation],
+                heatmap: %i[cell_width colormap min max],
                 stem: %i[scale]
             }.freeze
 
@@ -293,7 +315,8 @@ module Tessella
                      closed: "--closed", fill: "--fill", area: "--area",
                      gradient: "--gradient", orientation: "--orientation",
                      blocks: "--blocks", yscale: "--yscale",
-                     stacked: "--stacked",
+                     stacked: "--stacked", cell_width: "--cell-width",
+                     colormap: "--colormap", min: "--min", max: "--max",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
             def self.check!(opts)
@@ -369,6 +392,7 @@ module Tessella
                 return BarKind.build(kind, opts, rows) if
                     BARLIKE.include?(kind)
                 return BoxKind.build(opts, rows) if kind == :box
+                return HeatKind.build(opts, rows) if kind == :heatmap
 
                 StemKind.build(opts, rows)
             end
