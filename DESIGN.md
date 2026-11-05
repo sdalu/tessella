@@ -398,8 +398,9 @@ take is left to the chart's own ArgumentError, so the library and the
 command line refuse the same values with the same message.
 
 A number keeps its kind (12 stays an Integer, 7.5 a Float), so values
-print as given; histogram ignores any column after the first, and box
-names its boxes by the header or 1..n.
+print as given; histogram ignores any column after the first, bar
+refuses a row past label and value rather than drop its other
+columns unseen, and box names its boxes by the header or 1..n.
 
 For line, scatter, stairs and density, a header names every series:
 the `Tessella.<kind>` call names the first (its `name:`), and

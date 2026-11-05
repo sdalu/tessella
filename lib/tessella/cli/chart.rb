@@ -397,9 +397,18 @@ module Tessella
             end
 
             def self.bar(opts, data)
+                check_two_columns!(data)
                 labels = data.map { it[0] }
                 values = Columns.numeric(data, 1, "value")
                 Tessella.bar(labels, values, **ChartOpts.for(opts))
+            end
+
+            # A column past the value would be dropped unseen: refused.
+            def self.check_two_columns!(data)
+                i = data.index { it.size > 2 } or return
+
+                raise DataError, "row #{i + 1} has #{data[i].size} columns: " \
+                                 "bar takes label and value"
             end
 
             def self.histogram(opts, data)

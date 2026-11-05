@@ -259,7 +259,8 @@ splits on commas, one holding a tab on tabs, and any other line on
 runs of spaces, so a CSV or tab-separated label may hold spaces.
 Columns by kind: line/scatter/stairs/density take one column of y
 (against 1..n), two columns of x y, or more columns as x and one
-series per further column; bar takes label and value; histogram takes
+series per further column; bar takes label and value, and refuses a
+row with a third column (bad input, exit 1); histogram takes
 one column of samples; box takes one or more columns, one box per
 column; stem takes one column, or two for the back-to-back form. A
 first row that is not all numbers (for bar, a first row whose value

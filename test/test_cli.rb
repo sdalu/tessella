@@ -150,6 +150,12 @@ class TestCLIErrors < Minitest::Test
         assert_match(/value/, err)
     end
 
+    def test_bar_refuses_a_row_past_label_and_value
+        status, _out, err = run_cli(["--kind", "bar"], "x sin cos\n1 2 3\n")
+        assert_equal(1, status)
+        assert_match(/row 1 has 3 columns: bar takes label and value/, err)
+    end
+
     def test_help_exits_0_and_prints_usage
         status, out, = run_cli(["--help"])
         assert_equal(0, status)
