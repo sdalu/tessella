@@ -10,7 +10,8 @@ module Tessella
             "chart" => ChartCLI, "compose" => ComposeCLI, "tree" => TreeCLI,
             "table" => TableCLI, "bitfield" => BitfieldCLI, "wave" => WaveCLI,
             "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI,
-            "glyphs" => GlyphsCLI, "meter" => MeterCLI, "rule" => RuleCLI
+            "glyphs" => GlyphsCLI, "meter" => MeterCLI, "rule" => RuleCLI,
+            "text" => TextCLI
         }.freeze
 
         USAGE = <<~TEXT
@@ -32,6 +33,8 @@ module Tessella
               glyphs    the named glyph sets and their width classes
               meter     a one-line progress bar or gauge
               rule      a divider line, with an optional ornament
+              text      text in a Unicode style: bold, script, small
+                        caps, circled, fullwidth, ...
 
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.

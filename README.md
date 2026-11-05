@@ -340,6 +340,38 @@ divider: a line in a rule style (`light ─`, `heavy ━`, `double ═`,
 ───────────`. On the command line: `tessella rule [--width N]
 [--ornament T] [--style S] [--ascii]`.
 
+### Text styles
+
+```ruby
+Tessella.text("Hello", style: :double_struck)   # => "ℍ𝕖𝕝𝕝𝕠"
+Tessella.text("ℍ𝕖𝕝𝕝𝕠", style: :plain)          # => "Hello"
+```
+
+Letters and digits in a Unicode style: `bold`, `italic`,
+`bold-italic`, `script`, `bold-script`, `fraktur`, `bold-fraktur`,
+`double-struck`, `sans`, `sans-bold`, `sans-italic`,
+`sans-bold-italic`, `monospace`, `small-caps`, `superscript`,
+`subscript`, `circled`, `negative-circled`, `parenthesized`,
+`squared`, `negative-squared`, `fullwidth`; `:plain` turns any of
+them back. The forms come from Unicode's own data, the gaps in the
+mathematical alphabets filled from Letterlike Symbols (`ℎ`, `ℬ`,
+`ℂ`, ...). A character a style has no form for -- digits outside
+bold, double-struck, sans, sans-bold and monospace, a small-cap `x`,
+most subscript letters -- passes through unchanged; `strict: true`
+refuses the text instead, naming them. Capitals keep their case in
+small caps; squared and the negative styles have capitals only.
+Every style is non-ASCII (`ascii: true` refuses it), and `fullwidth`
+is two columns a glyph. These are for a decorative line, not
+documentation prose: screen readers and search see other letters.
+
+```text
+tessella text --style S [--strict] [TEXT ...]   (stdin if none)
+tessella text --plain [TEXT ...]
+```
+
+A letter or digit with no form is named on stderr; under `--strict`
+the command prints nothing and exits 1.
+
 ### Glyph sets
 
 ```ruby

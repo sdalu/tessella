@@ -61,6 +61,8 @@ lib/tessella/width.rb      display width: columns a terminal gives text
 lib/tessella/width_class.rb width classes N, A, W (Unicode 15.1)
 lib/tessella/glyphs.rb     the named glyph sets and their classes
 lib/tessella/meter.rb      a one-line meter (progress bar, gauge)
+lib/tessella/rule.rb       a divider line
+lib/tessella/text.rb       text styles; text_forms.rb: their tables
 lib/tessella/borders.rb    border glyph sets: light heavy double rounded ascii
 lib/tessella/block.rb      Tessella::Block: a finished figure as lines
 lib/tessella/compose.rb    frame, beside, stack, indent, caption
@@ -278,6 +280,19 @@ terminal and the label after it drifts. It doubles as the gauge
 other libraries have: a gauge is a meter with a title.
 `Tessella.rule` (`rule.rb`) is a divider in a registry rule style,
 an ornament centred by display width.
+
+## Text styles
+
+`Tessella.text` (`text.rb`) maps characters through tables in
+`text_forms.rb`, generated from Unicode 16's names and decomposition
+tags (`<font>`, `<super>`, `<sub>`, `<circle>`, `<square>`, `<wide>`),
+never by code point offset: the Mathematical Alphanumeric block has
+reserved holes (italic h, script B E F H I L M R e g o, fraktur C H I
+R Z, double-struck C H N P Q R Z) whose letters live in Letterlike
+Symbols, and an offset table would emit the reserved code points.
+The ordinal indicators `ª º` share `<super>` with `ᵃ ᵒ` and are left
+out. `:plain` is every table reversed, so it undoes exactly what the
+library produces.
 
 ## Stats and Axis
 
