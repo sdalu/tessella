@@ -393,3 +393,65 @@ class TestTableCLI < Minitest::Test
                      out)
     end
 end
+
+# Multi-line cells, fitting a width, colour in cells (climat's Render
+# needs): a cell's "\n" draws on several lines, the row top-aligned;
+# width: narrows the widest column and wraps it, refusing below
+# min_width; colour is zero width and survives padding and wrapping.
+class TestTableCells < Minitest::Test
+    ROWS = [%w[zone devices], ["living", "thermostat\nvalve"],
+            ["bed", "one two three four five"]].freeze
+
+    def lines(rows = ROWS, **)
+        Tessella.table(rows, **).to_s.lines(chomp: true)
+    end
+
+    def test_a_multi_line_cell_draws_on_several_lines_top_aligned
+        assert_equal(["│ living │ thermostat              │",
+                      "│        │ valve                   │"], lines[3, 2])
+    end
+
+    def test_width_narrows_the_widest_column_and_wraps_it
+        out = lines(width: 20)
+        assert(out.all? { Tessella::Width.of(it) <= 20 }, out.join("\n"))
+        assert_equal(20, Tessella::Width.of(out.first))
+        assert_includes(out, "│ bed    │ one two │")
+    end
+
+    def test_a_word_longer_than_the_column_breaks_inside
+        out = lines([%w[k v], %w[a abcdefghijkl]], width: 13)
+        assert_equal(["│ a │ abcde │", "│   │ fghij │", "│   │ kl    │"],
+                     out[3, 3])
+    end
+
+    def test_too_narrow_a_width_is_refused_naming_the_least
+        error = assert_raises(ArgumentError) { lines(width: 10) }
+        assert_includes(error.message, "needs 17 columns")
+    end
+
+    def test_colour_is_zero_width_and_reopened_across_a_wrap
+        red = "\e[31mred text here\e[0m"
+        out = lines([%w[k v], ["a", red]], width: 14)
+        assert_equal(["│ a │ \e[31mred\e[0m    │", "│   │ \e[31mtext\e[0m   │",
+                      "│   │ \e[31mhere\e[0m   │"], out[3, 3])
+        assert(out.all? { Tessella::Width.of(it) == 14 })
+    end
+
+    def test_color_makes_the_header_bold
+        assert_includes(lines(color: true)[1], "\e[1mzone\e[0m")
+        refute_includes(lines[1], "\e[")
+    end
+
+    def test_align_takes_symbols
+        out = lines([%w[a b], %w[1 2]], align: %i[right center])
+        assert_equal(lines([%w[a b], %w[1 2]], align: "rc"), out)
+        assert_raises(ArgumentError) { lines(align: %i[left sideways]) }
+    end
+
+    def test_markdown_refuses_multi_line_cells_and_width
+        assert_raises(ArgumentError) { lines(style: :markdown) }
+        assert_raises(ArgumentError) do
+            lines([%w[a b]], style: :markdown, width: 10)
+        end
+    end
+end

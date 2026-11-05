@@ -132,6 +132,13 @@ rule:
 - **Table's own CSV reader.** In Ruby 3.4 `csv` is a bundled gem, not
   standard library, so a dependency; `Table.parse` is a short RFC 4180
   reader instead, held to `CSV.parse`'s records by test.
+- **Tables past the script.** Beyond the port, a table takes
+  multi-line cells, fits a width by narrowing only its widest column
+  (wrapping its cells, refusing below `min_width:` rather than
+  returning something narrower than asked), and keeps ANSI colour in
+  cells, closing and reopening it across a wrap so every line stands
+  alone: what climat's tables need to move off tty-table. The script
+  printed a newline in a CSV field raw, breaking the frame.
 - **Bitfield is ASCII by genre.** RFC 2360 diagrams are ASCII; there
   is no Unicode path to keep in step.
 

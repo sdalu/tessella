@@ -70,9 +70,19 @@ module Tessella
                 Array.new(ncols) { |i| auto_align(body, i) }
             end
 
+            # "lrc" letters, or an Array of :left / :right / :center.
             def self.parse_align(align)
+                return align.map { align_symbol(it) } if align.is_a?(Array)
+
                 check_chars!(align)
                 align.chars.map { |c| Table::ALIGN_LETTERS.fetch(c.downcase) }
+            end
+
+            def self.align_symbol(name)
+                sym = name.to_s.to_sym
+                return sym if Table::ALIGN_LETTERS.value?(sym)
+
+                raise ArgumentError, "unknown align: #{name.inspect}"
             end
 
             def self.check_chars!(align)
@@ -95,9 +105,11 @@ module Tessella
                 end
             end
 
+            # One row of cells (each an Array of lines) as padded output
+            # lines, each an Array of padded cells.
             def self.build_row(row, widths, aligns)
-                row.each_index.map do |i|
-                    pad_cell(Table.sanitize(row[i]), widths[i], aligns[i])
+                Cells.rows_of(row).map do |line|
+                    line.zip(widths, aligns).map { |c, w, a| pad_cell(c, w, a) }
                 end
             end
 
@@ -123,12 +135,12 @@ module Tessella
                             widths)]
             end
 
-            def self.header_lines(g, header_cells, widths)
-                return [] unless header_cells
+            def self.header_lines(g, header_lines, widths)
+                return [] unless header_lines
 
-                [content_row(g[:cl], g[:cs], g[:cr], header_cells),
-                 border_row(g[:sep_l], g[:sep_h], g[:sep_t], g[:sep_r],
-                            widths)]
+                header_lines.map { content_row(g[:cl], g[:cs], g[:cr], it) } +
+                    [border_row(g[:sep_l], g[:sep_h], g[:sep_t], g[:sep_r],
+                                widths)]
             end
 
             def self.top_border(g, title, widths)
@@ -141,9 +153,9 @@ module Tessella
                 border_row(g[:bl], g[:h], g[:bot_t], g[:br], widths)
             end
 
-            def self.body_lines(g, body_cells)
-                body_cells.map do |row|
-                    content_row(g[:cl], g[:cs], g[:cr], row)
+            def self.body_lines(g, body_rows)
+                body_rows.flatten(1).map do |line|
+                    content_row(g[:cl], g[:cs], g[:cr], line)
                 end
             end
 
@@ -205,6 +217,7 @@ module Tessella
 
         ALIGN_LETTERS = { "l" => :left, "r" => :right, "c" => :center }
                         .freeze
+        MIN_WIDTH = 4
         STYLE_NAMES = (Glyphs::TEES.keys + %i[minimal markdown]).freeze
 
         # The three things a render needs beyond the header and body
@@ -216,17 +229,39 @@ module Tessella
 
         # rows: Array of Arrays of String; the first is the header
         # unless header: false. Raises ArgumentError naming a ragged
-        # row, an empty table, an align: of the wrong length, or an
-        # unknown style.
+        # row, an empty table, an align: of the wrong length, an
+        # unknown style, a table that cannot fit width:, or (markdown)
+        # a multi-line cell or a width:.
         # rubocop:disable-next Metrics/ParameterLists
-        def self.build(rows, header:, style:, ascii:, align:, title:)
+        def self.build(rows, header:, style:, ascii:, align:, title:, **fit)
             head, body = split(rows, header)
             ncols = (head || body.first).size
             check_align_length!(align, ncols)
             aligns = Detect.resolve_aligns(body, align, ncols)
-            widths = compute_widths(head, body, ncols)
+            style = resolve_style!(style, ascii)
+            return markdown(head, body, aligns, title, fit) if
+                style == :markdown
+
+            framed(style, Cells.grid([head, *body].compact), head, aligns,
+                   title, fit)
+        end
+
+        # rubocop:disable-next Metrics/ParameterLists
+        def self.framed(style, grid, head, aligns, title, fit)
+            widths = Cells.column_widths(grid)
+            grid, widths = Fit.apply(grid, widths, fit[:width],
+                                     fit.fetch(:min_width, MIN_WIDTH))
+            head_row, *body = head ? grid : [nil, *grid]
             layout = Layout.new(widths, aligns, title_text(title))
-            Block.new(render(resolve_style!(style, ascii), head, body, layout))
+            Block.new(render(style, Cells.header(head_row, fit[:color]), body,
+                             layout))
+        end
+
+        def self.markdown(head, body, aligns, title, fit)
+            Cells.check_markdown!(head, body, fit)
+            widths = compute_widths(head, body, (head || body.first).size)
+            layout = Layout.new(widths, aligns, title_text(title))
+            Block.new(Markdown.render(head, body, layout))
         end
 
         def self.title_text(title) = title && sanitize(title)
@@ -283,8 +318,6 @@ module Tessella
         end
 
         def self.render(style, head, body, layout)
-            return Markdown.render(head, body, layout) if style == :markdown
-
             widths = layout.widths
             aligns = layout.aligns
             g = Glyphs.fetch(style)
@@ -422,10 +455,15 @@ module Tessella
         end
     end
 
+    # width: fits the framed table to that many columns by narrowing
+    # its widest column (wrapping its cells), refusing below min_width
+    # columns of text; color: true makes the header bold.
     # rubocop:disable-next Metrics/ParameterLists
     def self.table(rows, header: true, style: nil, ascii: false, align: nil,
-                   title: nil)
+                   title: nil, width: nil, min_width: Table::MIN_WIDTH,
+                   color: false)
         Table.build(rows, header: header, style: style, ascii: ascii,
-                          align: align, title: title)
+                          align: align, title: title, width: width,
+                          min_width: min_width, color: color)
     end
 end

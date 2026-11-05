@@ -122,7 +122,8 @@ chart:
 ```ruby
 Tessella.tree(outline, style: nil, ascii: false, root: nil)
 Tessella.table(rows, header: true, style: nil, ascii: false,
-               align: nil, title: nil)
+               align: nil, title: nil, width: nil, min_width: 4,
+               color: false)
 Tessella::Table.parse(text, tsv: false)          # CSV/TSV -> rows
 Tessella.bitfield(fields, word: 32, octets: false, ruler: true,
                   abbrev: false)
@@ -139,8 +140,17 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   false`; styles `:light`, `:heavy`, `:double`, `:rounded`, `:ascii`,
   `:minimal` (dividers only) and `:markdown` (a GitHub pipe table). A
   column of numbers right-aligns; `align:` ("lrc", one letter per
-  column) overrides. `Table.parse` reads CSV (RFC 4180 quoting) or,
-  with `tsv: true`, tab-separated text.
+  column) overrides; it also takes an Array of `:left`, `:right`,
+  `:center`. `Table.parse` reads CSV (RFC 4180 quoting) or, with `tsv:
+  true`, tab-separated text. A cell holding `"\n"` draws on several
+  lines within its row, top-aligned. `width: N` fits the framed table
+  to N columns by narrowing its widest column and word-wrapping that
+  column's cells (a word too long breaks inside); below `min_width:`
+  columns of text (4 by default) it is refused, naming the width it
+  needs. ANSI colour in a cell takes no column and survives padding and
+  wrapping, closed and reopened on each wrapped line; `color: true`
+  sets the header in bold. Markdown refuses multi-line cells and
+  `width:`.
 - **bitfield**: `name:bits` lines or `[name, bits]` pairs, drawn as
   RFC 2360 draws them, always in ASCII: a bit ruler, `+-+` ticks, each
   name centred in its cell, a field longer than its row continued on
