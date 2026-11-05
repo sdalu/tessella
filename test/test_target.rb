@@ -65,4 +65,23 @@ class TestTarget < Minitest::Test
         assert_equal(2, status)
         assert_includes(err, "unknown target")
     end
+
+    def cjk_unicode_figures
+        T.with(:cjk) do
+            [Tessella::Compose.frame("é abc\n名前", title: "tï", ascii: false),
+             Tessella.table([%w[名前 é], %w[ab 2]], ascii: false, title: "x"),
+             Tessella.table([%w[a bc], [1, 2]], ascii: false, style: :double)]
+        end
+    end
+
+    # Under cjk a Unicode box glyph takes two columns: frames and
+    # tables asked for in Unicode keep every line one width there.
+    def test_cjk_frames_and_tables_in_unicode_close
+        cjk_unicode_figures.each do |figure|
+            widths = T.with(:cjk) do
+                figure.to_s.lines.map { Tessella::Width.of(it.chomp) }
+            end
+            assert_equal(1, widths.uniq.size, figure.to_s)
+        end
+    end
 end

@@ -563,8 +563,11 @@ ones (CJK, emoji) two, an emoji sequence joined by ZWJ or skin-toned
 two. `:cjk` is a CJK-configured terminal, where ambiguous glyphs take
 two: every module's `ascii:` then defaults to `true`, so the
 structure is ASCII, while text stays as given (CJK labels, `é`) and
-is measured with ambiguous glyphs as two; `ascii: false` still asks
-for Unicode structure, which will not line up there. `:web` is a
+is measured with ambiguous glyphs as two. `ascii: false` still asks
+for Unicode structure: a frame (`Compose.frame`) and a table then
+keep every inner width a whole number of border glyphs, so they close
+in a CJK terminal (and look a column wide here and there in a Western
+one); other figures' Unicode structure will not line up there. `:web` is a
 browser, which may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide
 emoji: the output carries U+FE0E, the text-presentation selector,
 after each one, so it stays a one-column glyph. On the command line:

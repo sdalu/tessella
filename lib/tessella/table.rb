@@ -126,14 +126,18 @@ module Tessella
                 end
             end
 
-            def self.span_width(widths) = widths.sum + widths.size - 1
+            # The columns under a spanning row: the cells and the
+            # separators between them (two columns each under :cjk).
+            def self.span_width(widths, sep = "|")
+                widths.sum + ((widths.size - 1) * Width.of(sep))
+            end
 
             def self.span_row(left, fill, right, widths)
-                left + (fill * span_width(widths)) + right
+                left + Width.run(fill, span_width(widths, fill)) + right
             end
 
             def self.border_row(left, fill, sep, right, widths)
-                left + widths.map { |w| fill * w }.join(sep) + right
+                left + widths.map { Width.run(fill, it) }.join(sep) + right
             end
 
             def self.content_row(left, sep, right, cells)
@@ -143,7 +147,8 @@ module Tessella
             def self.title_lines(g, title, widths)
                 [span_row(g[:tl], g[:h], g[:tr], widths),
                  content_row(g[:cl], g[:cl], g[:cr],
-                             [Width.center(title, span_width(widths))]),
+                             [Width.center(title,
+                                           span_width(widths, g[:cs]))]),
                  border_row(g[:sep_l], g[:sep_h], g[:top_t], g[:sep_r],
                             widths)]
             end
@@ -338,10 +343,14 @@ module Tessella
             raise ArgumentError, "unknown style: #{style.inspect}"
         end
 
+        # Each column a whole number of border glyphs wide, so under
+        # target :cjk, where a Unicode one takes two columns, the
+        # borders meet the cells.
         def self.render(style, head, body, layout)
-            widths = layout.widths
             aligns = layout.aligns
             g = Glyphs.fetch(style)
+            unit = Width.of(g[:h])
+            widths = layout.widths.map { Width.round_up(it, unit) }
             padded_head = head && Render.build_row(head, widths, aligns)
             padded_body = body.map { |r| Render.build_row(r, widths, aligns) }
             Render.render_box(g, padded_head, padded_body, widths,

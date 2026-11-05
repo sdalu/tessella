@@ -46,6 +46,9 @@ module Tessella
 
     # frame: a box around one block, title centred in the top edge;
     # pad: is horizontal only, the frame hugs its content vertically.
+    # Its inner width is a whole number of border glyphs, so under
+    # target :cjk, where a Unicode box glyph takes two columns, the
+    # frame still closes.
     module Compose
         # fill: a pattern for the background the frame adds, halo: as
         # Compose.fill's (compose_fill.rb).
@@ -55,17 +58,19 @@ module Tessella
             block, = blocks([figure], ascii)
             text!("title", title, ascii)
             g = Borders.fetch(style, ascii: ascii)
-            field = frame_field(block, title, count!("pad", pad))
+            field = frame_field(block, title, count!("pad", pad), g.h)
             framed = Block.new([frame_top(g, title, field),
                                 *frame_rows(block, g, pad, field),
-                                g.bl + (g.h * field) + g.br])
+                                g.bl + Width.run(g.h, field) + g.br])
             fill ? fill_frame(framed, fill, ascii, halo) : framed
         end
 
         # The width inside the frame: the block and its pads, or room
-        # for the title and a run of border on each side.
-        def self.frame_field(block, title, pad)
-            [block.width + (2 * pad), title ? Width.of(title) + 4 : 0].max
+        # for the title and a run of border on each side, in whole h.
+        def self.frame_field(block, title, pad, h)
+            least = [block.width + (2 * pad),
+                     title ? Width.of(title) + 4 : 0].max
+            Width.round_up(least, Width.of(h))
         end
 
         def self.frame_rows(block, g, pad, field)
@@ -77,15 +82,27 @@ module Tessella
         end
 
         def self.frame_top(g, title, field)
-            return g.tl + (g.h * field) + g.tr unless title
+            return g.tl + Width.run(g.h, field) + g.tr unless title
 
-            deco = " #{title} "
-            g.tl + titled(g.h, deco, field - Width.of(deco)) + g.tr
+            g.tl + titled(g.h, deco(title, field, Width.of(g.h)), field) +
+                g.tr
         end
 
-        # deco centred in a run of h rest columns long, the odd one right.
-        def self.titled(h, deco, rest)
-            (h * (rest / 2)) + deco + (h * (rest - (rest / 2)))
+        # " title ", a blank more when the border around it would
+        # otherwise end half a glyph short.
+        def self.deco(title, field, unit)
+            deco = " #{title} "
+            deco += " " until ((field - Width.of(deco)) % unit).zero?
+            deco
+        end
+
+        # deco centred in a run of h field columns long, the odd one
+        # right; h whole, so under :cjk a two-column one splits evenly.
+        def self.titled(h, deco, field)
+            rest = field - Width.of(deco)
+            unit = Width.of(h)
+            left = (rest / unit / 2) * unit
+            Width.run(h, left) + deco + Width.run(h, rest - left)
         end
     end
 

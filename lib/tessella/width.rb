@@ -82,6 +82,15 @@ module Tessella
         end
 
         def self.pad(count) = " " * [count, 0].max
+
+        # glyph repeated to fill cols columns: cols / its width copies,
+        # so a two-column box glyph (an ambiguous one under :cjk) runs
+        # half as many times.
+        def self.run(glyph, cols) = glyph * (cols / [of(glyph), 1].max)
+
+        # cols rounded up to a whole number of units: a frame's or a
+        # column's inner width, so its border glyphs fill it exactly.
+        def self.round_up(cols, unit) = ((cols + unit - 1) / unit) * unit
         def self.ljust(text, cols) = text + pad(cols - of(text))
         def self.rjust(text, cols) = pad(cols - of(text)) + text
 

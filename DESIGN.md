@@ -304,7 +304,10 @@ text; and `Block#to_s` / `Frame#to_s`, which under `:web` put U+FE0E
 after each emoji-capable glyph (`Target.adapt`). Unicode boxes are not
 kept aligned under `:cjk` by doubling: a box glyph two columns wide
 beside single spaces cannot line up in trees, waves and chart axes,
-so the structure turns ASCII instead. Width.of sums grapheme clusters:
+so the structure turns ASCII instead. Frames and tables asked for in
+Unicode there do close: their inner widths are rounded up to a whole
+number of border glyphs (`Width.round_up`) and every border run is
+`Width.run`, a glyph repeated to fill columns, not characters. Width.of sums grapheme clusters:
 an emoji sequence (ZWJ, skin tone) is one wide glyph.
 
 ## Meters and rules
