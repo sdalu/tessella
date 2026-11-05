@@ -489,3 +489,30 @@ class TestTableCustomBorders < Minitest::Test
         assert_equal(2, run.call("╒╕╘╛═│"))
     end
 end
+
+# The named sets past light/heavy/double/rounded: dashed and fine
+# dashed, light and heavy; double horizontals or double verticals,
+# with their mixed tees.
+class TestNamedBorderStyles < Minitest::Test
+    def test_double_h_and_double_v_tables_use_the_mixed_tees
+        { double_h: "╤╞╪╡╧", "double-v" => "╥╟╫╢╨" }.each do |style, tees|
+            out = Tessella.table([%w[a b], %w[1 2]], style: style).to_s
+            tees.each_char { assert_includes(out, it, style) }
+        end
+    end
+
+    def test_each_dashed_style_frames_with_its_dash
+        { dashed: "┄┆", dashed_fine: "┈┊", heavy_dashed: "┅┇",
+          heavy_dashed_fine: "┉┋" }.each do |style, glyphs|
+            out = Tessella.frame("ab", style: style).to_s
+            glyphs.each_char { assert_includes(out, it, style) }
+        end
+    end
+
+    def test_the_command_takes_hyphenated_names
+        status = Tessella::CLI.run(%w[table --style heavy-dashed-fine],
+                                   stdin: StringIO.new("a,b\n"),
+                                   stdout: StringIO.new, stderr: StringIO.new)
+        assert_equal(0, status)
+    end
+end

@@ -25,7 +25,19 @@ module Tessella
                 double: { top_t: "╦", bot_t: "╩", sep_l: "╠", sep_t: "╬",
                           sep_r: "╣" },
                 rounded: { top_t: "┬", bot_t: "┴", sep_l: "├", sep_t: "┼",
-                           sep_r: "┤" }
+                           sep_r: "┤" },
+                dashed: { top_t: "┬", bot_t: "┴", sep_l: "├", sep_t: "┼",
+                          sep_r: "┤" },
+                dashed_fine: { top_t: "┬", bot_t: "┴", sep_l: "├",
+                               sep_t: "┼", sep_r: "┤" },
+                heavy_dashed: { top_t: "┳", bot_t: "┻", sep_l: "┣",
+                                sep_t: "╋", sep_r: "┫" },
+                heavy_dashed_fine: { top_t: "┳", bot_t: "┻", sep_l: "┣",
+                                     sep_t: "╋", sep_r: "┫" },
+                double_h: { top_t: "╤", bot_t: "╧", sep_l: "╞", sep_t: "╪",
+                            sep_r: "╡" },
+                double_v: { top_t: "╥", bot_t: "╨", sep_l: "╟", sep_t: "╫",
+                            sep_r: "╢" }
             }.freeze
 
             MINIMAL = { tl: " ", tr: " ", bl: " ", br: " ", h: " ",
@@ -320,7 +332,7 @@ module Tessella
         end
 
         def self.normalize_style!(style)
-            sym = style.to_s.to_sym
+            sym = Borders.name(style)
             return sym if STYLE_NAMES.include?(sym)
 
             raise ArgumentError, "unknown style: #{style.inspect}"

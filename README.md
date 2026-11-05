@@ -166,7 +166,10 @@ puts Tessella.beside(fig, Tessella.caption("note", text: "n"),
 ```
 
 `frame(fig, title:, style:, pad:)` boxes one figure (style `:light`,
-`:heavy`, `:double`, `:rounded` or `:ascii`, or a custom set: six
+`:heavy`, `:double`, `:rounded`, `:dashed` (`┄┆`), `:dashed_fine`
+(`┈┊`), `:heavy_dashed` (`┅┇`), `:heavy_dashed_fine` (`┉┋`),
+`:double_h` (`╒═╕`, double horizontals), `:double_v` (`╓─╖`, double
+verticals) or `:ascii`; a name may say `-` for `_`; or a custom set: six
 glyphs `tl tr bl br h v`, as in `style: "╓╖╙╜─║"`, or a
 `Tessella::Borders::Set`); `beside(*figs, gap:,
 align:)` sets figures side by side (align `:top`, `:middle`,
@@ -201,7 +204,9 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   `:light`, `:heavy`, `:rounded`; several top-level lines draw as a
   forest unless `root:` names one root for them.
 - **table**: rows of Strings, the first the header unless `header:
-  false`; styles `:light`, `:heavy`, `:double`, `:rounded`, `:ascii`,
+  false`; styles `:light`, `:heavy`, `:double`, `:rounded`, the
+  dashed four and `:double_h`/`:double_v` (with their mixed tees `╤ ╞
+  ╪` and `╥ ╟ ╫`), `:ascii`,
   `:minimal` (dividers only) and `:markdown` (a GitHub pipe table), or
   a custom set of eleven glyphs, a frame's six then the tees `top_t
   bot_t sep_l sep_t sep_r` (`"╒╕╘╛═│╤╧╞╪╡"`). A

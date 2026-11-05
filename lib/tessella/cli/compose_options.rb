@@ -88,7 +88,7 @@ module Tessella
 
         def add_style
             @parser.on("--style S", "a border style, or six glyphs") do |s|
-                @opts[:style] = Borders.custom?(s) ? s : s.to_sym
+                @opts[:style] = Borders.custom?(s) ? s : Borders.name(s)
             end
         end
 

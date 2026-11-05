@@ -20,6 +20,12 @@ module Tessella
             heavy: Set.new("┏", "┓", "┗", "┛", "━", "┃"),
             double: Set.new("╔", "╗", "╚", "╝", "═", "║"),
             rounded: Set.new("╭", "╮", "╰", "╯", "─", "│"),
+            dashed: Set.new("┌", "┐", "└", "┘", "┄", "┆"),
+            dashed_fine: Set.new("┌", "┐", "└", "┘", "┈", "┊"),
+            heavy_dashed: Set.new("┏", "┓", "┗", "┛", "┅", "┇"),
+            heavy_dashed_fine: Set.new("┏", "┓", "┗", "┛", "┉", "┋"),
+            double_h: Set.new("╒", "╕", "╘", "╛", "═", "│"),
+            double_v: Set.new("╓", "╖", "╙", "╜", "─", "║"),
             ascii: Set.new("+", "+", "+", "+", "-", "|")
         }.freeze
 
@@ -28,7 +34,7 @@ module Tessella
         def self.fetch(style, ascii: false)
             return custom(style, ascii: ascii).first if custom?(style)
 
-            name = (style || (ascii ? :ascii : :light)).to_sym
+            name = Borders.name(style || (ascii ? :ascii : :light))
             if ascii && name != :ascii
                 raise ArgumentError, "style #{name} conflicts with ascii: true"
             end
@@ -38,11 +44,14 @@ module Tessella
             end
         end
 
+        # A style's name as a Symbol: "double-h" and :double_h alike.
+        def self.name(style) = style.to_s.tr("-", "_").to_sym
+
         # A Set, or a String that names no style: a glyph set.
         def self.custom?(style)
             style.is_a?(Set) ||
-                (style.is_a?(String) && !STYLES.key?(style.to_sym) &&
-                 !style.match?(/\A[a-z]+\z/))
+                (style.is_a?(String) && !STYLES.key?(name(style)) &&
+                 !style.match?(/\A[a-z_-]+\z/))
         end
 
         # [Set, tees Hash or nil] for a custom style, checked.

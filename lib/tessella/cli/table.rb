@@ -44,7 +44,8 @@ module Tessella
 
         # A name, or a glyph set checked as a table's (11 glyphs).
         def style!(spec, names)
-            return spec.to_sym if names.include?(spec)
+            name = Borders.name(spec)
+            return name if names.include?(name.to_s)
 
             usage!("unknown --style #{spec}") unless Borders.custom?(spec)
             Table::Glyphs.custom(spec)
