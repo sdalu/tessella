@@ -398,8 +398,12 @@ installed and never required, and without it is refused with the
 trade tone for resolution: `ramp` and `blocks` give one tone per cell,
 `half`, `quadrant`, `sextant`, `braille` and `octant` pack 2 to 8
 pixels into a cell (`octant` is Unicode 16, drawn by the newest
-terminals only, Ghostty and its like), and `edges` draws Sobel
-contours as `─ │ ╱ ╲`. `ramp:` is glyphs light to dense, or a name
+terminals only, Ghostty and its like), `petscii` draws each cell
+with the glyph whose shape best fits its 4x8 tones, in the spirit of
+the Commodore character set -- halves, quadrants, eighth-lines,
+diagonal triangles `◢ ◣ ◤ ◥` and lines, shades `░ ▒ ▓`, line pieces,
+discs `● ○` (threshold and dither do not apply to it) -- and `edges`
+draws Sobel contours as `─ │ ╱ ╲`. `ramp:` is glyphs light to dense, or a name
 from the glyph registry: `ramp` (` .:-=+*#%@`), `blocks`, `long` (a
 70-glyph ASCII ramp, for finer tone) or `hatch`; a name wins over
 the same letters. `dither:` is `:none`, `:fs` (Floyd-Steinberg),

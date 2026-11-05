@@ -29,11 +29,11 @@ module Tessella
             end
         end.freeze
         STYLES = %i[ramp blocks half quadrant sextant braille octant
-                    edges].freeze
+                    petscii edges].freeze
         DITHERS = %i[none fs atkinson bayer].freeze
         SUBCELL = { ramp: [1, 1], blocks: [1, 1], half: [1, 2],
                     quadrant: [2, 2], sextant: [2, 3], braille: [2, 4],
-                    octant: [2, 4],
+                    octant: [2, 4], petscii: [4, 8],
                     edges: [1, 1] }.freeze
         DEFAULTS = { style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                      threshold: 0.5, dither: :fs, invert: false,
@@ -256,6 +256,9 @@ module Tessella
 
             def tone(cx, cy) = sample(cx, cy, 1, 1)
 
+            # A subcell's tone, undithered: what petscii matches.
+            def level(x, y) = sample(x, y, @sw, @sh)
+
             def on?(x, y) = bits[(y * @pw) + x]
 
             private
@@ -307,6 +310,7 @@ module Tessella
     module Image
         class Glyphs
             include OctantGlyph
+            include PetsciiGlyph
 
             SOBEL_X = [[-1, -1, -1], [-1, 0, -2], [-1, 1, -1],
                        [1, -1, 1], [1, 0, 2], [1, 1, 1]].freeze
@@ -322,17 +326,12 @@ module Tessella
                 @edge_thr = opts[:edge_threshold]
             end
 
-            def glyph(cx, cy)
-                case @style
-                when :half     then half(cx, cy)
-                when :quadrant then quadrant(cx, cy)
-                when :sextant  then sextant(cx, cy)
-                when :braille  then braille(cx, cy)
-                when :octant   then octant(cx, cy)
-                when :edges    then edge(cx, cy)
-                else                tone(cx, cy)
-                end
-            end
+            # The style's own glyph method; the ramps' is tone.
+            GLYPH = { half: :half, quadrant: :quadrant, sextant: :sextant,
+                      braille: :braille, octant: :octant,
+                      petscii: :petscii, edges: :edge }.freeze
+
+            def glyph(cx, cy) = send(GLYPH.fetch(@style, :tone), cx, cy)
 
             private
 

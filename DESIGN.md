@@ -216,6 +216,13 @@ quadrants, quarter blocks), so the table is computed from that rule
 and a 26-entry list, checked against the Unicode 16 names. Named
 ramps come from the glyph registry.
 
+`style: :petscii` (`image_petscii.rb`) matches shapes rather than
+packing pixels: each cell's 4x8 tones, undithered (`Field#level`),
+go to the glyph of least squared error among about forty whose ink
+is a function of the cell's x and y (a half, a triangle, a line
+piece, a disc) or a flat shade, so the set is one table of shapes
+and adding a glyph is one entry.
+
 The rendering is the skill's img2art.rb, ported byte for byte (182
 cases): its sampling, dithering (Floyd-Steinberg, Atkinson, Bayer) and
 glyph tables. Where it differs, it keeps a library rule: a blank
