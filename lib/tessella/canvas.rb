@@ -117,7 +117,10 @@ module Tessella
             dy = to[1] - from[1]
             steps = [dx.abs, dy.abs].max
             return if steps.zero?
-            step_line(from, [dx.fdiv(steps), dy.fdiv(steps)], steps, color)
+
+            inc = [dx.fdiv(steps), dy.fdiv(steps)]
+            line = long?(steps) ? :clipped_line : :step_line
+            send(line, from, inc, steps, color)
         end
 
         # A running sum, as unicode_plot (from + inc * i rounds apart).
