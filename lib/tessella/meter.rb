@@ -112,12 +112,15 @@ module Tessella
                                  "classes: #{classes.join(", ")}"
         end
 
+        # width glyphs, filled then tracked: counted in glyphs, not
+        # columns, so a two-column pair (or a cjk target's) keeps its
+        # length as it fills.
         def self.bar(share, width, glyphs, eighths)
             fill, track = glyphs
             units = (share * width * (eighths ? 8 : 1)).round
             full, rem = eighths ? units.divmod(8) : [units, 0]
             cells = (fill * full) + (rem.zero? ? "" : EIGHTHS[rem])
-            cells + (track * (width - Width.of(cells)))
+            cells + (track * (width - cells.length))
         end
 
         def self.percent(share) = "#{(share * 100).round} %"
