@@ -91,7 +91,8 @@ tessella seq: output is 41 columns, over --max-width 30
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
                [--canvas C] [--xscale F] [--ascii] [--color]
-               [--style post|pre] [--bins N] [--closed left|right]
+               [--style post|pre] [--area] [--gradient C,C,...]
+               [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
                [file]
 ```
@@ -111,6 +112,8 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--ascii`              | ASCII only                             | off             |
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
+| `--area`               | line, stairs: fill under each series   | off             |
+| `--gradient C,...`     | area: colours by height, or `none`     | green,yellow,red |
 | `--bins N`             | histogram: number of bins              | Sturges' rule   |
 | `--closed C`           | histogram: `left right`                | `left`          |
 | `--scale N`            | stem: value of one stem step           | 10              |

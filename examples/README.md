@@ -47,6 +47,7 @@ All are shown with their output in
 |----------------|-------------------------|-----------------------------------------------|
 | `langs.csv`    | `chart`, `table`        | three labels and values, with a header        |
 | `trig.txt`     | `chart`                 | `x sin cos`, 101 rows for x in 0..10          |
+| `cpu.txt`      | `chart --area`          | 60 load samples between 10 and 90             |
 | `growth.txt`   | `chart --xscale`        | x over four decades                           |
 | `neg.csv`      | `chart --kind bar`      | negative, positive and zero values            |
 | `normal.txt`   | `chart --kind histogram`| 200 roughly normal samples                    |
@@ -72,11 +73,12 @@ All are shown with their output in
 | `wide.txt`     | `lint --no-wide`        | a CJK label                                   |
 | `disc.pgm`     | `image`                 | a 64 × 64 grey disc, bright at its centre     |
 
-`trig.txt` and `normal.txt` were generated:
+`trig.txt`, `normal.txt` and `cpu.txt` were generated:
 
 ```sh
 ruby -e 'puts "x sin cos"; 0.step(10, 0.1) { puts [it.round(1),
     Math.sin(it), Math.cos(it)].join(" ") }' > trig.txt
 ruby -e 'srand 7; 200.times {
     puts (Array.new(12) { rand }.sum - 6).round(3) }' > normal.txt
+ruby -e '60.times { puts (50 + (40 * Math.sin(it / 6.0))).round }' > cpu.txt
 ```

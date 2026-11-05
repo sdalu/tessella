@@ -101,6 +101,87 @@ $ printf '1 1\n2 3\n3 2\n4 4\n' | \
      1                    4
 ```
 
+### Filled areas
+
+`--area` (`area: true`) fills under each line or stairs series, from
+the floor up, as btop draws its graphs. Every pixel column is a bar
+of its own, so a braille cell holds two bars of 0 to 4 dots, and a
+peak narrower than a cell still shows. The y axis starts at 0 unless
+`--ylim` says otherwise. `cpu.txt` is 60 load samples between 10 and
+90:
+
+```text
+$ tessella chart --area --width 30 --height 6 cpu.txt
+      ┌──────────────────────────────┐
+   90 │  ⢀⣴⣾⣿⣷⣄             ⢀⣴⣿⣿⣶⣄   │
+      │ ⢠⣾⣿⣿⣿⣿⣿⣧⡀          ⣠⣿⣿⣿⣿⣿⣿⣦  │
+      │⢠⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀        ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀│
+      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄      ⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷│
+      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄   ⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
+    0 │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
+      └──────────────────────────────┘
+      0                             60
+```
+
+On the block canvas a cell holds two bars of 0 to 2; under `--ascii`
+the fill is drawn in ASCII strokes:
+
+```text
+$ tessella chart --area --canvas block --width 30 --height 6 cpu.txt
+      ┌──────────────────────────────┐
+   90 │   ▄██▙▄              ▟██▙▖   │
+      │ ▗██████▙           ▗██████▙  │
+      │▗████████▙▖        ▗████████▙ │
+      │▐██████████▖      ▟██████████▙│
+      │▐███████████▄   ▗▟████████████│
+    0 │▐█████████████▄▟██████████████│
+      └──────────────────────────────┘
+      0                             60
+```
+
+```text
+$ tessella chart --area --ascii --width 30 --height 6 cpu.txt
+      +------------------------------+
+   90 |  .+###-             .+###_   |
+      | _######+           -######-  |
+      |-########+.        -########+ |
+      |+##########.      +##########+|
+      |+###########-   .#############|
+    0 |+#############-###############|
+      +------------------------------+
+      0                             60
+```
+
+With `--ylim` the floor moves up, so the variation fills the height:
+
+```text
+$ tessella chart --area --ylim 30,100 --width 30 --height 4 cpu.txt
+       ┌──────────────────────────────┐
+   100 │   ⢀⣠⣤⣀               ⢀⣠⣤⣀    │
+       │  ⣴⣿⣿⣿⣿⣷⣄           ⢀⣴⣿⣿⣿⣿⣷⡄  │
+       │⢀⣾⣿⣿⣿⣿⣿⣿⣿⣦         ⢠⣾⣿⣿⣿⣿⣿⣿⣿⣆ │
+    30 │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀      ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧│
+       └──────────────────────────────┘
+       0                             60
+```
+
+Under `--color` a filled cell is coloured by its height, bottom row
+first, from a gradient: `--gradient C,C,...` (`gradient: [...]`), by
+default green, yellow, red in equal bands. A gradient whose colours
+are all `#rrggbb` blends smoothly from the bottom row to the top
+instead of in bands. `--gradient none` (`gradient: false`) keeps the
+series' own colour. Without `--color` a gradient changes nothing and
+the glyphs are plain.
+
+`--area` is for line and stairs only, and `--gradient` needs
+`--area`; anything else is a usage error:
+
+```text
+$ tessella chart --gradient red,blue cpu.txt
+tessella chart: gradient: needs area: true
+Usage: tessella chart [options] [file]
+```
+
 ### density
 
 `density` draws the points on its own canvas, where a cell's shade
@@ -336,6 +417,8 @@ corner-and-tick frame bar charts use, or `:none`.
 | CLI                         | Library            | Kinds                |
 |-----------------------------|--------------------|----------------------|
 | `--style post\|pre`         | `style: :post`     | stairs               |
+| `--area`                    | `area: true`       | line, stairs         |
+| `--gradient C,C,...\|none` | `gradient: [...]`  | line, stairs, with area |
 | `--bins N`                  | `bins: N`          | histogram            |
 | `--closed left\|right`      | `closed: :left`    | histogram            |
 | `--scale N`                 | `scale: N`         | stem                 |
@@ -402,6 +485,14 @@ plotted cells with ANSI escapes, one colour per series from the cycle
 red, green, yellow, blue, magenta, cyan, white; `add(..., color:
 :blue)` picks one. The frame, labels and legend stay plain. Where two
 series cross in a cell, the last one drawn colours it.
+
+A colour, in `add(..., color:)` as in a gradient, is one of three
+forms: a name (`:red`, `:green`, `:yellow`, `:blue`, `:magenta`,
+`:cyan`, `:white`), a 256-colour index (`0..255`, `208` is orange),
+or a truecolor `"#rrggbb"`. On the command line, `--gradient` takes
+the same three forms, comma-separated: `--gradient
+'#2e7d32,#f9a825,#c62828'`. A filled area's colours are covered in
+[Filled areas](#filled-areas).
 
 ## ASCII
 
