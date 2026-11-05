@@ -56,6 +56,8 @@ module Tessella
                 "--min" => ["heatmap range bottom"],
                 "--max" => ["heatmap range top"],
                 "--donut" => ["pie: a ring, hollow in the middle"],
+                "--rim" => ["pie edge: cells (default), smooth (shaped",
+                            "glyphs) or basic (smooth, older fonts)"],
                 "--style" => ["stairs: post or pre"],
                 "--scale" => ["stem: the stem unit"],
                 "--area" => ["fill under the line (line, stairs)"],

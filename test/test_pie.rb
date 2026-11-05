@@ -28,6 +28,28 @@ class TestPie < Minitest::Test
         assert_includes(colored, "\e[32m")
     end
 
+    # rim: :smooth draws the edge to the shape; :basic keeps to the
+    # older blocks; :cells, the default, fills whole cells.
+    def test_a_smooth_rim
+        smooth = Tessella.pie(%w[a b], [1, 1], height: 4, rim: :smooth).to_s
+        assert_match(/[◢◣◤◥▗▖▝▘▟▙▜▛]/, smooth)
+        basic = Tessella.pie(%w[a b], [1, 1], height: 10, rim: :basic).to_s
+        refute_match(/[\u{1FB8A}\u{1FB82}\u{1FB85}]/, basic)
+        assert_equal(Tessella.pie(%w[a b], [1, 1], height: 4).to_s,
+                     Tessella.pie(%w[a b], [1, 1], height: 4, rim: :cells).to_s)
+    end
+
+    def test_a_rim_is_refused_when_unknown_or_ascii
+        assert_raises(ArgumentError) { Tessella.pie(%w[a], [1], rim: :x) }
+        assert_raises(ArgumentError) do
+            Tessella.pie(%w[a], [1], rim: :smooth, ascii: true)
+        end
+        status, out, = run_cli(%w[chart --kind pie --rim smooth --height 4],
+                               "a 1\nb 1\n")
+        assert_equal(0, status)
+        assert_match(/[◢◣◤◥▗▖▝▘▟▙▜▛]/, out)
+    end
+
     def test_shares_sum_to_a_hundred
         out = Tessella.pie(%w[a b c], [1, 1, 1], height: 4).to_s
         assert_equal(100, out.scan(/(\d+) %/).flatten.sum(&:to_i))

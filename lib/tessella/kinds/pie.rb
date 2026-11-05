@@ -10,10 +10,13 @@ module Tessella
     # right of the disc gives each slice's share, or under it, wrapped
     # to 40 columns or the disc's width, when the slices outnumber the
     # rows. height: (12 by default) sets the size, so width: is
-    # refused. Values must be 0 or more, and not all 0.
+    # refused. Values must be 0 or more, and not all 0. rim: :smooth
+    # draws the edge to the shape (PieRim).
     class Pie < Chart
+        include PieRim
+
         OPTIONS = (Chart::OPTIONS - %i[width xlim ylim canvas xscale] +
-                   %i[donut]).freeze
+                   %i[donut rim]).freeze
         HOLE = 0.5
         LEGEND = 40
 
@@ -56,11 +59,15 @@ module Tessella
         def disc_cell(x, y, w, stops)
             dx = offset(x, w)
             dy = offset(y, height)
-            r = Math.hypot(dx, dy)
-            return Cell.blank if r > 1 || (@opts[:donut] && r < HOLE)
-
             i = slice_at(turn(dx, dy), stops)
-            Cell.new(char: fill(i), color: slice_color(i))
+            cell = rim? ? rim_cell(x, y, w, i) : whole_cell(dx, dy)
+            cell || Cell.new(char: fill(i), color: slice_color(i))
+        end
+
+        # A cell in or out by its centre: blank, or nil for its fill.
+        def whole_cell(dx, dy)
+            r = Math.hypot(dx, dy)
+            Cell.blank if r > 1 || (@opts[:donut] && r < HOLE)
         end
 
         # A cell's centre from the disc's, in radii.

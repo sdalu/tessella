@@ -475,7 +475,8 @@ Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
 Tessella.candlestick(x = nil, open:, high:, low:, close:, **opts)
     # OHLC, a column a candle (kinds/candlestick.rb)
 Tessella.pie(labels, values, donut: false, **opts)  # slices by fill,
-    # a ring under donut:, no axes, so no width: (kinds/pie.rb)
+    # a ring under donut:, no axes, so no width: (kinds/pie.rb);
+    # rim: :smooth | :basic shapes the edge (kinds/pie_rim.rb)
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays;
     # orientation: :vertical stands the boxes (kinds/box_upright.rb)
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf

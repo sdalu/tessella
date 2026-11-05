@@ -124,7 +124,14 @@ module Tessella
                 end
                 @parser.on("--min A") { @opts[:min] = num(it) }
                 @parser.on("--max B") { @opts[:max] = num(it) }
+                add_pie
+            end
+
+            def add_pie
                 @parser.on("--donut") { @opts[:donut] = true }
+                @parser.on("--rim R", %w[cells smooth basic]) do |v|
+                    @opts[:rim] = v.to_sym
+                end
             end
         end
     end
@@ -326,7 +333,7 @@ module Tessella
                 box: %i[orientation],
                 heatmap: %i[cell_width colormap min max],
                 candlestick: %i[xdate],
-                pie: %i[donut],
+                pie: %i[donut rim],
                 stem: %i[scale]
             }.freeze
 
@@ -353,7 +360,7 @@ module Tessella
                      below: "--below",
                      colormap: "--colormap", min: "--min", max: "--max",
                      eighths: "--no-eighths", track: "--track",
-                     donut: "--donut" }.freeze
+                     donut: "--donut", rim: "--rim" }.freeze
 
             def self.check!(opts)
                 allowed = ChartOpts::EXTRA.fetch(opts[:kind], [])

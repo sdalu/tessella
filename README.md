@@ -256,7 +256,14 @@ each slice its own fill (the bars' twelve, so at most 12 slices)
 and, under `color: true`, its own colour; the legend beside the disc
 gives the shares in whole percents summing to 100 (under it, wrapped
 to 40 columns, when the slices outnumber the rows). `donut: true` hollows the
-middle into a ring. `height:` (12 by default) sizes the disc;
+middle into a ring. `rim: :smooth` (`--rim smooth`) draws the edge
+of the disc, and of a donut's hole, to the shape: a cell it only
+partly covers takes the glyph that best fits the coverage (`◢ ◣ ◤ ◥`,
+halves, quadrants, quarter blocks, as `image --style petscii` picks
+them), in its slice's colour; solid ink, so without colour the rim
+reads as an outline. `:basic` does the same without Legacy
+Computing's `🮊 🮂 🮅`, which older fonts lack; `:cells`, the default,
+fills whole cells. `height:` (12 by default) sizes the disc;
 `width:`, the limits, `canvas:` and `xscale:` are refused. Values
 must be 0 or more, not all 0. On the command line `--kind pie` reads
 `label value` rows, `--donut` for the ring:
