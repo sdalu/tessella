@@ -35,12 +35,15 @@ of a back-to-back plot. `opts`, their defaults, and the bar options
 ### Composition
 
 ```ruby
-Tessella.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
+Tessella.frame(fig, title: nil, style: nil, pad: 1, fill: nil,
+               ascii: false)
 Tessella.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
 Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
                ascii: false)
 Tessella.indent(fig, prefix:, ascii: false)
 Tessella.caption(fig, text:, above: false, ascii: false)
+Tessella.shadow(fig, glyph: nil, ascii: false)
+Tessella.fill(fig, pattern: nil, ascii: false)
 ```
 
 Each takes any figure (a `Block`, a `String`, a chart) and returns a
@@ -128,6 +131,19 @@ Tessella::Width.of("\e[1mab\e[0m") # => 2
 The display width of a string: the columns a terminal gives it, wide
 characters two, combining marks and ANSI escapes none. Every figure
 is measured with it, which is why CJK labels line up.
+`Tessella::Width.class_of(char)` is a character's width class, `:N`,
+`:A` or `:W`; see [glyph sets](glyphs.md).
+
+### `Tessella::Glyphs`
+
+```ruby
+Tessella::Glyphs.fetch(kind, name)  # => GlyphSet
+Tessella::Glyphs.all                # => every GlyphSet
+glyph_set.glyphs; glyph_set.classes; glyph_set.mixed?
+```
+
+The named glyph sets the library draws with, and their width classes.
+See [glyph sets](glyphs.md).
 
 ## Errors
 

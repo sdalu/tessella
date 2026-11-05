@@ -56,6 +56,7 @@ All are shown with their output in
 | `ages.txt`     | `chart --kind stem`     | two columns, for the back-to-back form        |
 | `bad.csv`      | `status.sh`             | a CSV with a value that is not a number       |
 | `plot.txt`     | `compose`               | a bar chart, as `tessella chart` printed it   |
+| `boxes.txt`    | `compose fill`          | two hand-drawn boxes joined by a line         |
 | `note.txt`     | `compose`               | two lines of text                             |
 | `outline.txt`  | `tree`                  | an indented outline with notes                |
 | `kinds.csv`    | `table`                 | CSV with quoted fields holding commas         |

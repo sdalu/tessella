@@ -13,7 +13,7 @@ figure on stdout. Each has its own `--help`.
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|
 | `chart`    | line, scatter, stairs, density, bar, histogram, box, stem | [charts](charts.md) |
-| `compose`  | frame, beside, stack, indent, caption      | [composition](composition.md)  |
+| `compose`  | frame, beside, stack, indent, caption, shadow, fill | [composition](composition.md)  |
 | `tree`     | an indented outline as a tree              | [tree](tree.md)                |
 | `table`    | CSV or TSV rows as a table                 | [table](table.md)              |
 | `bitfield` | an RFC-style packet or register layout     | [bitfield](bitfield.md)        |
@@ -21,6 +21,7 @@ figure on stdout. Each has its own `--help`.
 | `seq`      | a sequence diagram                         | [seq](seq.md)                  |
 | `image`    | a picture as text                          | [images](images.md)            |
 | `lint`     | checks a text figure, drawn or hand-made   | [lint](lint.md)                |
+| `glyphs`   | lists glyph sets and their width classes   | [glyphs](glyphs.md)            |
 
 ## Exit status
 
@@ -50,27 +51,9 @@ Usage: tessella chart [options] [file]
 ```
 
 ```text
-$ tessella
+$ tessella 2>&1 | head -2
 tessella: no command
 Usage: tessella COMMAND [options] [file]
-
-Commands:
-  chart     line, scatter, stairs, density, bar, histogram,
-            box and stem charts
-  compose   frame, beside, stack, indent, caption: assemble
-            blocks into one figure
-  tree      an indented outline as a box-drawing tree
-  table     CSV or TSV rows as a framed table
-  bitfield  an RFC-style packet / bit-field diagram
-  wave      a timing diagram from WaveDrom-like signals
-  seq       a sequence diagram from "A -> B: msg" lines
-  image     a picture as text: tones, blocks, braille, edges
-  lint      check text figures: tabs, widths, invisible
-            glyphs, mixed or misaligned structure
-  glyphs    the named glyph sets and their width classes
-
-tessella COMMAND --help shows a command's options;
-tessella --version prints the version.
 ```
 
 ## `--max-width N`
@@ -131,11 +114,14 @@ The input format, column by kind, is in
 ## `tessella compose`
 
 ```text
-tessella compose frame   [--title T] [--style S] [--pad N] BLOCK
+tessella compose frame   [--title T] [--style S] [--pad N] [--fill P]
+                         BLOCK
 tessella compose beside  [--gap N] [--align top|middle|bottom] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
+tessella compose shadow  [--glyph G] BLOCK
+tessella compose fill    [--pattern P] BLOCK
 ```
 
 All take `--ascii` and `--max-width N`. A BLOCK is a file, or `-` for
@@ -160,7 +146,8 @@ Each also takes `--max-width N`. A frame's `--style` also takes six
 glyphs (`tl tr bl br h v`), a table's eleven (those six, then `top_t
 bot_t sep_l sep_t sep_r`): see
 [custom borders](composition.md#custom-borders). Table styles are `light heavy double
-rounded ascii minimal markdown`; image styles `ramp blocks half
+rounded dashed dashed_fine heavy_dashed heavy_dashed_fine double_h
+double_v ascii minimal markdown`; image styles `ramp blocks half
 quadrant sextant braille edges`, dithers `fs atkinson bayer none`.
 
 ## `tessella lint`

@@ -87,9 +87,23 @@ $ tessella table --title Kinds --align lcr kinds.csv
 
 ## Styles
 
-`light` (the default), `heavy`, `double`, `rounded`, `ascii`,
-`minimal` (dividers only, no outer frame) and `markdown` (a GitHub
-pipe table, ready to paste):
+`light` (the default), `heavy`, `double`, `rounded`, the four
+dashed ones (`dashed`, `dashed_fine`, `heavy_dashed`,
+`heavy_dashed_fine`), the two mixed doubles `double_h` and
+`double_v`, `ascii`, `minimal` (dividers only, no outer frame) and
+`markdown` (a GitHub pipe table, ready to paste). The mixed doubles
+bring their own tees, `╤ ╧ ╞ ╪ ╡` and `╥ ╨ ╟ ╫ ╢`:
+
+```text
+$ tessella table --style double_v langs.csv
+╓──────╥─────╖
+║ lang ║ loc ║
+╟──────╫─────╢
+║ ruby ║  12 ║
+║ c    ║  30 ║
+║ rust ║ 7.5 ║
+╙──────╨─────╜
+```
 
 ```text
 $ tessella table --style minimal kinds.csv

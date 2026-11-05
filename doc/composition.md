@@ -70,7 +70,8 @@ Three rules hold for every block:
 ## frame
 
 ```ruby
-Tessella.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
+Tessella.frame(fig, title: nil, style: nil, pad: 1, fill: nil,
+               ascii: false)
 ```
 
 Draws a border around one figure, with an optional title centred in
@@ -94,7 +95,12 @@ $ tessella compose frame --pad 0 note.txt
 ```
 
 The styles are `:light` (the default), `:heavy`, `:double`,
-`:rounded` and `:ascii`:
+`:rounded`, the four dashed ones `:dashed` (`┄┆`), `:dashed_fine`
+(`┈┊`), `:heavy_dashed` (`┅┇`) and `:heavy_dashed_fine` (`┉┋`), the
+two mixed doubles `:double_h` (double horizontals, `╒═╕`) and
+`:double_v` (double verticals, `╓─╖`), and `:ascii`. A name may say
+`-` for `_`, and `tessella glyphs border` lists them all with their
+glyphs ([glyph sets](glyphs.md)). Four of them:
 
 ```text
 $ tessella compose frame --style heavy note.txt && \
@@ -107,6 +113,19 @@ $ tessella compose frame --style heavy note.txt && \
 ║ ruby is 12 kLOC ║
 ║ c is the bulk   ║
 ╚═════════════════╝
+```
+
+```text
+$ tessella compose frame --style dashed note.txt && \
+    tessella compose frame --style double-h note.txt
+┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┆ ruby is 12 kLOC ┆
+┆ c is the bulk   ┆
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+╒═════════════════╕
+│ ruby is 12 kLOC │
+│ c is the bulk   │
+╘═════════════════╛
 ```
 
 ### Custom borders
@@ -139,7 +158,10 @@ $ tessella compose frame --ascii --style '****=!' note.txt
 ```text
 $ tessella compose frame --ascii --style '╓╖╙╜─║' note.txt
 tessella compose: border glyph ╓ conflicts with ascii: true
-Usage: tessella compose frame  [--title T] [--style S] [--pad N] BLOCK
+Usage: tessella compose frame  [--title T] [--style S] [--pad N]
+                              [--fill P] BLOCK
+       tessella compose shadow [--glyph G] BLOCK
+       tessella compose fill   [--pattern P] BLOCK
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK
@@ -259,6 +281,95 @@ $ tessella compose caption --text 'Figure 2: lines of code' plot.txt
    Figure 2: lines of code
 ```
 
+## shadow
+
+```ruby
+Tessella.shadow(fig, glyph: nil, ascii: false)
+```
+
+Adds a drop shadow: a glyph one column right of every row but the
+first, and a bar under the figure from its second column to the
+shadow's. The glyph is `░`, `#` under `ascii: true`; `glyph:`
+(`--glyph`) is any glyph one column wide.
+
+```text
+$ tessella compose frame note.txt | tessella compose shadow -
+┌─────────────────┐
+│ ruby is 12 kLOC │░
+│ c is the bulk   │░
+└─────────────────┘░
+ ░░░░░░░░░░░░░░░░░░░
+```
+
+```text
+$ tessella compose frame --ascii note.txt | tessella compose shadow --ascii -
++-----------------+
+| ruby is 12 kLOC |#
+| c is the bulk   |#
++-----------------+#
+ ###################
+```
+
+A shadow drawn this way is the one [the lint](lint.md) expects, so
+the figure stays lint-clean.
+
+## fill
+
+```ruby
+Tessella.fill(fig, pattern: nil, ascii: false)
+Tessella.frame(fig, ..., fill: nil)
+```
+
+Fills every enclosed blank cell with a pattern. What is enclosed is
+what a flood from the figure's edge, through blank cells, cannot
+reach; text, lines and everything outside are left as they are. The
+blanks between words inside a box are enclosed too, so a pattern
+behind text reads as a texture:
+
+```text
+$ tessella compose frame --fill light note.txt
+┌─────────────────┐
+│░ruby░is░12░kLOC░│
+│░c░is░the░bulk░░░│
+└─────────────────┘
+```
+
+`frame`'s `fill:` (`--fill P`) fills the inside of the frame it
+draws; `fill` works on any figure, here two hand-drawn boxes in
+`boxes.txt`. The space between them is not enclosed, so it stays
+blank:
+
+```text
+$ tessella compose fill --pattern stipple boxes.txt
+┌────┐  ┌────┐
+│∴∵∴∵│──│∴ok∵│
+└────┘  └────┘
+```
+
+A pattern is a name from the registry (`light`, the default, `medium`,
+`dark`, `solid`, `hatch`, `backhatch`, `cross`, `grid`, `stipple`,
+`sparse`, `dotted`, `dots`, `colons`, `hash`, `at`; `tessella glyphs
+pattern` lists them) or glyphs of one's own. Several glyphs tile
+diagonally. Each glyph must be one column wide, and all must share
+one [width class](glyphs.md#width-classes), else the fill would not
+line up in every terminal:
+
+```text
+$ tessella compose fill --pattern '░▒' boxes.txt
+tessella compose: pattern "░▒" mixes width classes: N, A
+```
+
+Under `ascii: true` the pattern must be ASCII, and the default is
+`colons`:
+
+```text
+$ tessella compose frame --ascii --fill hash note.txt
++-----------------+
+|#ruby#is#12#kLOC#|
+|#c#is#the#bulk###|
++-----------------+
+```
+
 ## ASCII
 
 Every function takes `ascii: true`. Its borders are then drawn in
@@ -327,11 +438,14 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
 ## `tessella compose`
 
 ```text
-tessella compose frame   [--title T] [--style S] [--pad N] BLOCK
+tessella compose frame   [--title T] [--style S] [--pad N] [--fill P]
+                         BLOCK
 tessella compose beside  [--gap N] [--align A] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
+tessella compose shadow  [--glyph G] BLOCK
+tessella compose fill    [--pattern P] BLOCK
 ```
 
 Each BLOCK is a file, or `-` for stdin (once). Every subcommand also
@@ -361,7 +475,10 @@ other than `ascii` with `--ascii`, the wrong number of blocks.
 ```text
 $ tessella compose beside plot.txt
 tessella compose: beside takes at least two BLOCKs
-Usage: tessella compose frame  [--title T] [--style S] [--pad N] BLOCK
+Usage: tessella compose frame  [--title T] [--style S] [--pad N]
+                              [--fill P] BLOCK
+       tessella compose shadow [--glyph G] BLOCK
+       tessella compose fill   [--pattern P] BLOCK
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK

@@ -36,13 +36,15 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
    histogram, box and stem; input formats, options, canvases, colour,
    ASCII.
 3. [Composition](composition.md): blocks; frame, beside, stack,
-   indent, caption.
+   indent, caption, shadow, fill.
 4. Diagrams: [trees](tree.md), [tables](table.md),
    [bit fields](bitfield.md), [timing diagrams](wave.md),
    [sequence diagrams](seq.md).
 5. [Pictures](images.md): images as text.
 6. [Linting](lint.md): checking a figure, drawn or hand-made, for
    what breaks it on someone else's screen.
+7. [Glyph sets](glyphs.md): width classes, the named glyph sets, and
+   checking a set of one's own.
 
 ## Reference
 
