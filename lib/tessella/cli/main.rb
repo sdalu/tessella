@@ -44,6 +44,13 @@ module Tessella
             klass.run(rest, stdin: stdin, stdout: stdout, stderr: stderr)
         end
 
+        # "cannot read PATH: reason" for a file a command cannot open,
+        # the reason in the system's own words (ENOENT's "No such file
+        # or directory"), not Ruby's "... @ rb_sysopen - PATH".
+        def self.cannot_read(path, error)
+            "cannot read #{path || "stdin"}: #{error.class.new(nil).message}"
+        end
+
         def self.meta(flag, stdout)
             stdout.print(flag == "--version" ? "#{VERSION}\n" : USAGE)
             0

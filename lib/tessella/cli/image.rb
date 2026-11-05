@@ -187,7 +187,7 @@ module Tessella
             def self.bytes(path, stdin)
                 path ? File.binread(path) : stdin.binmode.read
             rescue SystemCallError => e
-                raise ImageCLI::DataError, e.message
+                raise ImageCLI::DataError, CLI.cannot_read(path, e)
             end
         end
     end

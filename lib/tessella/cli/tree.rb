@@ -30,7 +30,7 @@ module Tessella
             help(stdout)
         rescue *USAGE_ERRORS => e
             fail_with(stderr, e.message, 2)
-        rescue ArgumentError, SystemCallError => e
+        rescue ArgumentError => e
             fail_with(stderr, e.message, 1)
         end
 
@@ -50,6 +50,8 @@ module Tessella
 
         def self.read(path, stdin)
             path ? File.read(path) : stdin.read
+        rescue SystemCallError => e
+            raise ArgumentError, CLI.cannot_read(path, e)
         end
 
         # Usage is settled by now; style is ignored under --ascii, as

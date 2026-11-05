@@ -128,7 +128,7 @@ module Tessella
         def self.read(path, stdin)
             path == "-" ? stdin.read : File.read(path)
         rescue SystemCallError => e
-            raise ComposeCLI::DataError, "#{path}: #{e.message}"
+            raise ComposeCLI::DataError, CLI.cannot_read(path, e)
         end
 
         def self.check!(path, lines, ascii)

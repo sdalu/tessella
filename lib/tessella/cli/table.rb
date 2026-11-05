@@ -148,7 +148,7 @@ module Tessella
         def self.read(path, stdin)
             path ? File.read(path) : stdin.read
         rescue SystemCallError => e
-            raise DataError, e.message
+            raise DataError, CLI.cannot_read(path, e)
         end
 
         def self.check_align_length!(align, ncols)

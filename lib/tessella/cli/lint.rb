@@ -50,9 +50,7 @@ module Tessella
             statuses = inputs.map do |name, read|
                 one(mode, name, read.call)
             rescue SystemCallError => e
-                # The errno's own text, without Ruby's "@ rb_sysopen".
-                reason = e.class.new.message.sub(/\Aunknown error - /, "")
-                @stderr.puts("tessella lint: cannot read #{name}: #{reason}")
+                @stderr.puts("tessella lint: #{CLI.cannot_read(name, e)}")
                 1
             end
             statuses.max || 0

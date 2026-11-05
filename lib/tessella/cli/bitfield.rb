@@ -124,7 +124,7 @@ module Tessella
         def self.read(path, stdin)
             path ? File.read(path) : stdin.read
         rescue SystemCallError => e
-            raise BitfieldCLI::DataError, e.message
+            raise BitfieldCLI::DataError, CLI.cannot_read(path, e)
         end
     end
 end

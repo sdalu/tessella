@@ -313,7 +313,7 @@ module Tessella
             def self.text(path, stdin)
                 path ? File.read(path) : stdin.read
             rescue SystemCallError => e
-                raise DataError, "cannot read #{path}: #{e.message}"
+                raise DataError, CLI.cannot_read(path, e)
             end
 
             def self.line(raw)

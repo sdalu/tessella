@@ -141,7 +141,7 @@ module Tessella
             def self.text(path, stdin)
                 path ? File.read(path) : stdin.read
             rescue SystemCallError => e
-                raise WaveCLI::DataError, e.message
+                raise WaveCLI::DataError, CLI.cannot_read(path, e)
             end
         end
     end

@@ -40,6 +40,19 @@ class TestCLIContract < Minitest::Test
         end
     end
 
+    # The reason in the system's own words, not Ruby's "@ rb_sysopen".
+    def test_an_unreadable_file_is_named_with_its_reason
+        Dir.mktmpdir do |dir|
+            missing = File.join(dir, "missing")
+            COMMANDS.each do |cmd|
+                _, err = run_cli([*cmd, missing])
+                want = ": cannot read #{missing}: No such file or directory\n"
+                assert(err.end_with?(want), "#{cmd.join(" ")}: #{err}")
+                refute_match(/rb_sysopen/, err, cmd.join(" "))
+            end
+        end
+    end
+
     def test_an_unknown_option_is_a_usage_error_in_every_command
         COMMANDS.each do |cmd|
             status, err = run_cli([*cmd, "--bogus"])
