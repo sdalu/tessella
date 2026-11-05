@@ -269,6 +269,7 @@ module Tessella
                 bar: %i[fill eighths track orientation blocks],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
+                box: %i[orientation],
                 stem: %i[scale]
             }.freeze
 

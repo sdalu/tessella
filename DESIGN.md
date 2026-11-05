@@ -342,7 +342,8 @@ Tessella.histogram(values, bins: nil, closed: :left, **opts)
     #   blocks: :eighths | :braille | :block (:quadrant) | :half
     #   (kinds/columns.rb); only
     #   horizontal :eighths is unicode_plot's layout, the oracle's
-Tessella.box(names, samples, **opts)        # samples: Array of Arrays
+Tessella.box(names, samples, **opts)        # samples: Array of Arrays;
+    # orientation: :vertical stands the boxes (kinds/box_upright.rb)
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf
 chart.to_s; chart.render(io = $stdout)
 ```

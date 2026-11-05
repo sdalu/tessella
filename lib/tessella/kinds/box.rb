@@ -96,11 +96,16 @@ module Tessella
     class Box < Chart
         include BoxShapes
 
+        OPTIONS = (Chart::OPTIONS + %i[orientation]).freeze
         MIN_WIDTH = 10
 
         def initialize(**opts)
             super
             @boxes = []
+            @orientation = opts.fetch(:orientation, :horizontal)
+            return if BarLayouts::ORIENTATIONS.include?(@orientation)
+
+            raise ArgumentError, "unknown orientation: #{@orientation.inspect}"
         end
 
         def add(names, samples, color: nil)
@@ -118,7 +123,7 @@ module Tessella
         private
 
         def frame
-            Frame.new(**frame_options)
+            Frame.new(**(upright? ? upright_options : frame_options))
         end
 
         def frame_options

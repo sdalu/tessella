@@ -135,6 +135,13 @@ $ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
        ruby   c  rust  go
 ```
 
+Box takes `orientation: :vertical` (`--orientation vertical`) too:
+each box stands three columns wide, whiskers running up and down
+(`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
+`╶┴╴` at the minimum), the value axis on the left with its two ends
+and middle, the names under the boxes; `ylim:` sets its range, and a
+median sharing a row with a box edge wins it.
+
 `Tessella.stem` refuses a scale that is not positive, and a plot
 that would need more than 1000 stems, one line each (raise `scale:`).
 
