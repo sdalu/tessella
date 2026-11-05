@@ -2,9 +2,10 @@
 
 Text figures for a monospace grid, drawn in Unicode or pure ASCII, for
 documents first and terminals second. Plain Ruby 3.4, no runtime
-dependency. Today it draws charts: line, scatter, stairs, bar,
-histogram, box, stem and density plots with scaled axes, on braille,
-block, dot, ASCII or density canvases.
+dependency. It draws charts (line, scatter, stairs, bar, histogram,
+box, stem and density plots with scaled axes, on braille, block, dot,
+ASCII or density canvases), trees, tables, bit-field, timing and
+sequence diagrams, and composes any of them into one figure.
 
 ## One library, one command per module
 
@@ -67,6 +68,9 @@ lib/ascii_art/kinds/*.rb    one file per kind
 lib/ascii_art/chart_cli.rb  `ascii-art chart`: options, input, one chart
 lib/ascii_art/compose_cli.rb     `ascii-art compose`: subcommands, exits
 lib/ascii_art/compose_options.rb its options, and the block reader
+lib/ascii_art/<name>.rb     tree, table, bitfield, wave, seq: one file
+                            per module
+lib/ascii_art/<name>_cli.rb `ascii-art <name>`, one file per command
 lib/ascii_art/cli.rb        `ascii-art`: dispatches on the command
 exe/ascii-art               the command line
 tools/bundle.rb             single-file build for vendoring
@@ -102,6 +106,35 @@ other style, block or text holding a non-ASCII character is refused
 rather than rewritten. These rules, and the exact output, are the
 ascii-art skill's compose.rb's, which `ascii-art compose` replaces
 byte for byte; its lint pass stays in the skill.
+
+## Diagram modules
+
+`tree`, `table`, `bitfield`, `wave` and `seq` began as the ascii-art
+skill's generator scripts and are ported from them, not redesigned:
+each was gated by byte parity with its script (output and exit
+status, 47 to 77 cases each) before it replaced it. Each reads the
+text format its script read, returns a `Block`, measures with
+`Width`, and refuses bad input with an `ArgumentError` naming the
+line. Where a port departs from its script, it is to keep a library
+rule:
+
+- **ASCII while drawing.** The scripts relied on a later artlint pass
+  to catch a non-ASCII label under `--ascii`; the library refuses it
+  while drawing, as every part does.
+- **One exit-status contract.** A file that cannot be read is bad
+  input (exit 1) in every command; three scripts made it a usage error.
+  A wave `--period` below 2 is a usage error: a step of one column
+  cannot hold a clock's rise and its fall.
+- **No trailing blank row.** A wave ending on `---` loses that last
+  blank row, as every block drops its trailing blank lines.
+- **Table's own CSV reader.** In Ruby 3.4 `csv` is a bundled gem, not
+  standard library, so a dependency; `Table.parse` is a short RFC 4180
+  reader instead, held to `CSV.parse`'s records by test.
+- **Bitfield is ASCII by genre.** RFC 2360 diagrams are ASCII; there
+  is no Unicode path to keep in step.
+
+The lint pass the scripts ran on their output (artlint) stays in the
+skill: it is a policy tool for documents, not part of drawing.
 
 ## Stats and Axis
 

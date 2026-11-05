@@ -1,10 +1,12 @@
 # ascii-art
 
-Text figures for a monospace grid, in Unicode or pure ASCII. It draws
-charts today: line, scatter, stairs, bar, histogram, box, stem and
-density plots, on braille, block, dot, density or ASCII canvases,
-with scaled axes. The output is meant for documents first, a terminal
-second: no trailing blank on any line,
+Text figures for a monospace grid, in Unicode or pure ASCII: charts
+(line, scatter, stairs, bar, histogram, box, stem and density plots,
+on braille, block, dot, density or ASCII canvases, with scaled axes),
+trees, tables, RFC-style bit-field diagrams, timing diagrams and
+sequence diagrams, and the composition that frames them and sets
+them side by side or stacked. The output is meant for documents
+first, a terminal second: no trailing blank on any line,
 no escape code unless colour is asked for, and a `--ascii` mode that
 is ASCII from the first byte.
 
@@ -111,6 +113,50 @@ above:)` adds a centred line. Each takes `ascii: true`, which draws
 ASCII glyphs and refuses non-ASCII content, and returns a `Block`
 (`lines`, `width`, `height`, `to_s`).
 
+### Diagrams
+
+Each diagram module reads the same small text formats the ascii-art
+skill's scripts read, and returns a `Block`, so it composes like a
+chart:
+
+```ruby
+AsciiArt.tree(outline, style: nil, ascii: false, root: nil)
+AsciiArt.table(rows, header: true, style: nil, ascii: false,
+               align: nil, title: nil)
+AsciiArt::Table.parse(text, tsv: false)          # CSV/TSV -> rows
+AsciiArt.bitfield(fields, word: 32, octets: false, ruler: true,
+                  abbrev: false)
+AsciiArt.wave(text, period: 4, ascii: false, ruler: false)
+AsciiArt.seq(text, ascii: false, numbered: false, footer: false)
+```
+
+- **tree**: an indented outline, one node per line, the indent unit
+  inferred from the first indented line; an optional `- `/`* `
+  bullet, and `label  # note` notes aligned into one column. Styles
+  `:light`, `:heavy`, `:rounded`; several top-level lines draw as a
+  forest unless `root:` names one root for them.
+- **table**: rows of Strings, the first the header unless `header:
+  false`; styles `:light`, `:heavy`, `:double`, `:rounded`, `:ascii`,
+  `:minimal` (dividers only) and `:markdown` (a GitHub pipe table). A
+  column of numbers right-aligns; `align:` ("lrc", one letter per
+  column) overrides. `Table.parse` reads CSV (RFC 4180 quoting) or,
+  with `tsv: true`, tab-separated text.
+- **bitfield**: `name:bits` lines or `[name, bits]` pairs, drawn as
+  RFC 2360 draws them, always in ASCII: a bit ruler, `+-+` ticks, each
+  name centred in its cell, a field longer than its row continued on
+  the next. `word:` is 8, 16, 32 or 64; `octets:` ticks per byte; a
+  name too wide for its cell is refused unless `abbrev:` truncates it.
+- **wave**: WaveDrom-like signals, `name: wave` per line in `0 1 p n
+  x z = .`, bus labels after `|`, a lone `---` for a blank row; each
+  step is `period:` columns (2 at least), `ruler:` numbers the steps.
+- **seq**: `participant A`, `A -> B: call`, `A --> B: reply`, `A ->>
+  B: async`, `A -> A: self`, `note over A[,B]: text`; columns widen
+  to fit every label, and `numbered:` / `footer:` number the messages
+  and repeat the participant boxes below.
+
+Every one refuses bad input with an `ArgumentError` naming the line,
+and under `ascii: true` draws ASCII glyphs and refuses non-ASCII text.
+
 ## The `ascii-art` command
 
 ```text
@@ -119,8 +165,11 @@ ascii-art chart [options] [file]
 ```
 
 The first argument names the command; `ascii-art --help` lists them:
-`chart` and `compose`. `ascii-art --version` prints the
-version. No command, or an unknown one, is a usage error (exit 2).
+`chart`, `compose`, `tree`, `table`, `bitfield`, `wave` and `seq`, each
+with its own `--help`. A file that cannot be read is bad input (exit
+1) in every command, a bad option a usage error (exit 2).
+`ascii-art --version` prints the version. No command, or an unknown
+one, is a usage error (exit 2).
 
 Reads one file argument or stdin (blank lines and `#` comments
 skipped), draws one chart, and prints it. A line holding a comma
@@ -232,6 +281,25 @@ mistake (an unknown style or align, `--style` other than ascii with
 ```text
 $ ascii-art chart --kind bar --width 20 langs.csv > plot.txt
 $ ascii-art compose frame --title Load plot.txt
+```
+
+### The diagram commands
+
+```text
+ascii-art tree     [--style S] [--ascii] [--root NAME] [file]
+ascii-art table    [--tsv] [--no-header] [--style S] [--ascii]
+                   [--align SPEC] [--title T] [file]
+ascii-art bitfield [--word N] [--octets] [--no-ruler] [--abbrev] [file]
+ascii-art wave     [--period N] [--ascii] [--ruler] [file]
+ascii-art seq      [--ascii] [--numbered] [--footer] [file]
+```
+
+Each reads its file or stdin and takes `--max-width N`, refusing
+(exit 1) a figure wider than N columns. Bad input exits 1 naming the
+line; a usage mistake exits 2.
+
+```text
+$ printf 'A -> B: request\nB --> A: ok\n' | ascii-art seq
 ```
 
 ## Relation to unicode_plot

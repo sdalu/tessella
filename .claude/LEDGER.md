@@ -58,6 +58,8 @@ Decisions:
 - 2026-11-05 — scope widened: a general ASCII/Unicode text-figure generator and composer (charts, frames, diagrams, arrows, picture dithering, …), charts its first module — by user
 - 2026-11-05 — renamed inkchart -> ascii-art (gem ascii-art, module AsciiArt, require "ascii-art", command `ascii-art COMMAND`, chart as `ascii-art chart`, repo ~/Repos/ascii-art); rubygems.org may refuse the name as too close to ascii_art, moot while unpublished — by user (name, module, directory), subcommands mine
 - 2026-11-05 — adoption: core first (grid, width, frame, compose), then the skill scripts as each is finished; artlint stays in the skill (more than a linter), a lint capability in the library to be considered — by user
+- 2026-11-05 — the five skill generators (tree, table, bitfield, wave, seq) ported into the library by parallel Sonnet agents, each gated by byte parity with its script (47-77 cases), reviewed and rerun by me; one exit-status contract imposed across commands (unreadable file = 1, --period < 2 = 2); table has its own RFC 4180 reader, csv being a bundled gem in 3.4 — by me
+- 2026-11-05 — new name chosen: tessella (free on rubygems.org, no near-duplicate in its full name list), to apply after the ports merge — by user
 
 Pieces:
 - P0 [kept: interface judgment, verified] — scaffold the repo (git init, gemspec, Makefile per make, minitest harness, oracle harness) and write the internal interfaces the other pieces share: Canvas (pixel grid → rows), Stats (bins, percentiles, density, scales), Layout (frame, axes, title, legend, colour) — evidence: DESIGN.md; make check 23 files no offences; make tests 3/3; make bundle parses and loads
