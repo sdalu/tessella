@@ -383,7 +383,9 @@ Tessella::Frame.new(
 ).to_s                  # => String, "\n"-terminated, no trailing blank
 Tessella::Color.wrap(text, color) # ANSI wrap; nil => text as is; a
                                   #   name, a 0..255 index (38;5) or
-                                  #   "#rrggbb" (38;2)
+                                  #   "#rrggbb" (38;2); [fg, bg] sets
+                                  #   the background too (a cell split
+                                  #   between two series)
 Tessella::Color::NAMES            # :red :green :yellow :blue :magenta
                                   #   :cyan :white, the series cycle
 Tessella::Color::Gradient.at(stops, row, rows)  # row 0 the bottom:

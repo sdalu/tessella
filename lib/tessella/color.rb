@@ -18,12 +18,22 @@ module Tessella
 
         RESET = "\e[0m"
 
-        # name nil => text as is, never an escape.
+        # name nil => text as is, never an escape. [fg, bg] sets the
+        # background too: a cell split between two colours, the glyph's
+        # ink one and the rest of the cell the other.
         def self.wrap(text, name)
             return text if name.nil?
 
-            "\e[#{code(name)}m#{text}#{RESET}"
+            codes = if name.is_a?(Array)
+                        [code(name[0]), background(name[1])]
+                    else
+                        [code(name)]
+                    end
+            "\e[#{codes.join(";")}m#{text}#{RESET}"
         end
+
+        # The background code for a colour: 4x for 3x, 48 for 38.
+        def self.background(color) = code(color).to_s.sub(/\A3/, "4")
 
         def self.code(color)
             case color

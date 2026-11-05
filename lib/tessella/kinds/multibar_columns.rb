@@ -88,12 +88,17 @@ module Tessella
 
         # [total, the cumulative top of each series], in eighths.
         def stack_heights(vals, max)
+            ends = stack_ends(vals, max)
+            return [ends.last, ends] if fine?
+
             top = series_fill(vals.size - 1)
-            total = column_units(share(vals.sum, max), vals.sum, top)
-            ends = vals.each_index.map do |i|
+            [column_units(share(vals.sum, max), vals.sum, top), ends]
+        end
+
+        def stack_ends(vals, max)
+            vals.each_index.map do |i|
                 rise_units(share(vals[0..i].sum, max), vals[0..i].sum)
             end
-            [total, ends]
         end
 
         # Whole cells take the series at their middle; the top cell's
@@ -101,6 +106,8 @@ module Tessella
         def stack_cell(heights, level, count)
             total, ends = heights
             return Cell.blank unless total > level
+            return fine_cell(ends, level, ColumnBars::RISE) if fine?
+
             if total < level + 8
                 return Cell.new(char: ColumnBars::RISE[total - level],
                                 color: series_color(count - 1))

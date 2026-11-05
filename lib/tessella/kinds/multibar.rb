@@ -12,6 +12,8 @@ module Tessella
     # must be 0 or more; the braille, block and half layouts refuse
     # several series. Kept apart so Bar stays under budget.
     module MultiBars
+        include MultiBarFine
+
         FILLS = Legend::FILLS
         ASCII_FILLS = Legend::ASCII_FILLS
 

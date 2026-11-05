@@ -62,7 +62,9 @@ module Tessella
 
         def stacked_rows(area, ew)
             scale = [@groups.map { it.last.sum }.max.to_f, area, ew]
-            rows = @groups.map { |_, vals| stacked_row(vals, scale) }
+            rows = @groups.map do |_, vals|
+                fine? ? fine_row(vals, scale) : stacked_row(vals, scale)
+            end
             [rows, @groups.each_with_index.to_h { |(l, _), i| [i, l.to_s] }]
         end
 

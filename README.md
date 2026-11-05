@@ -186,7 +186,11 @@ apart by fill (`█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆ ·`, `# = + @ * : . 
 in ASCII, so at most 12 series) and, under `color: true`, by colour;
 the legend sits right of the frame, or wrapped to the frame's width
 under it when there are more series than rows. Eighths end only the
-`█` series, since they are solid. Values must be 0 or more, and the
+`█` series, since they are solid -- except under `color: true`,
+where stacked series meet to the eighth: the cell they share is an
+eighths glyph inked in the first series' colour on the next one's
+background (without colour its two halves could not be told apart,
+so the boundary stays on a whole cell). Values must be 0 or more, and the
 braille, block and half layouts draw one series only.
 
 ```text
