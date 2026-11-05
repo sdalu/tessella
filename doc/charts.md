@@ -740,6 +740,7 @@ whitespace to a text tool.
 | `--xscale F`        | `xscale: :f`          | none                           |
 | `--yscale F`        | `yscale: :f`          | none (plotted kinds only)      |
 | `--xdate [FMT]`     | `xdate: "FMT"`        | by span (plotted kinds only)   |
+| `--yerr`            | `yerr: [...]`         | none (line, scatter)           |
 | `--ascii`           | `ascii: true`         | off                            |
 | `--color`           | `color: true`         | off                            |
 | (none)              | `border: :box`        | by kind                        |
@@ -878,6 +879,74 @@ or `DateTime`s), and `xdate: "FMT"` sets the format:
 
 ```ruby
 Tessella.line(times, temps, xdate: "%b %d")
+```
+
+## Error bars
+
+`--yerr` (line and scatter) reads a third column as each point's
+error, and draws a bar from y − e to y + e along the value axis, after
+the line or the points. The axis limits take the bars in. `dose.txt`
+holds a measured effect and its error per dose:
+
+```text
+$ cat dose.txt
+dose effect err
+1 2.1 0.4
+2 3.0 0.5
+3 4.6 0.3
+4 5.2 0.8
+5 6.9 0.6
+6 7.4 1.0
+```
+
+```text
+$ tessella chart --yerr --width 30 --height 8 dose.txt
+     ┌──────────────────────────────┐
+   9 │                             ⢠│ effect
+     │                        ⡄⢀⣀⣀⡠⢼│
+     │                     ⣀⠤⠊⠏⠁   ⠸│
+     │                ⢀⣀⡧⠔⠉         │
+     │          ⣀⠤⠗⠒⠉⠉⠁ ⠇           │
+     │      ⣄⠤⠒⠉                    │
+     │⣄⡠⠤⠒⠊⠉⠇                       │
+   1 │⠃                             │
+     └──────────────────────────────┘
+     1                              6
+```
+
+```text
+$ tessella chart --kind scatter --yerr --ascii --width 30 --height 8 dose.txt
+     +------------------------------+
+   9 |                             || effect
+     |                        .    ||
+     |                        |    ||
+     |                  |           |
+     |            |     |           |
+     |      |                       |
+     ||     |                       |
+   1 |`                             |
+     +------------------------------+
+     1                              6
+```
+
+Sideways (`--orientation horizontal`) the bars run across. Errors are
+in data units, and go through `--yscale` with y. `--yerr` needs
+exactly three columns, x, y and the error:
+
+```text
+$ printf 'x y e f\n1 2 1 1\n' | tessella chart --yerr
+tessella chart: --yerr reads x, y and the error: 4 columns
+```
+
+In Ruby, `yerr:` on `Tessella.line`, `Tessella.scatter` and `add`
+takes one error a point, or `[lows, highs]` for bars that are not
+symmetric. An error list of the wrong length, or a negative error, is
+refused. With `mark:`, the point stays visible at the middle of its
+bar:
+
+```ruby
+Tessella.scatter([1, 2, 3], [2, 3, 5], yerr: [[0.5, 0.2, 1], [1, 0.4, 0.5]],
+                 mark: "●", width: 20, height: 6)
 ```
 
 ## Several series, and marks

@@ -79,7 +79,7 @@ tessella seq: output is 41 columns, over --max-width 30
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
                [--canvas C] [--xscale F] [--yscale F] [--xdate [FMT]]
-               [--ascii] [--color]
+               [--yerr] [--ascii] [--color]
                [--style post|pre] [--stacked]
                [--orientation horizontal|vertical]
                [--area] [--gradient C,C,...] [--blocks B]
@@ -103,6 +103,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--xscale F`           | `ln log2 log10`                        |                 |
 | `--yscale F`           | plotted kinds: `ln log2 log10`         |                 |
 | `--xdate [FMT]`        | plotted kinds: x as ISO 8601 dates     | format by span  |
+| `--yerr`               | line, scatter: third column is the error | off           |
 | `--ascii`              | ASCII only                             | off             |
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |

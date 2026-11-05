@@ -50,6 +50,7 @@ All are shown with their output in
 | `trig.txt`     | `chart`                 | `x sin cos`, 101 rows for x in 0..10          |
 | `cpu.txt`      | `chart --area`          | 60 load samples between 10 and 90             |
 | `temps.txt`    | `chart --xdate`         | a month of daily temperatures, ISO dates      |
+| `dose.txt`     | `chart --yerr`          | x, y and an error per point                   |
 | `growth.txt`   | `chart --xscale`        | x over four decades                           |
 | `hosts.csv`    | `chart --kind bar`      | three series per label, for grouped/stacked   |
 | `week.txt`     | `chart --kind heatmap`  | a load per day and per three hours            |
