@@ -60,7 +60,7 @@ What each kind reads:
 | Kind                                  | Columns                                                         |
 |---------------------------------------|-----------------------------------------------------------------|
 | `line`, `scatter`, `stairs`, `density` | one column: y against 1..n; two: x y; more: x, then one series each |
-| `bar`                                 | label, value                                                    |
+| `bar`                                 | label, value; a row with more is refused                        |
 | `histogram`                           | one column of samples (further columns are ignored)             |
 | `box`                                 | one or more columns, one box per column                         |
 | `stem`                                | one column; two for the back-to-back form                       |
@@ -443,6 +443,14 @@ naming the row and the field:
 ```text
 $ printf '1\nx\n' | tessella chart
 tessella chart: row 2: y is not a number: "x"
+```
+
+A bar chart takes exactly a label and a value; a row with more
+columns is refused rather than read in part:
+
+```text
+$ tessella chart --kind bar trig.txt
+tessella chart: row 1 has 3 columns: bar takes label and value
 ```
 
 ## How tessella differs from unicode_plot
