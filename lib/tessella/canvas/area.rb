@@ -19,6 +19,21 @@ module Tessella
                 end
             end
 
+            # A bar along pixel row py (0 the top), length pixels from
+            # the left edge: a horizontal bar chart's bar on a canvas.
+            def row_bar(py, length, color: nil)
+                length.clamp(0, pixel_width).times do |px|
+                    set_sub_pixel(px, py, color)
+                end
+            end
+
+            # A bar up pixel column px, height pixels from the floor: a
+            # column chart's column on a canvas.
+            def column_bar(px, height, color: nil)
+                ((pixel_height - height.clamp(0, pixel_height))...pixel_height)
+                    .each { set_sub_pixel(px, it, color) }
+            end
+
             private
 
             def column_value(xs, ys, px)

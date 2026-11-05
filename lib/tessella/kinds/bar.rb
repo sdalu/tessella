@@ -132,8 +132,12 @@ module Tessella
     class Bar < Chart
         include BarCells
         include SignedBars
+        include BarLayouts
+        include ColumnBars
+        include DotRowBars
 
-        OPTIONS = (Chart::OPTIONS + %i[fill eighths track]).freeze
+        OPTIONS = (Chart::OPTIONS +
+                   %i[fill eighths track orientation blocks]).freeze
         MIN_WIDTH = 10
         DEFAULT_FILL = "█"
         ASCII_FILL = "#"
@@ -145,6 +149,7 @@ module Tessella
             @fill = fill_option(opts)
             @eighths = @ascii ? false : opts.fetch(:eighths, true)
             @track = track_option(opts)
+            check_layout!(opts)
             @bars = []
         end
 
@@ -180,7 +185,7 @@ module Tessella
         end
 
         def frame
-            Frame.new(**frame_options)
+            Frame.new(**(classic? ? frame_options : layout_frame_options))
         end
 
         def frame_options
@@ -246,12 +251,24 @@ module Tessella
         def add(values, bins: nil, closed: :left, color: nil)
             values = Check.finite!(Array(values), "value")
             hist = Stats.histogram(values, bins: bins, closed: closed)
+            @pairs = edge_pairs(hist).first(hist.counts.size)
             super(bin_labels(hist), hist.counts, color: color)
         end
 
         private
 
         def default_xlabel_basename = "Frequency"
+        def column_value_label = "Frequency"
+
+        # Columns sit on a continuous axis: its two ends, not names.
+        def column_names(_slot)
+            { bottom: [Axis.label(@pairs.first[0]),
+                       Axis.label(@pairs.last[1])] }
+        end
+
+        def group_label(first, last)
+            "#{Axis.label(@pairs[first][0])}..#{Axis.label(@pairs[last][1])}"
+        end
 
         def bin_labels(hist)
             pairs = edge_pairs(hist)

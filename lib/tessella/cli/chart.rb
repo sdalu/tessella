@@ -164,7 +164,17 @@ module Tessella
                 @parser.on("--closed C") { |v| @opts[:closed] = v.to_sym }
             end
 
+            def add_layout
+                @parser.on("--orientation O", %w[horizontal vertical]) do |v|
+                    @opts[:orientation] = v.to_sym
+                end
+                @parser.on("--blocks B", %w[eighths braille block]) do |v|
+                    @opts[:blocks] = v.to_sym
+                end
+            end
+
             def add_bar_specific
+                add_layout
                 @parser.on("--fill G") { |v| @opts[:fill] = v }
                 @parser.on("--no-eighths") { @opts[:eighths] = false }
                 @parser.on("--track G") do |v|
@@ -255,8 +265,9 @@ module Tessella
             EXTRA = {
                 line: %i[area gradient],
                 stairs: %i[style area gradient],
-                bar: %i[fill eighths track],
-                histogram: %i[fill eighths track bins closed],
+                bar: %i[fill eighths track orientation blocks],
+                histogram: %i[fill eighths track bins closed orientation
+                              blocks],
                 stem: %i[scale]
             }.freeze
 
@@ -274,7 +285,8 @@ module Tessella
         module KindOptions
             FLAG = { style: "--style", scale: "--scale", bins: "--bins",
                      closed: "--closed", fill: "--fill", area: "--area",
-                     gradient: "--gradient",
+                     gradient: "--gradient", orientation: "--orientation",
+                     blocks: "--blocks",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
             def self.check!(opts)

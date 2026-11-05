@@ -337,6 +337,9 @@ Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
                                             #   stairs: filled, btop-style
 Tessella.bar(labels, values, **opts)
 Tessella.histogram(values, bins: nil, closed: :left, **opts)
+    # bar, histogram: orientation: :horizontal | :vertical (columns),
+    #   blocks: :eighths | :braille | :block (kinds/columns.rb); only
+    #   horizontal :eighths is unicode_plot's layout, the oracle's
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf
 chart.to_s; chart.render(io = $stdout)

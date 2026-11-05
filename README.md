@@ -104,6 +104,33 @@ under `ascii: true` or `eighths: false`:
      └                              ┘
 ```
 
+Bar and histogram also take `orientation:` and `blocks:`.
+`orientation: :vertical` draws columns rising from a floor, the value
+axis on the left from 0 to the largest value; a bar chart's names go
+under their columns when each fits, else its first and last name at
+the two ends, and a histogram shows its axis's two ends. `blocks:` is
+the glyph the bars are built of: `:eighths` (the default; `▁` to `█`
+up a column, one column per character), `:braille` (one dot column
+per bar, so two columns per character, 4 steps per cell; or, kept
+horizontal, four bars per text row, each row named by the bars it
+holds) or `:block` (two per character, 2 steps). Both need values of
+0 or more; `:braille` and `:block` refuse `ascii: true`, `fill:`,
+`eighths:` and `track:`. On the command line: `--orientation
+horizontal|vertical` and `--blocks eighths|braille|block`.
+
+```text
+$ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
+  tessella chart --kind bar --orientation vertical --height 5 --width 20
+      ┌───────────────────┐
+   30 │     ████          │
+      │     ████          │
+      │     ████      ████│
+      │████ ████ ▂▂▂▂ ████│
+    0 │████ ████ ████ ████│
+      └───────────────────┘
+       ruby   c  rust  go
+```
+
 `Tessella.stem` refuses a scale that is not positive, and a plot
 that would need more than 1000 stems, one line each (raise `scale:`).
 

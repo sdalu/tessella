@@ -6,7 +6,46 @@ module Tessella
     # nothing of data; the body and every label arrive as given. Labels
     # are measured in display columns (Width), not characters, so a
     # wide-character label keeps the frame aligned.
+    # The lines a Frame draws under its bottom border: a row of text
+    # aligned with the body (under:), and the x-axis extremes at its two
+    # ends (bottom:). Kept apart so Frame's own class body stays under
+    # budget.
+    module FrameBelow
+        private
+
+        # A row of text under the body, column for column (a column
+        # chart's names).
+        def under_line
+            return nil if @under.to_s.empty?
+
+            lead + (" " * Width.of(border_part(:l))) + @under
+        end
+
+        def bottom_extremes_line
+            left_text, right_text = Array(@bottom)
+            return nil unless left_text || right_text
+
+            extremes_line(left_text.to_s, right_text.to_s)
+        end
+
+        def extremes_line(left_text, right_text)
+            lead + left_text + extremes_gap(left_text, right_text) +
+                right_text
+        end
+
+        def extremes_gap(left_text, right_text)
+            lw = Width.of(left_text)
+            cnt1 = ((width / 2.0) - lw).round
+            cnt2 = width - Width.of(right_text) - lw + 2 - cnt1
+            pad(cnt1) + pad(cnt2)
+        end
+
+        def pad(count) = count.positive? ? " " * count : ""
+    end
+
     class Frame
+        include FrameBelow
+
         MARGIN = 3
         GUTTER = 1
 
@@ -24,11 +63,12 @@ module Tessella
                    t: " ", b: " ", l: "|", r: nil }
         }.freeze
 
-        # DESIGN.md fixes this exact keyword interface: ten named options.
+        # DESIGN.md fixes this exact keyword interface: eleven named
+        # options.
         # rubocop:disable-next Metrics/ParameterLists
         def initialize(body:, border: :box, ascii: false, color: false,
                        title: nil, xlabel: nil, ylabel: nil,
-                       left: {}, right: {}, bottom: nil)
+                       left: {}, right: {}, bottom: nil, under: nil)
             @body = body
             @border = border == :none ? nil : borders(ascii).fetch(border)
             @color = color
@@ -38,6 +78,7 @@ module Tessella
             @left = left
             @right = right
             @bottom = bottom
+            @under = under
         end
 
         def to_s
@@ -54,7 +95,7 @@ module Tessella
         def max_left = @max_left ||= left_column_width
 
         def lines
-            [title_line, top_line, *row_lines, bottom_line,
+            [title_line, top_line, *row_lines, bottom_line, under_line,
              bottom_extremes_line, xlabel_line].compact
         end
 
@@ -117,26 +158,5 @@ module Tessella
                 Color.wrap(run.map(&:char).join, run.first.color)
             end.join
         end
-
-        def bottom_extremes_line
-            left_text, right_text = Array(@bottom)
-            return nil unless left_text || right_text
-
-            extremes_line(left_text.to_s, right_text.to_s)
-        end
-
-        def extremes_line(left_text, right_text)
-            lead + left_text + extremes_gap(left_text, right_text) +
-                right_text
-        end
-
-        def extremes_gap(left_text, right_text)
-            lw = Width.of(left_text)
-            cnt1 = ((width / 2.0) - lw).round
-            cnt2 = width - Width.of(right_text) - lw + 2 - cnt1
-            pad(cnt1) + pad(cnt2)
-        end
-
-        def pad(count) = count.positive? ? " " * count : ""
     end
 end
