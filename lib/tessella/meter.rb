@@ -20,7 +20,8 @@ module Tessella
         # (8); the other is refused.
         def self.build(fraction, orientation: :horizontal, **opts)
             share = fraction!(fraction)
-            opts = sized!(orientation, DEFAULTS.merge(opts))
+            opts = sized!(orientation,
+                          DEFAULTS.merge(ascii: Target.ascii?, **opts))
             return MeterUpright.build(share, opts) if orientation == :vertical
 
             Block.new([line(share, opts)])

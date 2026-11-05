@@ -28,8 +28,9 @@ module Tessella
         def width = @lines.map { Width.of(it) }.max
         def height = @lines.size
 
-        # Every line without its trailing blanks, each ended by "\n".
-        def to_s = @lines.map { "#{it.rstrip}\n" }.join
+        # Every line without its trailing blanks, each ended by "\n";
+        # under target :web, emoji-capable glyphs kept as text (Target).
+        def to_s = Target.adapt(@lines.map { "#{it.rstrip}\n" }.join)
 
         def ascii? = @lines.all?(&:ascii_only?)
 

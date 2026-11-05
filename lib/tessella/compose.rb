@@ -24,7 +24,8 @@ module Tessella
         end
 
         def self.text!(name, text, ascii)
-            return text unless ascii && !text.to_s.ascii_only?
+            return text unless ascii && !text.to_s.ascii_only? &&
+                               !Target.text_free?
 
             raise ArgumentError, "#{name} is non-ASCII under ascii: true"
         end
@@ -49,8 +50,8 @@ module Tessella
         # fill: a pattern for the background the frame adds, halo: as
         # Compose.fill's (compose_fill.rb).
         # rubocop:disable-next Metrics/ParameterLists
-        def self.frame(figure, title: nil, style: nil, pad: 1, ascii: false,
-                       fill: nil, halo: true)
+        def self.frame(figure, title: nil, style: nil, pad: 1,
+                       ascii: Target.ascii?, fill: nil, halo: true)
             block, = blocks([figure], ascii)
             text!("title", title, ascii)
             g = Borders.fetch(style, ascii: ascii)
@@ -91,7 +92,7 @@ module Tessella
     # beside: blocks side by side, each padded to its own width, the
     # shorter ones filled vertically by align:.
     module Compose
-        def self.beside(*figures, gap: 1, align: :top, ascii: false)
+        def self.beside(*figures, gap: 1, align: :top, ascii: Target.ascii?)
             raise ArgumentError, "beside takes two figures or more" if
                 figures.size < 2
 
@@ -123,7 +124,7 @@ module Tessella
     # blocks without one); center: centres a narrower block as a whole.
     module Compose
         def self.stack(*figures, gap: 0, rule: nil, center: false,
-                       ascii: false)
+                       ascii: Target.ascii?)
             raise ArgumentError, "stack takes two figures or more" if
                 figures.size < 2
 
@@ -169,7 +170,7 @@ module Tessella
     # without its trailing blank; caption: one centred line of text:,
     # above: or below the block, a blank line between.
     module Compose
-        def self.indent(figure, prefix:, ascii: false)
+        def self.indent(figure, prefix:, ascii: Target.ascii?)
             block, = blocks([figure], ascii)
             text!("prefix", prefix, ascii)
             Block.new(block.lines.map do |l|
@@ -177,7 +178,7 @@ module Tessella
             end)
         end
 
-        def self.caption(figure, text:, above: false, ascii: false)
+        def self.caption(figure, text:, above: false, ascii: Target.ascii?)
             block, = blocks([figure], ascii)
             cap = Width.center(text!("text", text, ascii), block.width)
             Block.new(above ? [cap, "", *block.lines] : [*block.lines, "", cap])

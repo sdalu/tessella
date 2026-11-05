@@ -537,13 +537,40 @@ Western terminals, two in CJK-configured ones); W, always two.
 styles, fill patterns, meter fill/track pairs, rule lines, tone ramps
 -- and computes each set's classes from Unicode 15.1, never by hand.
 A set spanning two classes is *mixed*: fine in Western terminals, but
-it changes length in CJK ones.
+it changes length in CJK ones. Each set also lists the width targets
+it is safe for (`GlyphSet#targets`, `Glyphs.targets(glyphs)`): `term`
+always, `cjk` with no ambiguous glyph, `web` with no wide or
+emoji-capable one.
 
 ```text
 tessella glyphs [KIND [NAME]]    # every set, a kind, or one set's glyphs
+tessella glyphs --target cjk     # only the sets safe for a target
 tessella glyphs --check GLYPHS   # the classes of a set of one's own;
                                  #   exit 1 when they are mixed
 ```
+
+### Width targets
+
+```ruby
+Tessella.target = :cjk                      # for the rest of the fiber
+Tessella::Target.with(:web) { Tessella.table(rows).to_s }
+```
+
+A figure is aligned for where it is read, and widths differ there.
+`:term`, the default, is a Western terminal: ambiguous glyphs (box
+drawing, blocks, `·●★`, Greek, accented Latin) take one column, wide
+ones (CJK, emoji) two, an emoji sequence joined by ZWJ or skin-toned
+two. `:cjk` is a CJK-configured terminal, where ambiguous glyphs take
+two: every module's `ascii:` then defaults to `true`, so the
+structure is ASCII, while text stays as given (CJK labels, `é`) and
+is measured with ambiguous glyphs as two; `ascii: false` still asks
+for Unicode structure, which will not line up there. `:web` is a
+browser, which may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide
+emoji: the output carries U+FE0E, the text-presentation selector,
+after each one, so it stays a one-column glyph. On the command line:
+`tessella --target term|cjk|web COMMAND ...`, or `TESSELLA_TARGET`.
+`tessella lint --target` checks a figure for a target, and `tessella
+glyphs` says which sets are safe for which.
 
 ### The command line from Ruby
 

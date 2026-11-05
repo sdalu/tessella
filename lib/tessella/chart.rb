@@ -92,7 +92,7 @@ module Tessella
         def initialize(**opts)
             check_options!(opts)
             @opts = opts
-            @ascii = opts.fetch(:ascii, false)
+            @ascii = opts.fetch(:ascii) { Target.ascii? }
             @color_on = opts.fetch(:color, false)
             @border = opts[:border] || default_border
             @xscale = Stats.transform(opts[:xscale])

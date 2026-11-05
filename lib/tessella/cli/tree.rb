@@ -78,7 +78,8 @@ module Tessella
         STYLE_NAMES = %w[light heavy rounded].freeze
 
         def self.parse(argv)
-            opts = { style: nil, ascii: false, root: nil, max_width: nil }
+            opts = { style: nil, ascii: Target.ascii?, root: nil,
+                     max_width: nil }
             build_parser(opts).parse!(argv)
             [opts, argv]
         end

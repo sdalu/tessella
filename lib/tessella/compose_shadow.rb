@@ -10,7 +10,7 @@ module Tessella
         SHADOW = "░"
         ASCII_SHADOW = "#"
 
-        def self.shadow(figure, glyph: nil, ascii: false)
+        def self.shadow(figure, glyph: nil, ascii: Target.ascii?)
             block, = blocks([figure], ascii)
             g = shadow_glyph!(glyph, ascii)
             width = block.width

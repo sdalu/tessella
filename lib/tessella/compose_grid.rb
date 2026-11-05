@@ -11,7 +11,7 @@ module Tessella
 
         # (*figures, columns: 2, gap: 2, row_gap: 1, align: :top,
         # ascii: false)
-        def self.grid(*figures, ascii: false, **layout)
+        def self.grid(*figures, ascii: Target.ascii?, **layout)
             raise ArgumentError, "grid takes one figure or more" if
                 figures.empty?
 

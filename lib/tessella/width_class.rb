@@ -57,13 +57,15 @@ module Tessella
             0x100000..0x10FFFD
         ].freeze
 
+        def self.ambiguous?(code) = AMBIGUOUS.any? { it.cover?(code) }
+
         # :N, :A, :W, or nil for an invisible glyph.
         def self.class_of(char)
             code = char.ord
-            case Width.char(code)
+            case Width.base(code)
             when 0 then nil
             when 2 then :W
-            else AMBIGUOUS.any? { it.cover?(code) } ? :A : :N
+            else ambiguous?(code) ? :A : :N
             end
         end
 

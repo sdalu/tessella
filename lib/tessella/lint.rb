@@ -29,31 +29,6 @@ module Tessella
         # exempt says an allow-mixed marker came just before the fence.
         Section = Data.define(:lines, :first, :exempt)
 
-        # Emoji-capable with text-default presentation (Emoji=Yes minus
-        # Emoji_Presentation=Yes, BMP; digits/#/* excluded): one cell in
-        # terminals, but web viewers may substitute the 2-cell emoji
-        # glyph. Generated from Unicode 15.1 emoji-data.txt.
-        EMOJI_RISK = [
-            0x00A9..0x00A9, 0x00AE..0x00AE, 0x203C..0x203C, 0x2049..0x2049,
-            0x2122..0x2122, 0x2139..0x2139, 0x2194..0x2199, 0x21A9..0x21AA,
-            0x2328..0x2328, 0x23CF..0x23CF, 0x23ED..0x23EF, 0x23F1..0x23F2,
-            0x23F8..0x23FA, 0x24C2..0x24C2, 0x25AA..0x25AB, 0x25B6..0x25B6,
-            0x25C0..0x25C0, 0x25FB..0x25FC, 0x2600..0x2604, 0x260E..0x260E,
-            0x2611..0x2611, 0x2618..0x2618, 0x261D..0x261D, 0x2620..0x2620,
-            0x2622..0x2623, 0x2626..0x2626, 0x262A..0x262A, 0x262E..0x262F,
-            0x2638..0x263A, 0x2640..0x2640, 0x2642..0x2642, 0x265F..0x2660,
-            0x2663..0x2663, 0x2665..0x2666, 0x2668..0x2668, 0x267B..0x267B,
-            0x267E..0x267E, 0x2692..0x2692, 0x2694..0x2697, 0x2699..0x2699,
-            0x269B..0x269C, 0x26A0..0x26A0, 0x26A7..0x26A7, 0x26B0..0x26B1,
-            0x26C8..0x26C8, 0x26CF..0x26CF, 0x26D1..0x26D1, 0x26D3..0x26D3,
-            0x26E9..0x26E9, 0x26F0..0x26F1, 0x26F4..0x26F4, 0x26F7..0x26F9,
-            0x2702..0x2702, 0x2708..0x2709, 0x270C..0x270D, 0x270F..0x270F,
-            0x2712..0x2712, 0x2714..0x2714, 0x2716..0x2716, 0x271D..0x271D,
-            0x2721..0x2721, 0x2733..0x2734, 0x2744..0x2744, 0x2747..0x2747,
-            0x2763..0x2764, 0x27A1..0x27A1, 0x2934..0x2935, 0x2B05..0x2B07,
-            0x3030..0x3030, 0x303D..0x303D, 0x3297..0x3297, 0x3299..0x3299
-        ].freeze
-
         VERTICALS = "│┃║╎╏┆┇┊┋|"
         STRUCTURAL = /[─-╿|]/
         BOX_CHAR = /[─-╿]/
@@ -84,20 +59,25 @@ module Tessella
             "markdown-fence" => ["```", "~~~"]
         }.freeze
 
-        DEFAULTS = { width: 78, prefix: "", web: false, forbid: [],
+        DEFAULTS = { width: 78, prefix: "", web: false, target: nil,
+                     forbid: [],
                      no_wide: false, ascii: false, allow_mixed: false,
                      fences: false, geometry: false, borders: [] }.freeze
 
         def self.wide?(code) = Width.char(code) == 2
         def self.invisible?(code) = Width.char(code).zero?
 
-        def self.emoji_risk?(code) = EMOJI_RISK.any? { it.cover?(code) }
+        def self.emoji_risk?(code) = Target.emoji_risk?(code)
 
         def self.width_of(text) = text.each_char.sum { Width.char(it.ord) }
 
+        # Linted for opts[:target] (web: true is :web), else the
+        # current one (Target): widths are that target's.
         def self.run(source, opts)
             resolved = Options.resolve(DEFAULTS.merge(opts))
-            Runner.new(resolved).run(text(source))
+            Target.with(resolved[:target]) do
+                Runner.new(resolved).run(text(source))
+            end
         end
 
         # The source as UTF-8, invalid bytes kept for the lint to name:
@@ -125,8 +105,16 @@ module Tessella
                                          "#{opts[:prefix].inspect}"
                 end
 
+                target = target(opts)
                 opts.merge(forbid: forbid(opts[:forbid]),
-                           borders: borders(opts[:borders]))
+                           borders: borders(opts[:borders]),
+                           target: target, web: target == :web)
+            end
+
+            def self.target(opts)
+                return Target.check!(opts[:target]) if opts[:target]
+
+                opts[:web] ? :web : Target.current
             end
 
             # Each a Borders name, Set or glyph String, as its Set.

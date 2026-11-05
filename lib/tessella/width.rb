@@ -90,7 +90,18 @@ module Tessella
             pad(gap / 2) + text + pad(gap - (gap / 2))
         end
 
+        # A character's columns under the current target (Target):
+        # an ambiguous glyph takes two under :cjk.
         def self.char(code)
+            width = base(code)
+            return width unless width == 1 && code > 0x7F && Target.cjk?
+
+            ambiguous?(code) ? 2 : 1
+        end
+
+        # A character's columns in a Western terminal, whatever the
+        # target: what its width class is read from.
+        def self.base(code)
             return 1 if code < 0x300
             return 2 if WIDE.any? { it.cover?(code) }
 

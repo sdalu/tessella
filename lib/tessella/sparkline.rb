@@ -10,7 +10,8 @@ module Tessella
         RISE = "▁▂▃▄▅▆▇█"
         ASCII = "_.-:=+*#"
 
-        def self.build(values, width: nil, min: nil, max: nil, ascii: false)
+        def self.build(values, width: nil, min: nil, max: nil,
+                       ascii: Target.ascii?)
             vals = Check.finite!(Array(values), "value")
             raise ArgumentError, "a sparkline needs values" if vals.empty?
 

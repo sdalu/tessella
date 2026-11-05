@@ -22,7 +22,7 @@ module Tessella
         HALOS = [true, false, :around].freeze
         STRUCTURE = /[\u2500-\u257F+|-]/
 
-        def self.fill(figure, pattern: nil, ascii: false, halo: true)
+        def self.fill(figure, pattern: nil, ascii: Target.ascii?, halo: true)
             block, = blocks([figure], ascii)
             glyphs = pattern_glyphs!(pattern, ascii)
             grid = cell_grid(block)

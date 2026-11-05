@@ -11,7 +11,7 @@ module Tessella
         end
 
         def initialize
-            @opts = { ascii: false, tsv: false, no_header: false }
+            @opts = { ascii: Target.ascii?, tsv: false, no_header: false }
             @parser = build_parser
         end
 

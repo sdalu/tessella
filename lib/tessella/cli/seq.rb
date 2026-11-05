@@ -84,7 +84,7 @@ module Tessella
             end
 
             def initialize
-                @opts = {}
+                @opts = { ascii: Target.ascii? }
                 @parser = OptionParser.new
                 @parser.banner = SeqCLI::BANNER
                 build

@@ -30,7 +30,8 @@ written here about another, so they can be built and tested apart.
   (test/oracle.rb), and no code is copied from it.
 - **Output is document-safe by construction.** No trailing blank on any
   line, no ANSI escape unless `color: true`, no tab, no invisible
-  glyph; a blank cell is U+0020, never U+2800. `ascii: true` output is
+  glyph (but U+FE0E after an emoji-capable glyph under target `:web`,
+  "Width targets"); a blank cell is U+0020, never U+2800. `ascii: true` output is
   ASCII-only from the first byte: no part draws Unicode and lets a later
   pass rewrite it.
 - **Values as given.** An Integer label stays an Integer (`12`, not
@@ -57,6 +58,7 @@ lib/tessella.rb            the public entry: requires, Tessella.<kind>
 lib/tessella/version.rb    VERSION, the one place it is written
 lib/tessella/error.rb      Tessella::Error < StandardError
 lib/tessella/check.rb      the argument checks every kind shares
+lib/tessella/target.rb     where a figure is read: term, cjk, web
 lib/tessella/width.rb      display width: columns a terminal gives text
 lib/tessella/width_class.rb width classes N, A, W (Unicode 15.1)
 lib/tessella/glyphs.rb     the named glyph sets and their classes
@@ -276,6 +278,27 @@ set's classes are computed, so the skill's references can query them
 (`tessella glyphs`) instead of keeping a hand-typed copy, and a set
 that mixes classes says so. Drawing modules take their glyphs from
 here, so a new named set is one entry, not a constant per module.
+Each set says which width targets it is safe for (`targets`): term,
+cjk without an ambiguous glyph, web without a wide or emoji-capable
+one.
+
+## Width targets
+
+`Target` (`target.rb`) names where a figure is read -- `:term`,
+`:cjk`, `:web` -- held in fiber storage (`Target.with`,
+`Tessella.target=`, the CLI's leading `--target` or
+`TESSELLA_TARGET`), so no signature carries it. Three things read it,
+and nothing else: `Width.char`, which gives an ambiguous glyph two
+columns under `:cjk` (`Width.base` keeps the Western width, which
+width classes are read from); every module's `ascii:` default, true
+under `:cjk`, where the text checks (`Check.ascii!`, `Compose.text!`,
+the tree's and the CLI's) stand down, so ASCII structure holds any
+text; and `Block#to_s` / `Frame#to_s`, which under `:web` put U+FE0E
+after each emoji-capable glyph (`Target.adapt`). Unicode boxes are not
+kept aligned under `:cjk` by doubling: a box glyph two columns wide
+beside single spaces cannot line up in trees, waves and chart axes,
+so the structure turns ASCII instead. Width.of sums grapheme clusters:
+an emoji sequence (ZWJ, skin tone) is one wide glyph.
 
 ## Meters and rules
 

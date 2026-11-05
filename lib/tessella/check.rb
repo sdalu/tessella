@@ -35,7 +35,8 @@ module Tessella
         # Under ascii: true every text drawn into a figure is ASCII
         # too: one that is not is refused, naming where it came from.
         def self.ascii!(text, where)
-            return text if text.nil? || text.to_s.ascii_only?
+            return text if text.nil? || text.to_s.ascii_only? ||
+                           Target.text_free?
 
             raise ArgumentError, "#{where} is non-ASCII under ascii: " \
                                  "true: #{text.to_s.inspect}"

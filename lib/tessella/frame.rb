@@ -85,8 +85,9 @@ module Tessella
             @under = under
         end
 
+        # Under target :web, emoji-capable glyphs kept as text (Target).
         def to_s
-            "#{lines.map(&:rstrip).join("\n")}\n"
+            Target.adapt("#{lines.map(&:rstrip).join("\n")}\n")
         end
 
         private

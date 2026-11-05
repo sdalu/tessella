@@ -132,7 +132,8 @@ module Tessella
             def initialize
                 @opts = { style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                           threshold: 0.5, dither: :fs, invert: false,
-                          edge_threshold: 0.3, ascii: false }
+                          edge_threshold: 0.3,
+                          ascii: Target.ascii? }
                 @parser = OptionParser.new
                 @parser.banner = ImageCLI::BANNER
                 build

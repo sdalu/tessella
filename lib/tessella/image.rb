@@ -46,7 +46,8 @@ module Tessella
 
         def self.build(source, opts)
             raster = Source.raster(source)
-            resolved = Options.resolve(DEFAULTS.merge(opts))
+            resolved = Options.resolve(DEFAULTS.merge(ascii: Target.ascii?,
+                                                      **opts))
             rows = Renderer.rows(raster, resolved)
             if rows.all? { it.strip.empty? }
                 raise Blank, blank_message(resolved)

@@ -46,7 +46,7 @@ module Tessella
             end
         end
 
-        def self.render(outline, style: nil, ascii: false, root: nil)
+        def self.render(outline, style: nil, ascii: Target.ascii?, root: nil)
             lines = Parser.parse(outline)
             roots = Builder.forest(lines)
             roots = [Builder.wrap(root, roots)] if root
@@ -54,7 +54,8 @@ module Tessella
             entries = []
             Renderer.walk(roots, nil, g, entries)
             rendered = Renderer.align(entries)
-            check_ascii!(root, rendered, entries) if ascii
+            check_ascii!(root, rendered, entries) if
+                ascii && !Target.text_free?
             Result.new(rendered, entries)
         end
 
@@ -213,7 +214,7 @@ module Tessella
         end
     end
 
-    def self.tree(outline, style: nil, ascii: false, root: nil)
+    def self.tree(outline, style: nil, ascii: Target.ascii?, root: nil)
         result = Tree.render(outline, style: style, ascii: ascii, root: root)
         Block.new(result.lines)
     end

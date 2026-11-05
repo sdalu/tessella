@@ -74,7 +74,7 @@ module Tessella
             end
 
             def initialize
-                @opts = { period: 4, ascii: false, ruler: false }
+                @opts = { period: 4, ascii: Target.ascii?, ruler: false }
                 @parser = OptionParser.new
                 @parser.banner = WaveCLI::BANNER
                 build

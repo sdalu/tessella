@@ -15,7 +15,7 @@ module Tessella
         }.freeze
 
         USAGE = <<~TEXT
-            Usage: tessella COMMAND [options] [file]
+            Usage: tessella [--target T] COMMAND [options] [file]
 
             Commands:
               chart     line, scatter, stairs, density, bar, histogram,
@@ -37,19 +37,46 @@ module Tessella
                         caps, circled, fullwidth, ...
               sparkline one line of values, ▁ to █
 
+            --target term|cjk|web (or TESSELLA_TARGET) names where the
+            figure is read: term (default); cjk, a CJK terminal, whose
+            ambiguous glyphs (box drawing, blocks) are two columns, so
+            structure is ASCII; web, a browser, where emoji-capable
+            glyphs are kept as text with U+FE0E.
+
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.
         TEXT
 
-        def self.run(argv, stdin:, stdout:, stderr:)
+        def self.run(argv, stdin:, stdout:, stderr:, env: ENV)
+            target, argv = target(argv, env)
             command, *rest = argv
             return meta(command, stdout) if %w[--help -h --version]
                                             .include?(command)
 
-            klass = COMMANDS[command]
-            return refuse(command, stderr) unless klass
+            klass = COMMANDS[command] or return refuse(command, stderr)
+            Target.with(target) do
+                klass.run(rest, stdin: stdin, stdout: stdout, stderr: stderr)
+            end
+        rescue ArgumentError => e
+            usage_error(e, stderr)
+        end
 
-            klass.run(rest, stdin: stdin, stdout: stdout, stderr: stderr)
+        # A leading --target T (or --target=T), else TESSELLA_TARGET,
+        # else term; and the arguments after it.
+        def self.target(argv, env)
+            first, second, *rest = argv
+            return [second, rest] if first == "--target" && second
+            return [first.delete_prefix("--target="), [second, *rest]] if
+                first&.start_with?("--target=")
+
+            [env.fetch("TESSELLA_TARGET", "term"), argv]
+        end
+
+        def self.usage_error(error, stderr)
+            raise error unless error.message.start_with?("unknown target")
+
+            stderr.puts("tessella: #{error.message}")
+            2
         end
 
         # "cannot read PATH: reason" for a file a command cannot open,

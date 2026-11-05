@@ -347,7 +347,7 @@ module Tessella
         end
     end
 
-    def self.wave(text, period: 4, ascii: false, ruler: false)
+    def self.wave(text, period: 4, ascii: Target.ascii?, ruler: false)
         Wave.build(text, period: period, ascii: ascii, ruler: ruler)
     end
 end

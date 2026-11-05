@@ -525,9 +525,9 @@ module Tessella
     # refusing only with every column at min_width or its natural
     # width; color: true makes the header bold.
     # rubocop:disable-next Metrics/ParameterLists
-    def self.table(rows, header: true, style: nil, ascii: false, align: nil,
-                   title: nil, width: nil, min_width: Table::MIN_WIDTH,
-                   color: false)
+    def self.table(rows, header: true, style: nil, ascii: Target.ascii?,
+                   align: nil, title: nil, width: nil,
+                   min_width: Table::MIN_WIDTH, color: false)
         Table.build(Table.cell_text(rows),
                     header: header, style: style, ascii: ascii,
                     align: align, title: title, width: width,

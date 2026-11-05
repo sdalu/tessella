@@ -153,7 +153,7 @@ module Tessella
 
         def initialize(sub)
             @sub = sub
-            @opts = {}
+            @opts = { ascii: Target.ascii? }
             @parser = OptionParser.new
             @parser.banner = ComposeCLI.usage_line(sub)
             FLAGS.fetch(sub).each { send(:"add_#{it}") }
@@ -228,7 +228,7 @@ module Tessella
                 raise ComposeCLI::DataError, "#{where}: tab character" if
                     line.include?("\t")
                 raise ComposeCLI::DataError, "#{where}: non-ASCII byte" if
-                    ascii && !line.ascii_only?
+                    ascii && !line.ascii_only? && !Target.text_free?
             end
         end
     end

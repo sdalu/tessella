@@ -394,6 +394,8 @@ module Tessella
             # A non-ASCII label under --ascii is bad input, named by
             # its row (a non-ASCII --title or label is usage).
             def self.check_ascii!(rows)
+                return if Target.text_free?
+
                 i = rows.index { |row| !row.join.ascii_only? } or return
 
                 raise DataError, "row #{i + 1} is non-ASCII under --ascii"

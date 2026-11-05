@@ -501,7 +501,7 @@ module Tessella
         end
     end
 
-    def self.seq(text, ascii: false, numbered: false, footer: false)
+    def self.seq(text, ascii: Target.ascii?, numbered: false, footer: false)
         Seq.build(text, ascii: ascii, numbered: numbered, footer: footer)
     end
 end

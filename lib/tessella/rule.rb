@@ -7,7 +7,8 @@ module Tessella
     # display width and set off by a space on each side --
     # "────────── ✦ ──────────".
     module Rule
-        def self.build(width: 78, ornament: nil, style: :light, ascii: false)
+        def self.build(width: 78, ornament: nil, style: :light,
+                       ascii: Target.ascii?)
             Check.positive_integer!(width, "width")
             line = glyph!(ascii ? :ascii : style)
             return Block.new([line * width]) if ornament.to_s.empty?
