@@ -44,12 +44,29 @@ class TestGlyphs < Minitest::Test
     end
 
     def test_the_command_lists_details_and_checks
-        assert_match(/^meter\s+arrow\s+N\s+▸▹$/, glyphs.last)
+        assert_match(/^meter\s+arrow\s+N\s+term cjk web\s+▸▹$/, glyphs.last)
         assert_equal("∴  U+2234  A\n∵  U+2235  A\n",
                      glyphs("pattern", "stipple").last)
-        assert_equal([0, "A\n"], glyphs("--check", "■□"))
-        assert_equal([1, "mixed: A N\n"], glyphs("--check", "█░"))
+        assert_equal([0, "A\nsafe for: term web\n"], glyphs("--check", "■□"))
+        assert_equal([1, "mixed: A N\nsafe for: term web\n"],
+                     glyphs("--check", "█░"))
         assert_equal(2, glyphs("bogus").first)
         assert_equal(2, glyphs("border", "nope").first)
+    end
+
+    # Safe for term always, cjk with no ambiguous glyph, web with no
+    # wide or emoji-capable one.
+    def test_each_set_says_which_targets_it_suits
+        g = Tessella::Glyphs
+        assert_equal(%i[term web], g.fetch(:border, :light).targets)
+        assert_equal(%i[term cjk web], g.targets("+-|"))
+        assert_equal(%i[term cjk], g.targets("日本"))
+        assert_equal(%i[term], g.targets("▶·"))
+    end
+
+    def test_the_command_lists_the_sets_for_a_target
+        listed = glyphs("--target", "cjk").last.lines
+        assert(listed.all? { it.include?("cjk") })
+        assert_equal(2, glyphs("--target", "mars").first)
     end
 end

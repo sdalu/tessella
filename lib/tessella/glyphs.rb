@@ -7,10 +7,27 @@ module Tessella
     # width classes its glyphs fall into, computed from Width, never
     # typed in. A set whose glyphs span two classes is "mixed": fine in
     # Western terminals, but it changes length in CJK-configured ones.
+    # Each set also says which width targets it is safe for.
     module Glyphs
         GlyphSet = Data.define(:kind, :name, :glyphs, :note) do
             def classes = Width.classes(glyphs)
             def mixed? = classes.size > 1
+            def targets = Glyphs.targets(glyphs)
+        end
+
+        # The targets (Target) a glyph set is safe for: term always;
+        # cjk with no ambiguous glyph, as a CJK terminal widens those
+        # and nothing else; web with no wide glyph, which browser fonts
+        # do not hold to two columns, and no emoji-capable one.
+        def self.targets(glyphs)
+            chars = glyphs.chars.reject { it == " " }
+            [:term,
+             (:cjk unless Width.classes(glyphs).include?(:A)),
+             (:web unless chars.any? { web_risk?(it) })].compact
+        end
+
+        def self.web_risk?(char)
+            Width.class_of(char) == :W || Target.emoji_risk?(char.ord)
         end
 
         PATTERNS = {
