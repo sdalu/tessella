@@ -813,8 +813,9 @@ of:
 `quadrant` is another name for `block`. The finer glyphs pack more
 bars into the same width; across, a text row holds as many bars as
 its cell has pixel rows, and is named by its first and last bar,
-`ruby..c`. `sextant` and `octant` draw one series only, and need a
-font that has them (see [canvases](#canvases)).
+`ruby..c`. Every glyph set but `eighths` draws one series only (bars
+of [several series](#several-series) need `eighths`), and `sextant`
+and `octant` need a font that has them (see [canvases](#canvases)).
 
 ```text
 $ tessella chart --kind bar --orientation vertical --blocks braille \

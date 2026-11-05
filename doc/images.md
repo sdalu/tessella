@@ -174,9 +174,11 @@ own terminal.
 
 `petscii` draws as the Commodore character set did: each cell's 4 × 8
 tones are matched to the glyph of least error among about forty
-shapes (halves, quadrants, `▏▕▔▁`, the triangles `◢◣◤◥`, `╱╲╳`, the
-shades `░▒▓`, lines, corners and tees, `● ○`). A soft picture comes out
-in shades:
+shapes (halves, quadrants, `▏▕▔▁`, three-quarter blocks `▊ ▆` and
+their kin `▂ 🮊 🮂 🮅`, the triangles `◢◣◤◥`, `╱╲╳`, the shades `░▒▓`,
+lines, corners and tees, `● ○`). `🮊 🮂 🮅` are from Unicode 13's
+Legacy Computing block, so the font caveat on sextants holds here
+too. A soft picture comes out in shades:
 
 ```text
 $ tessella image --style petscii --width 24 disc.pgm
@@ -198,14 +200,14 @@ a wedge in black and white:
 
 ```text
 $ tessella image --style petscii --width 24 shapes.pgm
-      ▁▁▁▁     ├███████◤
-   ▗▄██████▙▖  ├██████▘
-  ◢███▀▀▀▀▜██▙ ├█████▘
- ▕██▓      ▐██▌├████▘
- ▕██▙      ▐██▌├███▘
-  ▜██▙▄▁▁▄▟██▛ ├█▛
-   ▝▜██████▓▀  ├▛
-      ▔▔▔▔     ╱
+      ▁▁▁▁     🮊███████◤
+   ▗▄██████▆▖  🮊██████▘
+  ◢███▀▀🮂▀▜██▙ 🮊█████▘
+ ▕██▊      ▐██▌🮊████▘
+ ▕██▊      ▐██▌🮊███▘
+  ▜██▙▄▂▂▂▟██▛ 🮊█▛
+   ▝🮅██████🮅▀  🮊▛
+      🮂🮂🮂🮂     ╱
 ```
 
 `petscii` takes no dithering, so `--threshold` and `--dither` do not
