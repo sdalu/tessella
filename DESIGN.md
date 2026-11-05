@@ -73,7 +73,8 @@ lib/tessella/stats.rb      binning, percentiles, transforms
 lib/tessella/axis.rb       limits, nice rounding, number labels
 lib/tessella/color.rb      colour names to ANSI, and nothing else
 lib/tessella/canvas.rb     the base grid
-lib/tessella/canvas/*.rb   braille, block, half, eighths (fills
+lib/tessella/canvas/*.rb   braille, block, half, sextant, octant
+                           (Image's glyph tables), eighths (fills
                            only), dot, ascii, density, and area (the
                            fill under a curve, every type)
 lib/tessella/frame.rb      border, labels, title, legend, render

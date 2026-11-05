@@ -3,12 +3,13 @@
 module Tessella
     # The bar layouts besides unicode_plot's (DESIGN.md, "Chart and
     # kinds"): orientation: :vertical draws columns, and blocks:
-    # :braille or :block packs several bars into one character --
-    # braille four bars per text row (two columns per character when
-    # vertical), block two. Values must be zero or more. Kept apart
-    # from Bar so Bar's own class body stays under budget.
+    # :braille, :block, :sextant or :octant packs several bars into
+    # one character -- braille and octant four bars per text row (two
+    # columns per character when vertical), sextant three, block two.
+    # Values must be zero or more. Kept apart from Bar so Bar's own
+    # class body stays under budget.
     module BarLayouts
-        BLOCKS = %i[eighths braille block quadrant half].freeze
+        BLOCKS = %i[eighths braille block quadrant half sextant octant].freeze
         ORIENTATIONS = %i[horizontal vertical].freeze
 
         private
@@ -214,8 +215,9 @@ module Tessella
         def column_value_label = nil
     end
 
-    # blocks: :braille or :block, horizontal: one pixel row per bar, so
-    # a text row holds four bars (braille) or two (block), each row
+    # blocks: other than eighths, horizontal: one pixel row per bar, so
+    # a text row holds four bars (braille, octant), three (sextant) or
+    # two (block), each row
     # named by the bars it holds; the value axis runs under the frame
     # from 0 to the largest value.
     module DotRowBars
@@ -233,7 +235,11 @@ module Tessella
         end
 
         def dot_row_count(n) = (n + per_row - 1) / per_row
-        def per_row = { braille: 4, half: 1 }.fetch(@blocks, 2)
+
+        # Bars a text row holds: the canvas's pixel rows per character.
+        def per_row
+            { braille: 4, octant: 4, sextant: 3, half: 1 }.fetch(@blocks, 2)
+        end
 
         def dot_row_labels(canvas)
             (0...canvas.height).to_h do |r|

@@ -53,7 +53,11 @@ Options common to every kind, all optional: `title xlabel ylabel
 width height xlim ylim canvas ascii color border xscale`, and for
 line, scatter, stairs and density `yscale` too. Defaults:
 width 40, height 15, canvas `:braille` (`:ascii` when `ascii: true`),
-`color: false`, border by kind. `xscale:` runs a series' x values
+`color: false`, border by kind. Besides braille's 2x4 dots, `canvas:`
+takes the solid mosaics: `:block`/`:quadrant` (2x2), `:half` (1x2),
+`:sextant` (teletext's 2x3, `🬀`..`🬻`, Unicode 13) and `:octant`
+(2x4, braille's resolution solid, Unicode 16, so only the newest
+terminals draw it), as well as `:dot`, `:ascii` and `:density`. `xscale:` runs a series' x values
 through a transform (`:ln`, `:log2`, `:log10`; `nil` the identity)
 before limits and drawing, and `yscale:` a series' y values; the
 axis then reads in transformed units (1 to 1000 under `:log10` is 0
@@ -151,10 +155,13 @@ holds) or `:block`, also named `:quadrant` (the 2x2 quadrant glyphs,
 as `canvas: :quadrant` for an area fill: two per character, 2
 steps) or `:half` (half blocks, one bar per character: `▄`/`█` up a
 column, 2 steps per cell, `▌`/`█` along a row, half a cell per step;
-`canvas: :half` fills an area by halves). All need values of
+`canvas: :half` fills an area by halves); `:sextant` and `:octant`
+pack three and four bars a text row (two columns per character
+upright). All need values of
 0 or more; `:braille` and `:block` refuse `ascii: true`, `fill:`,
 `eighths:` and `track:`. On the command line: `--orientation
-horizontal|vertical` and `--blocks eighths|braille|block|quadrant|half`.
+horizontal|vertical` and `--blocks
+eighths|braille|block|quadrant|half|sextant|octant`.
 
 ```text
 $ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
@@ -670,7 +677,8 @@ line|scatter|stairs|density|bar|histogram|box|stem|heatmap|candlestick|pie`
 (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
-`--canvas braille|block|quadrant|half|dot|ascii|density|eighths`,
+`--canvas
+braille|block|quadrant|half|sextant|octant|dot|ascii|density|eighths`,
 `--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` and
 `--xdate [FMT]` for line, scatter, stairs and density, and `--yerr`
 for line and scatter).
