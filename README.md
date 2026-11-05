@@ -339,7 +339,9 @@ two differ in width class (the bar would change length as it fills
 in a CJK terminal). `width:` (20), `title:`, `label: false` (no
 percentage), `brackets: false`; `ascii: true` draws `[=====     ]`.
 On the command line: `tessella meter [--style S] [--width N] [--title
-T] [--no-label] [--no-brackets] [--ascii] FRACTION`.
+T] [--title-width N] [--no-label] [--no-brackets] [--ascii]
+FRACTION`; `title_width:` (`--title-width`) pads the title, so a
+column of meters with titles of different lengths lines up.
 
 `Tessella.rule(width: 78, ornament: nil, style: :light)` is a
 divider: a line in a rule style (`light ─`, `heavy ━`, `double ═`,

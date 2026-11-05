@@ -6,21 +6,38 @@ module Tessella
     # "[██████······] 50 %". The fill/track pair is a style from
     # Glyphs::METERS or glyphs of one's own, of one width class; the
     # block style fills its last cell by eighths. title: goes before
-    # the bar, the percentage after it unless label: false.
+    # the bar, the percentage after it unless label: false;
+    # title_width: pads the title to that many columns, so meters with
+    # titles of different lengths line up.
     module Meter
         EIGHTHS = " ▏▎▍▌▋▊▉".chars.freeze
 
         # rubocop:disable-next Metrics/ParameterLists
         def self.build(fraction, style: :block, width: 20, title: nil,
-                       label: true, brackets: true, ascii: false)
+                       label: true, brackets: true, ascii: false,
+                       title_width: nil)
             share = fraction!(fraction)
             Check.positive_integer!(width, "width")
             fill, track = pair!(ascii ? :classic : style, ascii)
-            bar = bar(share, width, fill, track, style == :block && !ascii)
-            line = [title && Compose.text!("title", title, ascii),
+            eighths = Borders.name(style) == :block && !ascii
+            bar = bar(share, width, fill, track, eighths)
+            line = [title && title!(title, title_width, ascii),
                     brackets ? "[#{bar}]" : bar,
                     (percent(share) if label)].compact.join(" ")
             Block.new([line])
+        end
+
+        # The title, padded to title_width: columns when given.
+        def self.title!(title, title_width, ascii)
+            text = Compose.text!("title", title, ascii)
+            return text unless title_width
+
+            Check.positive_integer!(title_width, "title_width")
+            if Width.of(text) > title_width
+                raise ArgumentError, "title #{text.inspect} is wider than " \
+                                     "title_width #{title_width}"
+            end
+            Width.ljust(text, title_width)
         end
 
         # A number 0..1, or a String "45%" / "0.45".

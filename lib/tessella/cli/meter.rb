@@ -45,8 +45,16 @@ module Tessella
             parser.on("--width N", Integer, "bar cells (default 20)") do |n|
                 opts[:width] = n
             end
-            parser.on("--title T", "text before the bar") { opts[:title] = it }
+            titles(parser, opts)
             flags(parser, opts)
+        end
+
+        def self.titles(parser, opts)
+            parser.on("--title T", "text before the bar") { opts[:title] = it }
+            parser.on("--title-width N", Integer, "pad the title to N " \
+                                                  "columns") do |n|
+                opts[:title_width] = n
+            end
         end
 
         def self.flags(parser, opts)

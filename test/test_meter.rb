@@ -26,6 +26,20 @@ class TestMeter < Minitest::Test
         assert_equal("[=====     ] 50 %", meter(0.5, width: 10, ascii: true))
     end
 
+    # The CLI passes the style as a String: block must still use eighths.
+    def test_block_by_name_uses_eighths_and_titles_align
+        assert_equal("ch 5 ████████████▍······· 62 %",
+                     meter(0.62, style: "block", brackets: false,
+                                 title: "ch 5"))
+        assert_equal(["ch 5       [█▍] 70 %", "channel 12 [█▍] 70 %"],
+                     ["ch 5", "channel 12"].map do |t|
+                         meter(0.7, width: 2, title: t, title_width: 10)
+                     end)
+        assert_raises(ArgumentError) do
+            meter(0.7, title: "channel 12", title_width: 4)
+        end
+    end
+
     def test_refusals
         assert_raises(ArgumentError) { meter(1.5) }
         assert_raises(ArgumentError) { meter(0.5, style: :rocket) }
