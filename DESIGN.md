@@ -301,7 +301,9 @@ width classes are read from); every module's `ascii:` default, true
 under `:cjk`, where the text checks (`Check.ascii!`, `Compose.text!`,
 the tree's and the CLI's) stand down, so ASCII structure holds any
 text; and `Block#to_s` / `Frame#to_s`, which under `:web` put U+FE0E
-after each emoji-capable glyph (`Target.adapt`). Unicode boxes are not
+after each emoji-capable glyph (`Target.adapt`) -- which keeps it a
+text glyph but cannot fix its width, a fallback font's when the
+viewer's monospace font lacks it. Unicode boxes are not
 kept aligned under `:cjk` by doubling: a box glyph two columns wide
 beside single spaces cannot line up in trees, waves and chart axes,
 so the structure turns ASCII instead. Frames and tables asked for in

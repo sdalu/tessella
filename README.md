@@ -570,7 +570,12 @@ in a CJK terminal (and look a column wide here and there in a Western
 one); other figures' Unicode structure will not line up there. `:web` is a
 browser, which may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide
 emoji: the output carries U+FE0E, the text-presentation selector,
-after each one, so it stays a one-column glyph. On the command line:
+after each one, so it stays a text glyph. That fixes its form, not
+its width: a glyph missing from the viewer's monospace font is drawn
+from a fallback font at that font's width (in Chrome on GitHub's code
+fonts, `▶` takes two columns and `↗` 1.4, with or without U+FE0E), so
+on the web only glyphs the monospace font carries line up -- `▸`, not
+`▶`. On the command line:
 `tessella --target term|cjk|web COMMAND ...`, or `TESSELLA_TARGET`.
 `tessella lint --target` checks a figure for a target, and `tessella
 glyphs` says which sets are safe for which.

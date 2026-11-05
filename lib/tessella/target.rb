@@ -14,6 +14,10 @@ module Tessella
     #   :web   a browser: as :term, but emoji-capable glyphs (▶ ☀ ✔ ...)
     #          may turn into wide emoji, so a figure's text carries
     #          U+FE0E, the text-presentation selector, after each one.
+    #          That keeps it a text glyph, not its width: a glyph the
+    #          viewer's monospace font lacks takes its fallback font's
+    #          advance (▶ two columns, ↗ 1.4 in Chrome on GitHub's font
+    #          stack), so only glyphs that font carries line up.
     #
     # The target is set for a block of code (Target.with) or for the
     # rest of the fiber (Tessella.target=); the command line takes
