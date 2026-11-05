@@ -5,11 +5,11 @@ module Tessella
     # Wide and Fullwidth glyphs take two, invisible ones (combining
     # marks, zero-width and format characters, variation selectors)
     # none, everything else one -- ambiguous glyphs (box drawing,
-    # blocks) included, the Western terminal width. The two tables are
-    # the ascii-art skill's (artlint.rb's WIDE and INVISIBLE, generated
-    # from Unicode 15.1), copied rather than required: the library has
-    # no dependency, so the skill's check-cells.sh is what catches
-    # drift between the copies.
+    # blocks) included, the Western terminal width. The two tables,
+    # generated from Unicode 15.1, came from the ascii-art skill's
+    # artlint.rb and are now shared with Tessella.lint (lint.rb); the
+    # markdown skill's check_md.rb keeps a copy that must stay
+    # identical to them.
     module Width
         WIDE = [
             0x1100..0x115F, 0x231A..0x231B, 0x2329..0x232A, 0x23E9..0x23EC,

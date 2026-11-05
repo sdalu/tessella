@@ -78,10 +78,15 @@ lib/tessella/raster.rb     Raster: a greyscale image; PNM; the decoder
 lib/tessella/png.rb        the built-in PNG decoder
 lib/tessella/rmagick_reader.rb
                            every other format, through optional rmagick
+lib/tessella/lint.rb       Tessella.lint and .alphabet: tables, options
+lib/tessella/lint/*.rb     one file per check (lines, shadows, mixing,
+                           drift, geometry), fences, alphabet, and the
+                           runner that sequences them
 lib/tessella/cli.rb        the command line's entry: loads the library,
                            optparse, and lib/tessella/cli/
 lib/tessella/cli/<name>.rb `tessella <name>`: one file per command
-                           (compose_options.rb: compose's options)
+                           (compose_options.rb, lint_options.rb: their
+                           commands' options)
 lib/tessella/cli/main.rb   `tessella`: dispatches on the command
 exe/tessella               the command line
 tools/bundle.rb            single-file build for vendoring
@@ -191,6 +196,49 @@ braille cell is a space, never U+2800; trailing blanks go (its `--pad`
 is dropped, composition pads); `ascii: true` allows only the ramp style
 with an ASCII ramp; and a picture that renders blank is refused,
 naming the threshold to lower, rather than returned as nothing.
+
+## Lint
+
+`Tessella.lint` is the ascii-art skill's `artlint.rb`, ported so the
+library ships the check its own output is held to, and so the skill
+and the skills shelf (its README gate, the markdown skill, the evals)
+call one installed command instead of a script by path. Its output is
+a contract parsed elsewhere, kept byte for byte: `NAME:LINE: message`
+on stderr, `--ruler` and `--alphabet` on stdout, exit 0 clean and 1 on
+any finding. The port was checked against artlint.rb itself over
+1,410 files of the shelf and this repository under eight flag sets,
+identical on stdout, stderr and exit status; the suite carries the
+skill's own lint fixtures and the eval fixtures' planted defects.
+
+Two departures, each an addition rather than a change:
+
+- **`fences: true`.** A Markdown file linted whole reads its prose and
+  tables as art; the shelf's README gate split out each fence by hand
+  to avoid that. The lint now does it, keeping the file's line
+  numbers, and an allow-mixed marker just before a fence exempts it.
+- **`geometry: true`**, from the shelf's `check-readme.py`: box sides
+  that wander a column, and connectors hanging from blank space or a
+  plain edge -- the commonest hand-drawn defect, which artlint did not
+  measure. It is off by default because it reads every `│` and `+` as
+  structure, so a Markdown table or a prose `|` would be flagged,
+  and turning it on would have changed every existing lint result
+  (the eval fixtures expect exactly their planted findings).
+  check-readme.py knew only the light set and read a rounded box's
+  sides as connectors hanging from its corners; here each glyph of
+  U+2500..U+257F is read by its arms (up, down, left, right, from its
+  Unicode name), so heavy, double, rounded, dashed and mixed junctions
+  are one rule, and `borders:` declares custom sets whose glyphs take
+  the arms of their roles (a glyph used for several roles plays all
+  of them). It measures display columns, not characters, and does not
+  flag a lifeline continuing under a horizontal that crosses it; on
+  the light set it otherwise reports what `check-readme.py` reports
+  (157 of 161 shelf files identical, the 4 others all such
+  crossings), and every frame and table tessella draws, in every
+  style, passes it.
+
+`--paranoid`, an older name for `--ascii`, was dropped. The display
+width tables are `Width`'s, so the lint and the figures it checks
+count the same columns.
 
 ## Stats and Axis
 
@@ -417,10 +465,11 @@ Where tessella departs from unicode_plot, it does so on purpose:
   crashes, hangs, or draws a mistake.
 - **Display width.** Labels are measured in the columns a terminal
   gives them (`Width`), so CJK labels keep the frame aligned. Its
-  tables are a copy of the ascii-art skill's (artlint.rb's, generated
-  from Unicode 15.1), so the library and the lint that checks its
-  output count the same columns; copied, not required, because the
-  library has no dependency.
+  tables, generated from Unicode 15.1, came from the ascii-art skill's
+  artlint.rb and are now the lint's own ("Lint"), so the library and
+  the lint that checks its output count the same columns. The
+  markdown skill's check_md.rb keeps a copy, which must stay
+  identical.
 
 The name: a tessella is one tile of a mosaic, as one character cell is
 one tile of every figure here. It is free on rubygems.org with no gem

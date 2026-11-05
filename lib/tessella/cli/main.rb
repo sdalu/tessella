@@ -9,7 +9,7 @@ module Tessella
         COMMANDS = {
             "chart" => ChartCLI, "compose" => ComposeCLI, "tree" => TreeCLI,
             "table" => TableCLI, "bitfield" => BitfieldCLI, "wave" => WaveCLI,
-            "seq" => SeqCLI, "image" => ImageCLI
+            "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI
         }.freeze
 
         USAGE = <<~TEXT
@@ -26,6 +26,8 @@ module Tessella
               wave      a timing diagram from WaveDrom-like signals
               seq       a sequence diagram from "A -> B: msg" lines
               image     a picture as text: tones, blocks, braille, edges
+              lint      check text figures: tabs, widths, invisible
+                        glyphs, mixed or misaligned structure
 
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.

@@ -193,6 +193,43 @@ true` is for a light background. `ascii: true` allows only the `ramp`
 style with an ASCII ramp. A picture that renders blank is refused,
 naming the threshold to lower.
 
+### Linting
+
+```ruby
+report = Tessella.lint(source, width: 78, prefix: "", web: false,
+                       forbid: [], no_wide: false, ascii: false,
+                       allow_mixed: false, fences: false, geometry: false,
+                       borders: [])
+report.findings   # => [#<data Tessella::Lint::Finding line=3, message="...">]
+report.clean?     # => true when there is none
+Tessella.alphabet(source)  # => "ascii", or "utf-8 box-drawing(12) ..."
+```
+
+`source` is a String or an IO. The lint checks a text figure for
+what breaks it on someone else's screen: tabs, invisible glyphs,
+trailing blanks, lines past `width` once `prefix` is drawn in front,
+invalid UTF-8, ASCII box structure mixed with Unicode box drawing in
+one figure, a vertical one column off its anchor on a few rows, and a
+drop shadow (`░`) missing from a row or misplaced. `web: true` adds
+glyphs some web renderers draw two cells wide; `no_wide: true` makes
+every wide glyph an error, and `ascii: true` every non-ASCII one.
+`forbid:` takes sequences, or presets naming a comment syntax (`xml`,
+`c-block`, `c-line`, `python-doc`, ...), and flags lines that would
+end the comment the figure sits in. A line reading
+`artlint: allow-mixed` (or `tessella: allow-mixed`), in any comment
+syntax, exempts the figure after it from the mixing check.
+
+`fences: true` lints each fenced block of a Markdown text on its own,
+with the text's line numbers, so prose and tables are not read as
+art. `geometry: true` also checks that a box's sides stay in their
+columns down to its bottom edge, and that a vertical or an arrow head
+hangs from something above it rather than from blank space, for every
+box-drawing set (light, heavy, double, rounded, dashed, mixed
+junctions) and ASCII `+-|` boxes; `borders:` adds custom sets (names,
+`Borders::Set`s or six-glyph Strings, as `style:` takes them).
+`Tessella.alphabet` measures a file before a figure goes into it: a
+file that is pure ASCII should get ASCII art.
+
 ### The command line from Ruby
 
 `require "tessella"` loads the library alone. The command classes
@@ -207,9 +244,10 @@ tessella chart [options] [file]
 ```
 
 The first argument names the command; `tessella --help` lists them:
-`chart`, `compose`, `tree`, `table`, `bitfield`, `wave`, `seq` and `image`, each
-with its own `--help`. A file that cannot be read is bad input (exit
-1) in every command, a bad option a usage error (exit 2).
+`chart`, `compose`, `tree`, `table`, `bitfield`, `wave`, `seq`,
+`image` and `lint`, each with its own `--help`. A file that cannot
+be read is bad input (exit 1) in every command, a bad option a usage
+error (exit 2).
 `tessella --version` prints the version. No command, or an unknown
 one, is a usage error (exit 2).
 
@@ -346,6 +384,34 @@ line; a usage mistake exits 2.
 
 ```text
 $ printf 'A -> B: request\nB --> A: ok\n' | tessella seq
+```
+
+### `tessella lint`
+
+```text
+tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
+              [--web] [--no-wide] [--ascii] [--allow-mixed]
+              [--fences] [--geometry] [--border GLYPHS]...
+              [file ...]
+tessella lint --alphabet [file ...]
+```
+
+The command form of `Tessella.lint`, and the ascii-art skill's
+`artlint.rb` under a new name, with its options and output kept:
+findings go to stderr as `FILE:LINE: message` (`stdin` for stdin),
+one per line; exit 0 when every input is clean, 1 on any finding or
+an unreadable file (the other files are still linted), 2 on a usage
+mistake. `--ruler` prints each line's width and the columns of its
+verticals on stdout, which must agree down a figure. `--alphabet`
+prints `FILE: ascii` or `FILE: utf-8 ...` on stdout, lints nothing
+and exits 0. Its `--paranoid` is gone: `--ascii` is the flag.
+
+```text
+$ printf 'a\tb\n┌──┐ \n│ab │\n└──┘\n' | tessella lint --geometry
+stdin:1: tab character
+stdin:2: trailing whitespace
+stdin:3: side of box opened at line 2 col 1 is off at col 4
+stdin:3: connector '│' at col 5 hangs from ' '
 ```
 
 ## Relation to unicode_plot
