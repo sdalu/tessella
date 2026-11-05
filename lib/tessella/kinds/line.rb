@@ -9,6 +9,7 @@ module Tessella
     class Line < Chart
         include Sideways
         include DateAxis
+        include ErrorBars
 
         OPTIONS = (Chart::OPTIONS +
                    %i[area gradient orientation yscale xdate]).freeze
@@ -61,6 +62,7 @@ module Tessella
     class Scatter < Chart
         include Sideways
         include DateAxis
+        include ErrorBars
 
         OPTIONS = (Chart::OPTIONS + %i[orientation yscale xdate]).freeze
 
@@ -132,14 +134,15 @@ module Tessella
         def draw_grid? = false
     end
 
-    # (x = nil, y, **opts): a new Line chart with one series.
-    def self.line(*, name: nil, mark: nil, **)
-        add_series(Line.new(**), *, name: name, mark: mark)
+    # (x = nil, y, yerr: nil, **opts): a new Line chart with one series.
+    def self.line(*, name: nil, mark: nil, yerr: nil, **)
+        add_series(Line.new(**), *, name: name, mark: mark, yerr: yerr)
     end
 
-    # (x = nil, y, **opts): a new Scatter chart with one series.
-    def self.scatter(*, name: nil, mark: nil, **)
-        add_series(Scatter.new(**), *, name: name, mark: mark)
+    # (x = nil, y, yerr: nil, **opts): a new Scatter chart with one
+    # series.
+    def self.scatter(*, name: nil, mark: nil, yerr: nil, **)
+        add_series(Scatter.new(**), *, name: name, mark: mark, yerr: yerr)
     end
 
     # (x = nil, y, style: :post, **opts): a new Stairs chart, style:
@@ -156,8 +159,9 @@ module Tessella
 
     # name: and mark: apply to the first series, as add's do to the
     # others
-    def self.add_series(chart, *, name: nil, mark: nil)
-        chart.add(*, name: name, mark: mark)
+    def self.add_series(chart, *, name: nil, mark: nil, yerr: nil)
+        extra = yerr ? { yerr: yerr } : {}
+        chart.add(*, name: name, mark: mark, **extra)
         chart
     end
     private_class_method :add_series

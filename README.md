@@ -74,6 +74,14 @@ command line, `--xdate [FMT]` reads the x column as ISO 8601
 (`2026-11-05`, `2026-11-05T14:30`, with `Z` or `+hh:mm`, UTC when
 absent); a field that is not one is bad input.
 
+Error bars: `yerr:` on line and scatter (`Tessella.line`,
+`.scatter`, and `add`) is an error a point, the bar running from y -
+e to y + e, or `[lows, highs]` for asymmetric ones; each point gets a
+segment along the value axis (across, sideways), drawn after the line
+or marks, and the axis limits take the bars in. Errors are in data
+units and go through `yscale:` with y. On the command line `--yerr`
+reads three columns, x, y and the error.
+
 `mark:` (on `add`, and on `Tessella.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
 the cell of each point, over whatever the cell holds, instead of the
@@ -565,7 +573,8 @@ line|scatter|stairs|density|bar|histogram|box|stem|heatmap` (default
 `--xlim A,B`, `--ylim A,B`,
 `--canvas braille|block|quadrant|half|dot|ascii|density`,
 `--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` and
-`--xdate [FMT]` for line, scatter, stairs and density).
+`--xdate [FMT]` for line, scatter, stairs and density, and `--yerr`
+for line, scatter and density).
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
 `--style post|pre` (stairs only); `--stacked` (bar only); `--blocks

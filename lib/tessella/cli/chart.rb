@@ -90,6 +90,7 @@ module Tessella
             def add_axes
                 @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
                 @parser.on("--xdate [FMT]") { |v| @opts[:xdate] = v || true }
+                @parser.on("--yerr") { @opts[:yerr] = true }
             end
 
             def add_histogram_specific
@@ -303,9 +304,9 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                line: %i[area gradient orientation yscale xdate],
-                scatter: %i[orientation yscale xdate],
-                density: %i[orientation yscale xdate],
+                line: %i[area gradient orientation yscale xdate yerr],
+                scatter: %i[orientation yscale xdate yerr],
+                density: %i[orientation yscale xdate yerr],
                 stairs: %i[style area gradient orientation yscale xdate],
                 bar: %i[fill eighths track orientation blocks stacked],
                 histogram: %i[fill eighths track bins closed orientation
@@ -315,8 +316,9 @@ module Tessella
                 stem: %i[scale]
             }.freeze
 
+            # The chart's own options; --yerr goes to its series instead.
             def self.for(opts)
-                opts.slice(*(COMMON + EXTRA.fetch(opts[:kind], [])))
+                opts.slice(*(COMMON + EXTRA.fetch(opts[:kind], []) - %i[yerr]))
             end
         end
     end
@@ -332,7 +334,7 @@ module Tessella
                      gradient: "--gradient", orientation: "--orientation",
                      blocks: "--blocks", yscale: "--yscale",
                      stacked: "--stacked", cell_width: "--cell-width",
-                     xdate: "--xdate",
+                     xdate: "--xdate", yerr: "--yerr",
                      colormap: "--colormap", min: "--min", max: "--max",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
@@ -451,7 +453,18 @@ module Tessella
                 args = columns.size == 1 ? [columns[0]] : columns[0, 2]
                 name = header && header[columns.size == 1 ? 0 : 1]
                 Tessella.public_send(kind, *args, name: name,
+                                                  **error_opts(opts, columns),
                                                   **ChartOpts.for(opts))
+            end
+
+            # --yerr: x, y and the error, three columns exactly.
+            def self.error_opts(opts, columns)
+                return {} unless opts[:yerr]
+                unless columns.size == 3
+                    raise DataError, "--yerr reads x, y and the error: " \
+                                     "#{columns.size} columns"
+                end
+                { yerr: columns.pop }
             end
 
             def self.add_rest(chart, columns, header)
