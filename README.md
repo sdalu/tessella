@@ -747,7 +747,8 @@ $ printf 'A -> B: request\nB --> A: ok\n' | tessella seq
 
 ```text
 tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
-              [--web] [--no-wide] [--ascii] [--allow-mixed]
+              [--target T] [--web] [--no-wide] [--ascii]
+              [--allow-mixed]
               [--fences] [--geometry] [--border GLYPHS]...
               [file ...]
 tessella lint --alphabet [file ...]
@@ -762,6 +763,10 @@ mistake. `--ruler` prints each line's width and the columns of its
 verticals on stdout, which must agree down a figure. `--alphabet`
 prints `FILE: ascii` or `FILE: utf-8 ...` on stdout, lints nothing
 and exits 0. Its `--paranoid` is gone: `--ascii` is the flag.
+`--target term|cjk|web` lints for where the figure is read (the
+current target by default; see "Width targets"): widths are that
+target's, `web` is `--web` and accepts a glyph followed by U+FE0E,
+and `cjk` names ambiguous glyphs (`é`, `·`, `●`) on aligned rows.
 
 ```text
 $ printf 'a\tb\n┌──┐ \n│ab │\n└──┘\n' | tessella lint --geometry

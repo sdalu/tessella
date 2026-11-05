@@ -236,7 +236,7 @@ any finding. The port was checked against artlint.rb itself over
 identical on stdout, stderr and exit status; the suite carries the
 skill's own lint fixtures and the eval fixtures' planted defects.
 
-Two departures, each an addition rather than a change:
+Three departures, each an addition rather than a change:
 
 - **`fences: true`.** A Markdown file linted whole reads its prose and
   tables as art; the shelf's README gate split out each fence by hand
@@ -261,10 +261,17 @@ Two departures, each an addition rather than a change:
   (157 of 161 shelf files identical, the 4 others all such
   crossings), and every frame and table tessella draws, in every
   style, passes it.
+- **`target:`** (`--target term|cjk|web`, "Width targets"): the lint
+  runs under that target, the current one by default, so its columns
+  are the target's. `:web` is the old `web: true`, and lets an
+  emoji-capable glyph followed by U+FE0E, as tessella writes it there,
+  pass; `:cjk` names each ambiguous glyph other than box drawing on a
+  row that must line up, since a CJK terminal gives it two columns.
 
 `--paranoid`, an older name for `--ascii`, was dropped. The display
 width tables are `Width`'s, so the lint and the figures it checks
-count the same columns.
+count the same columns -- except that the lint walks characters, as
+artlint did, where `Width.of` takes an emoji sequence as one glyph.
 
 ## Glyphs
 

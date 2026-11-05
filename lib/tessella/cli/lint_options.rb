@@ -55,6 +55,11 @@ module Tessella
             end
 
             def add_glyph_flags
+                @parser.on("--target T", Target::TARGETS.map(&:to_s),
+                           "term (default), cjk: ambiguous glyphs 2",
+                           "columns, or web: as --web") do |t|
+                    @opts[:target] = t.to_sym
+                end
                 flag("--web", :web, "web-viewed target: flag emoji-capable",
                      "glyphs, and wide glyphs on aligned rows")
                 flag("--no-wide", :no_wide, "flag wide (2-cell) glyphs")

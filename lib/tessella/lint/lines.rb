@@ -4,8 +4,9 @@ module Tessella
     module Lint
         # The checks one line at a time: invalid UTF-8, tabs, forbidden
         # sequences, trailing blanks, wide / invisible / emoji-capable /
-        # non-ASCII glyphs, wide glyphs on an aligned row (web), and the
-        # column budget, which also records the line's ruler row.
+        # non-ASCII glyphs, wide glyphs on an aligned row (web) and
+        # ambiguous ones (cjk), and the column budget, which also
+        # records the line's ruler row.
         module Lines
             private
 
@@ -26,8 +27,8 @@ module Tessella
                 check_forbidden(sec, i, line)
                 report(sec, i, "trailing whitespace") if
                     line.match?(/[ \t]+\z/)
-                line.each_char { check_char(sec, i, it) }
-                check_web_row(sec, i, line) if @opts[:web]
+                check_chars(sec, i, line)
+                check_target_row(sec, i, line)
                 check_budget(sec, i, line)
             end
 
@@ -42,6 +43,30 @@ module Tessella
                         report(sec, i, "forbidden sequence #{seq.inspect}")
                     end
                 end
+            end
+
+            def check_chars(sec, i, line)
+                skip = text_styled(line)
+                line.each_char.with_index do |ch, k|
+                    check_char(sec, i, ch) unless skip.include?(k)
+                end
+            end
+
+            # Under :web, an emoji-capable glyph followed by U+FE0E is
+            # kept as text: the indices of both, neither a finding.
+            def text_styled(line)
+                return [] unless @opts[:web]
+
+                line.enum_for(:scan, /(.)\u{FE0E}/).flat_map do
+                    match = Regexp.last_match
+                    k = match.begin(0)
+                    Lint.emoji_risk?(match[1].ord) ? [k, k + 1] : []
+                end
+            end
+
+            def check_target_row(sec, i, line)
+                check_web_row(sec, i, line) if @opts[:web]
+                check_cjk_row(sec, i, line) if @opts[:target] == :cjk
             end
 
             def check_char(sec, i, ch)
@@ -73,6 +98,20 @@ module Tessella
 
                     report(sec, i, "#{glyph("wide", ch)} on aligned row " \
                                    "(web target)")
+                end
+            end
+
+            # Under :cjk an ambiguous glyph that is not box drawing (·, é,
+            # ●) on a row that must line up takes two columns: named,
+            # as the drift and geometry checks measure it so.
+            def check_cjk_row(sec, i, line)
+                return unless line.match?(STRUCTURAL)
+
+                line.each_char.grep_v(BOX_CHAR).uniq.each do |ch|
+                    next unless Width.class_of(ch) == :A
+
+                    report(sec, i, "#{glyph("ambiguous", ch)} on aligned row " \
+                                   "(cjk target: 2 columns)")
                 end
             end
 
