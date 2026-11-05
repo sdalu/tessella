@@ -28,6 +28,12 @@ break is caught before the slow oracle run.
 
 ## Documents
 
+- [ ] `make doc-check` — every render and listing in `doc/` still
+  matches what this checkout's `exe/` and `lib/` produce, and what is
+  in `examples/`; `ruby doc/check.rb --update` rewrites them, to be
+  read before it is kept. `examples/plot.txt` is a frozen bar chart
+  that it does not regenerate: redo it by hand when bar output
+  changes.
 - [ ] `README.md` — does every option, flag, kind and exit status it
   names still exist, and do its renders still come out byte for byte?
 - [ ] `DESIGN.md` — if this round changed an interface or took a

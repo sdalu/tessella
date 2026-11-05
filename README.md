@@ -11,8 +11,10 @@ no escape code unless colour is asked for, and a `--ascii` mode that
 is ASCII from the first byte.
 
 tessella has no runtime dependency: binning, percentiles and density
-mapping are plain Ruby. See [DESIGN.md](DESIGN.md) for the internal
-interfaces and the decisions behind them.
+mapping are plain Ruby. The full guide, a page per module with real
+renders and runnable [examples](examples/), is in [doc/](doc/README.md);
+see [DESIGN.md](DESIGN.md) for the internal interfaces and the
+decisions behind them.
 
 ## Install
 

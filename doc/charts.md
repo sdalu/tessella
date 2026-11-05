@@ -1,0 +1,458 @@
+# Charts
+
+A chart turns numbers into a framed figure: a plot area of character
+cells, the y extremes on its left, the x extremes under it, a title
+above and a legend on the right. There are eight kinds:
+
+| Kind        | Draws                                      | Input           |
+|-------------|--------------------------------------------|-----------------|
+| `line`      | points joined by straight segments         | y, or x and y   |
+| `scatter`   | points, not joined                         | y, or x and y   |
+| `stairs`    | a step path between points                 | y, or x and y   |
+| `density`   | points, shaded by how many share a cell    | y, or x and y   |
+| `bar`       | one horizontal bar per label               | labels, values  |
+| `histogram` | counts of samples per bin, as bars         | samples         |
+| `box`       | a box-and-whisker plot per sample set      | sets of samples |
+| `stem`      | a stem-and-leaf plot, as text              | values          |
+
+Every example on this page is the command's output, byte for byte;
+the input files are in [examples/](../examples/), and every command
+runs there.
+
+## From the command line
+
+`tessella chart` reads one file, or stdin when no file is given, and
+prints one chart. `--kind` picks the kind; `line` is the default.
+
+```text
+$ tessella chart --title trig --width 30 --height 6 trig.txt
+                   trig
+      ┌──────────────────────────────┐
+    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
+      │ ⡴⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⣄   ⠱⡀  │ cos
+      │⡜  ⠈⢆   ⠸⡄    ⡜⠁  ⢀⠞  ⠈⡆   ⠱⡀ │
+      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡍⠉⠉⡽⠉⠉⠉⢉⡝⠉⠉⠉⠉⠙⢏⠉⠉⠉⠹⡉│
+      │     ⠈⢇   ⠙⡄⡜   ⢀⠎      ⠘⢄   ⠱│
+   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+      └──────────────────────────────┘
+      0                             10
+```
+
+`trig.txt` is a header row `x sin cos` and 101 rows of numbers. The
+first column is x; each further column is one series, named by the
+header.
+
+### The input format
+
+- A line holding a comma splits on commas, one holding a tab on
+  tabs, any other on runs of spaces. A CSV or TSV label may therefore
+  hold spaces.
+- Blank lines and lines starting with `#` are skipped.
+- A first row that is not all numbers is a header: it names the
+  series (line, scatter, stairs, density), the boxes (box) or the two
+  sides (back-to-back stem). For `bar`, the first row is a header
+  when its value field is not a number.
+- A number keeps its kind: `12` stays an Integer and prints `12`,
+  `7.5` stays a Float.
+
+What each kind reads:
+
+| Kind                                  | Columns                                                         |
+|---------------------------------------|-----------------------------------------------------------------|
+| `line`, `scatter`, `stairs`, `density` | one column: y against 1..n; two: x y; more: x, then one series each |
+| `bar`                                 | label, value                                                    |
+| `histogram`                           | one column of samples (further columns are ignored)             |
+| `box`                                 | one or more columns, one box per column                         |
+| `stem`                                | one column; two for the back-to-back form                       |
+
+## The kinds
+
+### line, scatter, stairs
+
+`line` joins consecutive points; `scatter` draws them alone; `stairs`
+draws a step path. Each series gets the next colour of the cycle
+(used only under `--color`) and, when it has a name, a legend entry.
+
+```text
+$ tessella chart --kind scatter --width 30 --height 6 trig.txt
+      ┌──────────────────────────────┐
+    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
+      │ ⡰⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⢄   ⠑⡀  │ cos
+      │⠜  ⠈⢂   ⠐⡄    ⠔⠁  ⢀⠜  ⠈⡄   ⠱⡀ │
+      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡉⠉⠉⡹⠉⠉⠉⠉⡍⠉⠉⠉⠉⠉⠏⠉⠉⠉⠩⡉│
+      │      ⢅   ⠘⡄⡜   ⢀⠎      ⠘⢄   ⠱│
+   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+      └──────────────────────────────┘
+      0                             10
+```
+
+`stairs` steps after each point by default (`--style post`); `--style
+pre` steps before it:
+
+```text
+$ printf '1 1\n2 3\n3 2\n4 4\n' | \
+    tessella chart --kind stairs --style pre --width 20 --height 4
+     ┌────────────────────┐
+   4 │             ⡏⠉⠉⠉⠉⠉⠉│
+     │⡖⠒⠒⠒⠒⠒⢲      ⡇      │
+     │⡇     ⠸⠤⠤⠤⠤⠤⠤⠇      │
+   1 │⡇                   │
+     └────────────────────┘
+     1                    4
+```
+
+### density
+
+`density` draws the points on its own canvas, where a cell's shade
+grows with the number of points that fall in it (` ░▒▓█`, or `
+.:+#` under `--ascii`). It ignores `--canvas`, and draws no x = 0
+or y = 0 axis line.
+
+```text
+$ tessella chart --kind density --width 30 --height 6 trig.txt
+      ┌──────────────────────────────┐
+    1 │▓▒▓▓▒▒▓░        ▒▒▓▒▒█▒▒▓▒    │ sin
+      │ ▒▒▒   ▒▒      ▒░   ▒▒▒   ▒░  │ cos
+      │▒  ░▒   ░▒    ▒░  ░▒  ░▒   ▒░ │
+      │░   ░▒   ▒░  ▒░   ▒    ░▒   ▒░│
+      │      ▓   ▒▒▓   ░▒      ▒▒   ▒│
+   -1 │       ▒▒▓▒▓▓▒▒▓▒        ░▒▓▒▓│
+      └──────────────────────────────┘
+      0                             10
+```
+
+### bar
+
+One bar per row, labelled on the left, with its value after it.
+
+```text
+$ tessella chart --kind bar --width 30 langs.csv
+        ┌                              ┐
+   ruby ┤██████████▍··············· 12
+      c ┤██████████████████████████ 30
+   rust ┤██████▌··················· 7.5
+        └                              ┘
+```
+
+The default look draws the last, fractional cell in eighths
+(`▏▎▍▌▋▊▉`) and fills the rest of each bar's width with a `·` track,
+so a bar shows both its fraction and its share. Three options change
+it: `--fill G` the bar glyph, `--no-eighths` whole cells only, and
+`--track G` the track glyph (`--track none` for no track):
+
+```text
+$ tessella chart --kind bar --width 30 \
+    --fill ■ --no-eighths --track none langs.csv
+        ┌                              ┐
+   ruby ┤■■■■■■■■■■ 12
+      c ┤■■■■■■■■■■■■■■■■■■■■■■■■■■ 30
+   rust ┤■■■■■■■ 7.5
+        └                              ┘
+```
+
+Values may be negative. The bar area then splits at a zero column,
+each side as wide as its share of the values' span; negative bars
+grow left, and a negative bar's fractional end is a half cell (`▐`):
+
+```text
+$ tessella chart --kind bar --width 30 neg.csv
+     ┌                              ┐
+   a ┤█████████████████········· -6
+   b ┤·················█████████ 3
+   c ┤·························· 0
+     └                              ┘
+```
+
+### histogram
+
+`histogram` bins one column of samples and draws the counts as bars,
+with the same bar options. `--bins N` sets the number of bins (by
+default Sturges' rule, ⌈log₂ n⌉ + 1, as unicode_plot picks it);
+`--closed left` (the default) bins as `[a, b)`, `--closed right` as
+`(a, b]`. Every sample lands in exactly one bin.
+
+```text
+$ tessella chart --kind histogram --width 30 --bins 8 normal.txt
+                ┌                              ┐
+   [-3.0, -2.0) ┤██▉······················· 8
+   [-2.0, -1.0) ┤██████████▏··············· 28
+   [-1.0,  0.0) ┤██████████████████████████ 72
+   [ 0.0,  1.0) ┤██████████████████████···· 61
+   [ 1.0,  2.0) ┤██████████▏··············· 28
+   [ 2.0,  3.0) ┤█▏························ 3
+                └                              ┘
+                           Frequency
+```
+
+`--bins` is a request: the edges are rounded to nice values, which
+can give fewer bins than asked, as here.
+
+### box
+
+One box per column: whiskers from minimum to maximum, the box from
+the first to the third quartile, the median inside it. The axis under
+the boxes shows the minimum, the middle and the maximum of the range.
+
+```text
+$ tessella chart --kind box --width 40 samples.txt
+     ┌                                        ┐
+      ╷ ┬─┐ ╷
+   a  ├─│ ├─┤
+      ╵ ┴─┘ ╵
+        ╷┌┬┐     ╷
+   b    ├┤│├─────┤
+        ╵└┴┘     ╵
+         ╷  ┌┬┐                              ╷
+   c     ├──┤│├──────────────────────────────┤
+         ╵  └┴┘                              ╵
+     └                                        ┘
+     0                  15                   30
+```
+
+The box draws its own open frame; it takes no `border:`.
+
+### stem
+
+A stem-and-leaf plot is text, not a canvas: one line per stem, its
+leaves after the bar, and a key under it. `--scale N` sets what one
+stem step is worth (10 by default): at scale 10, `2 | 37` reads 23
+and 27.
+
+```text
+$ tessella chart --kind stem stem.txt
+1 | 25
+2 | 1337
+3 | 148
+4 | 57
+5 | 2
+Key: 1|0 = 10
+The decimal is 1 digit(s) to the right of |
+```
+
+Two columns give the back-to-back form, the first column's leaves
+read leftwards:
+
+```text
+$ tessella chart --kind stem ages.txt
+ 52 | 1 | 8
+731 | 2 | 25
+ 84 | 3 | 136
+  5 | 4 | 14
+Key: 1|0 = 10
+The decimal is 1 digit(s) to the right of |
+```
+
+A plot that would need more than 1000 stems is refused: raise
+`--scale`.
+
+## Canvases
+
+The line, scatter and stairs kinds draw on a canvas, a grid of cells
+each holding a few pixels. `--canvas` picks it:
+
+| Canvas    | Pixels per cell | Glyphs                       |
+|-----------|-----------------|------------------------------|
+| `braille` | 2 × 4           | braille patterns (default)   |
+| `block`   | 2 × 2           | quadrant blocks `▘▝▀▖▌▞▛…`   |
+| `dot`     | 1 × 2           | `'` `.` `:`                  |
+| `ascii`   | 3 × 3           | ASCII strokes `- \| / \ "`…  |
+| `density` | 1 × 2           | shades by hit count          |
+
+Braille gives the finest line, ASCII survives any font:
+
+```text
+$ tessella chart --canvas block --width 24 --height 5 trig.txt
+      ┌────────────────────────┐
+    1 │▀▚▛▀▀▚      ▗▞▀▀▜▞▀▀▙   │ sin
+      │▗▘▜▖  ▚     ▛  ▗▀▝▖  ▜▖ │ cos
+      │▙▄▄█▄▄▄▙▄▄▄▟▄▄▄▙▄▄█▄▄▄█▄│
+      │    ▜▖  ▚▗▞  ▗▘    ▜▖  ▜│
+   -1 │     ▝▄▄▄▜▄▄▟▘      ▀▄▄▄│
+      └────────────────────────┘
+      0                       10
+```
+
+<!-- tessella: allow-mixed -->
+```text
+$ tessella chart --canvas ascii --width 24 --height 5 trig.txt
+      ┌────────────────────────┐
+    1 │"\/""\      ./""\/""\   │ sin
+      │|"-.  \     /  _--|  \. │ cos
+      │------------------------│
+      │    -.  \./  |-    -.  \│
+   -1 │     --_--__-"      -\__│
+      └────────────────────────┘
+      0                       10
+```
+
+A blank cell is always a space (U+0020), never the empty braille
+pattern U+2800, which some fonts draw as dots and which is not
+whitespace to a text tool.
+
+## Common options
+
+| CLI                 | Library               | Default                        |
+|---------------------|-----------------------|--------------------------------|
+| `--width N`         | `width: N`            | 40 (plot area, in cells)       |
+| `--height N`        | `height: N`           | 15 (plot area, in cells)       |
+| `--title S`         | `title: "S"`          | none                           |
+| `--xlabel S`        | `xlabel: "S"`         | none                           |
+| `--ylabel S`        | `ylabel: "S"`         | none                           |
+| `--xlim A,B`        | `xlim: [a, b]`        | the data's extent, rounded     |
+| `--ylim A,B`        | `ylim: [a, b]`        | the data's extent, rounded     |
+| `--canvas C`        | `canvas: :c`          | `braille` (`ascii` with ASCII) |
+| `--xscale F`        | `xscale: :f`          | none                           |
+| `--ascii`           | `ascii: true`         | off                            |
+| `--color`           | `color: true`         | off                            |
+| (none)              | `border: :box`        | by kind                        |
+
+`--width` and `--height` size the plot area, not the whole figure:
+labels, frame and legend add to it. A limit of `0,0` means "from the
+data", as if none were given.
+
+`--xscale ln|log2|log10` runs every x through the transform before
+limits and drawing, so the axis reads in the transformed unit:
+
+```text
+$ tessella chart --xscale log10 --width 30 --height 6 \
+    --xlabel 'log10 n' growth.txt
+      ┌──────────────────────────────┐
+   10 │                           ⢀⣀⠴│ t
+      │                      ⣀⡠⠔⠒⠉⠁  │
+      │                ⢀⣀⠤⠒⠊⠉        │
+      │           ⣀⡠⠔⠒⠉⠁             │
+      │    ⢀⣀⡠⠤⠒⠊⠉                   │
+    0 │⠤⠒⠊⠉⠁                         │
+      └──────────────────────────────┘
+      0                              4
+                  log10 n
+```
+
+`border:` (library only) is `:box` for a full frame, `:bar` for the
+corner-and-tick frame bar charts use, or `:none`.
+
+### Options by kind
+
+| CLI                         | Library            | Kinds                |
+|-----------------------------|--------------------|----------------------|
+| `--style post\|pre`         | `style: :post`     | stairs               |
+| `--bins N`                  | `bins: N`          | histogram            |
+| `--closed left\|right`      | `closed: :left`    | histogram            |
+| `--scale N`                 | `scale: N`         | stem                 |
+| `--fill G`                  | `fill: "G"`        | bar, histogram       |
+| `--no-eighths`              | `eighths: false`   | bar, histogram       |
+| `--track G\|none`           | `track: "G"`/`nil` | bar, histogram       |
+
+The bar defaults are `fill: "█"`, `eighths: true`, `track: "·"`;
+under `ascii: true`, `#`, no eighths, and `.`.
+
+Giving an option to a kind that does not take it is an error naming
+both, not something silently ignored:
+
+```text
+$ tessella chart --kind bar --bins 3 langs.csv
+tessella chart: --bins is not valid with --kind bar
+Usage: tessella chart [options] [file]
+```
+
+## Several series, and marks
+
+From the library, `chart.add` adds a series to a line, scatter,
+stairs or density chart. `mark:` draws a series as one glyph in the
+cell of each point, over whatever the cell holds, instead of the
+kind's own line or dots; the legend shows the glyph before the name.
+That is how measured points sit on a fitted curve:
+
+```ruby
+# frozen_string_literal: true
+
+# examples/calibration.rb: measured points marked on a fitted line.
+require "tessella"
+
+xs = (0..20).map { it * 0.5 }
+fit = Tessella.line(xs, xs.map { (0.5 * it) + 1 },
+                    name: "fit", width: 30, height: 6, title: "calibration")
+fit.add([1, 3, 4.5, 7, 9], [1.4, 2.7, 3.0, 4.9, 5.4],
+        name: "measured", mark: "●")
+puts fit
+```
+
+```text
+$ ruby calibration.rb
+               calibration
+     ┌──────────────────────────────┐
+   6 │                         ⢀⡠●⠒⠉│ fit
+     │                    ⢀●⠴⠒⠉⠁    │ ● measured
+     │               ⣀⡠⠤⠒⠉⠁         │
+     │         ●⢀⡠⠔●⠉⠁              │
+     │     ⢀⡠⠤⠒⠉⠁                   │
+   1 │⣀⡠⠤●⠉⠁                        │
+     └──────────────────────────────┘
+     0                             10
+```
+
+A mark is one character, and ASCII under `ascii: true`. Bar,
+histogram, box and stem take no mark.
+
+## Colour
+
+Colour is off by default, because a chart's first home is a document,
+where an escape code is garbage. `--color` (`color: true`) colours the
+plotted cells with ANSI escapes, one colour per series from the cycle
+red, green, yellow, blue, magenta, cyan, white; `add(..., color:
+:blue)` picks one. The frame, labels and legend stay plain. Where two
+series cross in a cell, the last one drawn colours it.
+
+## ASCII
+
+`--ascii` (`ascii: true`) makes the whole chart ASCII from the first
+byte: the frame is `+ - |`, the canvas is the ASCII one, bars are `#`
+on a `.` track. No part draws Unicode and lets a later pass rewrite
+it, so the output is safe in a man page, an RFC-style text or a
+source file kept to ASCII. A non-ASCII title, label, bar or series
+name is refused, not drawn: on the command line, a non-ASCII data
+row is bad input (exit 1) and a non-ASCII `--title`, `--xlabel` or
+`--ylabel` a usage error (exit 2).
+
+```text
+$ tessella chart --kind histogram --width 30 --bins 8 --ascii normal.txt
+                +                              +
+   [-3.0, -2.0) |###....................... 8
+   [-2.0, -1.0) |##########................ 28
+   [-1.0,  0.0) |########################## 72
+   [ 0.0,  1.0) |######################.... 61
+   [ 1.0,  2.0) |##########................ 28
+   [ 2.0,  3.0) |#......................... 3
+                +                              +
+                           Frequency
+```
+
+## What a chart refuses
+
+A chart checks its input before drawing, and raises `ArgumentError`
+(exit 2 on the command line) naming what is wrong: an unknown option,
+kind, canvas, xscale, stairs style or closed side; a width or height
+that is not a positive Integer; x and y of different lengths; a value
+that is not a finite number (`nil`, a String, NaN, ±Infinity, or an x
+of 0 or less under a log `xscale`); a stem scale that is not
+positive.
+
+On the command line, a row that cannot be read is bad input, exit 1,
+naming the row and the field:
+
+```text
+$ printf '1\nx\n' | tessella chart
+tessella chart: row 2: y is not a number: "x"
+```
+
+## How tessella differs from unicode_plot
+
+tessella's chart kinds and canvases come from
+[unicode_plot](https://github.com/red-data-tools/unicode_plot), which
+the test suite uses as an oracle; with unicode_plot's own bar
+settings (`fill: "■"`, `"▇"` for histograms, `eighths: false`, `track:
+nil`) the output is identical. The departures — sizes below 5 on the
+density canvas, wide histogram bins, `10` not `10.0` on an axis,
+exact stem leaves, very large constant data, negative bars, CJK
+labels — are listed with their reasons in
+[DESIGN.md](../DESIGN.md#why-it-is-shaped-so).

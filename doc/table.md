@@ -1,0 +1,240 @@
+# Tables
+
+`table` draws rows of text as a framed table, sized to its content,
+with numbers right-aligned.
+
+```ruby
+Tessella.table(rows, header: true, style: nil, ascii: false,
+               align: nil, title: nil, width: nil, min_width: 4,
+               color: false)                     # => Block
+Tessella::Table.parse(text, tsv: false)          # => Array of rows
+```
+
+```text
+tessella table [--tsv] [--no-header] [--style S] [--ascii]
+               [--align SPEC] [--title T] [--max-width N] [file]
+```
+
+## Input
+
+`rows` is an Array of Arrays of Strings, the first row the header
+unless `header: false`. `Table.parse` reads CSV with RFC 4180 quoting
+(a quoted field may hold commas, doubled quotes and newlines), or
+tab-separated text with `tsv: true`. The command line reads CSV by
+default and TSV with `--tsv`.
+
+```text
+$ cat kinds.csv
+kind,canvas,notes
+line,braille,"joins points, one series per column"
+bar,none,"negative values split at zero"
+stem,none,"back-to-back with two columns"
+```
+
+```text
+$ tessella table kinds.csv
+┌──────┬─────────┬─────────────────────────────────────┐
+│ kind │ canvas  │ notes                               │
+├──────┼─────────┼─────────────────────────────────────┤
+│ line │ braille │ joins points, one series per column │
+│ bar  │ none    │ negative values split at zero       │
+│ stem │ none    │ back-to-back with two columns       │
+└──────┴─────────┴─────────────────────────────────────┘
+```
+
+A column whose every body cell is a number is right-aligned:
+
+```text
+$ tessella table langs.csv
+┌──────┬─────┐
+│ lang │ loc │
+├──────┼─────┤
+│ ruby │  12 │
+│ c    │  30 │
+│ rust │ 7.5 │
+└──────┴─────┘
+```
+
+`--no-header` draws every row as body:
+
+```text
+$ tessella table --tsv --no-header sizes.tsv
+┌──────┬──────┐
+│ name │ size │
+│ lib  │ 7876 │
+│ test │ 5120 │
+└──────┴──────┘
+```
+
+## Alignment and title
+
+`--align` takes one letter per column, `l`, `r` or `c`; the library
+also takes an Array of `:left`, `:right`, `:center`. `--title` adds a
+row above the header, centred across the table.
+
+```text
+$ tessella table --title Kinds --align lcr kinds.csv
+┌──────────────────────────────────────────────────────┐
+│                        Kinds                         │
+├──────┬─────────┬─────────────────────────────────────┤
+│ kind │ canvas  │                               notes │
+├──────┼─────────┼─────────────────────────────────────┤
+│ line │ braille │ joins points, one series per column │
+│ bar  │  none   │       negative values split at zero │
+│ stem │  none   │       back-to-back with two columns │
+└──────┴─────────┴─────────────────────────────────────┘
+```
+
+## Styles
+
+`light` (the default), `heavy`, `double`, `rounded`, `ascii`,
+`minimal` (dividers only, no outer frame) and `markdown` (a GitHub
+pipe table, ready to paste):
+
+```text
+$ tessella table --style minimal kinds.csv
+       ╷         ╷
+  kind │ canvas  │ notes
+╶──────┼─────────┼─────────────────────────────────────╴
+  line │ braille │ joins points, one series per column
+  bar  │ none    │ negative values split at zero
+  stem │ none    │ back-to-back with two columns
+       ╵         ╵
+```
+
+```text
+$ tessella table --style markdown kinds.csv
+| kind | canvas  | notes                               |
+|------|---------|-------------------------------------|
+| line | braille | joins points, one series per column |
+| bar  | none    | negative values split at zero       |
+| stem | none    | back-to-back with two columns       |
+```
+
+```text
+$ tessella table --style ascii kinds.csv
++------+---------+-------------------------------------+
+| kind | canvas  | notes                               |
++------+---------+-------------------------------------+
+| line | braille | joins points, one series per column |
+| bar  | none    | negative values split at zero       |
+| stem | none    | back-to-back with two columns       |
++------+---------+-------------------------------------+
+```
+
+### Custom borders
+
+`--style` (`style:`) also takes eleven glyphs: a frame's six (`tl tr
+bl br h v`), then the five tees, in the order `top_t bot_t sep_l
+sep_t sep_r` (the tee on the top edge, on the bottom edge, at the
+left end of the header rule, its crossings, its right end):
+
+```text
+$ tessella table --style '╒╕╘╛═│╤╧╞╪╡' langs.csv
+╒══════╤═════╕
+│ lang │ loc │
+╞══════╪═════╡
+│ ruby │  12 │
+│ c    │  30 │
+│ rust │ 7.5 │
+╘══════╧═════╛
+```
+
+Six glyphs are not enough for a table:
+
+```text
+$ tessella table --style '╓╖╙╜─║' langs.csv
+tessella table: a table's border set needs 11 glyphs, its tees after the six of a frame: "╓╖╙╜─║"
+Usage: tessella table [options] [file]  (stdin if none)
+    --tsv --no-header --align SPEC --style NAME|GLYPHS --ascii
+    --title TEXT --max-width N
+```
+
+### ASCII
+
+Under `ascii: true` a named style draws as `ascii`; a custom set is
+drawn if it is all ASCII and refused if not. A cell or title that is
+not ASCII is refused.
+
+```text
+$ tessella table --ascii --style '****=!+++++' langs.csv
+*======+=====*
+! lang ! loc !
++======+=====+
+! ruby !  12 !
+! c    !  30 !
+! rust ! 7.5 !
+*======+=====*
+```
+
+## Multi-line cells, and fitting a width
+
+These two are library options, not command-line flags.
+
+A cell holding `"\n"` draws on several lines within its row,
+top-aligned. `width: N` fits the framed table to N columns: it
+narrows the widest column and word-wraps that column's cells, a word
+too long for the column breaking inside.
+
+```ruby
+# frozen_string_literal: true
+
+# examples/fit.rb: a table fitted to 40 columns; its widest column
+# wraps, and a cell holding a newline keeps its own lines. Fitted to
+# 20, it is refused, naming the width it needs.
+require "tessella"
+
+rows = Tessella::Table.parse(File.read("kinds.csv"))
+rows << ["box", "none", "quartiles\nand whiskers"]
+puts Tessella.table(rows, width: 40)
+begin
+    Tessella.table(rows, width: 20)
+rescue ArgumentError => e
+    puts e.message
+end
+```
+
+```text
+$ ruby fit.rb
+┌──────┬─────────┬─────────────────────┐
+│ kind │ canvas  │ notes               │
+├──────┼─────────┼─────────────────────┤
+│ line │ braille │ joins points, one   │
+│      │         │ series per column   │
+│ bar  │ none    │ negative values     │
+│      │         │ split at zero       │
+│ stem │ none    │ back-to-back with   │
+│      │         │ two columns         │
+│ box  │ none    │ quartiles           │
+│      │         │ and whiskers        │
+└──────┴─────────┴─────────────────────┘
+table needs 25 columns at the least (min_width 4)
+```
+
+Below `min_width:` columns of text (4 by default) in the narrowed
+column, the table is refused rather than drawn narrower than asked,
+and the message names the width it needs: the last line above.
+
+The `markdown` style refuses multi-line cells and `width:`: a pipe
+table cannot hold either.
+
+## Colour
+
+An ANSI colour code in a cell takes no column. It survives padding,
+and wrapping too: it is closed at the end of each wrapped line and
+reopened on the next, so every line stands on its own. `color: true`
+sets the header in bold.
+
+## Errors
+
+Bad input is refused naming the line (exit 1): an unterminated
+quoted field, a row with a different number of fields from the
+first, a non-ASCII cell or title under `--ascii`, a table wider than
+`--max-width`.
+
+```text
+$ printf 'a,b\nc\n' | tessella table
+tessella table: line 2: expected 2 fields, got 1
+```
+
+An unknown style or a malformed `--align` is a usage error (exit 2).

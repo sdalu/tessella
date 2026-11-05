@@ -1,0 +1,4 @@
+kind,canvas,notes
+line,braille,"joins points, one series per column"
+bar,none,"negative values split at zero"
+stem,none,"back-to-back with two columns"

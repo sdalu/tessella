@@ -1,0 +1,12 @@
+Version:4
+IHL:4
+DSCP:6
+ECN:2
+Total Length:16
+Identification:16
+Flags:3
+Fragment Offset:13
+TTL:8
+Protocol:8
+Header Checksum:16
+Source Address:32

@@ -1,0 +1,10 @@
+participant Browser
+participant Server
+participant DB
+Browser -> Server: POST /login
+Server -> DB: SELECT user
+DB --> Server: row
+Server -> Server: check hash
+note over Server,DB: bcrypt, cost 12
+Server ->> DB: log attempt
+Server --> Browser: 200 + cookie

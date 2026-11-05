@@ -1,0 +1,8 @@
+tessella
+  lib            # the library
+    tessella.rb  # the entry
+    tessella
+      cli
+  exe
+    tessella     # the command
+  test

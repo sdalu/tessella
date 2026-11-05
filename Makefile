@@ -6,11 +6,12 @@
 RUBY      ?= ruby
 GEM       ?= gem
 RUBOCOP   ?= rubocop
+SHELLCHECK ?= shellcheck
 ORACLE    ?=
 
 VERSION   != sed -n 's/.*VERSION = "\(.*\)"/\1/p' lib/tessella/version.rb
 GEMFILE    = tessella-$(VERSION).gem
-SOURCES   != find lib exe tools test -name '*.rb' -o -path 'exe/*' -type f
+SOURCES   != find lib exe tools test examples doc -name '*.rb' -o -path 'exe/*' -type f
 
 help:						## show this help (the default)
 	@echo 'tessella -- charts and text figures for a monospace grid, in Unicode or pure ASCII'
@@ -39,13 +40,16 @@ help:						## show this help (the default)
 
 all: check build				## check, then build the gem
 
-check: check-syntax check-style		## preflight: every file parses and passes the house style
+check: check-syntax check-style check-shell	## preflight: every file parses and passes the house style
 
 check-syntax:					## every Ruby file parses, with warnings on
 	@for f in $(SOURCES); do $(RUBY) -wc "$$f" >/dev/null || exit 1; done
 
 check-style:					## the ruby skill's RuboCop gate (.rubocop.yml)
-	@$(RUBOCOP) --no-color -c .rubocop.yml lib exe tools test
+	@$(RUBOCOP) --no-color -c .rubocop.yml lib exe tools test examples doc
+
+check-shell:					## the examples' sh scripts pass shellcheck (POSIX sh)
+	@$(SHELLCHECK) -s sh examples/*.sh
 
 build: $(GEMFILE)				## build the gem file
 
@@ -57,6 +61,9 @@ bundle:					## write dist/tessella.rb, the library as one file
 
 tests:						## run the suite; ORACLE=path also runs the unicode_plot comparisons
 	@TESSELLA_ORACLE='$(ORACLE)' $(RUBY) -w test/run.rb
+
+doc-check:					## doc/'s renders and listings still match the code (ruby doc/check.rb)
+	@$(RUBY) doc/check.rb
 
 version:					## print the release, bare
 	@echo '$(VERSION)'
@@ -70,5 +77,7 @@ uninstall:					## remove what install put down
 clean:						## remove the built gem and dist/
 	rm -rf $(GEMFILE) dist
 
-.PHONY: help all check check-syntax check-style build bundle tests version \
+.PHONY: help all check check-syntax check-style check-shell build bundle \
+	tests doc-check \
+	version \
 	install uninstall clean
