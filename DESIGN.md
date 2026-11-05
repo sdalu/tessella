@@ -420,6 +420,8 @@ Tessella.histogram(values, bins: nil, closed: :left, **opts)
 Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
                  colormap: nil, min: nil, max: nil, **opts)  # shaded
     # cells, a colormap under color: (kinds/heatmap.rb)
+Tessella.candlestick(x = nil, open:, high:, low:, close:, **opts)
+    # OHLC, a column a candle (kinds/candlestick.rb)
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays;
     # orientation: :vertical stands the boxes (kinds/box_upright.rb)
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf

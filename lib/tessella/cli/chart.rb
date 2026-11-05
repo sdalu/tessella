@@ -137,7 +137,7 @@ module Tessella
             include KindFlags
 
             KINDS = %w[line scatter stairs density bar histogram box
-                       stem heatmap].freeze
+                       stem heatmap candlestick].freeze
 
             def self.parse(argv)
                 new.parse(argv)
@@ -323,6 +323,7 @@ module Tessella
                               blocks],
                 box: %i[orientation],
                 heatmap: %i[cell_width colormap min max],
+                candlestick: %i[xdate],
                 stem: %i[scale]
             }.freeze
 
@@ -424,6 +425,7 @@ module Tessella
                     BARLIKE.include?(kind)
                 return BoxKind.build(opts, rows) if kind == :box
                 return HeatKind.build(opts, rows) if kind == :heatmap
+                return CandleKind.build(opts, rows) if kind == :candlestick
 
                 StemKind.build(opts, rows)
             end

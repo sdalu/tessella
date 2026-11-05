@@ -221,6 +221,16 @@ $ printf 'host mon tue wed thu\nalpha 1 3 5 2\nbeta 4 6 8 9\n' |
           mon tue wed thu
 ```
 
+`Tessella.candlestick(x, open:, high:, low:, close:)` draws a column
+a candle: the wick `│` from low to high, the body from open to close
+`█` for an up candle (close at or above open), `▒` for a down one,
+`─` when they share a row; under `color: true` up is green and down
+red. The value axis is on the left, the first and last x under the
+frame -- dates when x holds times, formatted as a date axis's
+(`xdate:`). A low above open or close, or a high below, is refused.
+On the command line `--kind candlestick` reads `x open high low
+close` rows, `--xdate` for ISO 8601 dates.
+
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
 each box stands three columns wide, whiskers running up and down
 (`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
@@ -578,8 +588,8 @@ $ tessella chart --kind bar --ascii --width 30 langs.csv
 ### Options
 
 Common to every kind: `--kind
-line|scatter|stairs|density|bar|histogram|box|stem|heatmap` (default
-`line`),
+line|scatter|stairs|density|bar|histogram|box|stem|heatmap|candlestick`
+(default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
 `--canvas braille|block|quadrant|half|dot|ascii|density`,

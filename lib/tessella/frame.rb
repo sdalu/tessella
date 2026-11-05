@@ -28,9 +28,12 @@ module Tessella
             extremes_line(left_text.to_s, right_text.to_s)
         end
 
+        # The two ends of the x axis, a space between them at least,
+        # even when they are wider than the body.
         def extremes_line(left_text, right_text)
-            lead + left_text + extremes_gap(left_text, right_text) +
-                right_text
+            gap = extremes_gap(left_text, right_text)
+            gap = " " if gap.empty? && !left_text.empty? && !right_text.empty?
+            lead + left_text + gap + right_text
         end
 
         def extremes_gap(left_text, right_text)
