@@ -143,6 +143,10 @@ module Tessella
                 data = Chunks.data_for(chunks, "PLTE")
                 return nil unless header.colour_type == 3
                 raise ArgumentError, "missing PLTE chunk" unless data
+                unless (3..768).cover?(data.bytesize) &&
+                       (data.bytesize % 3).zero?
+                    raise ArgumentError, "bad PLTE chunk length"
+                end
 
                 data.unpack("C*").each_slice(3).to_a
             end
@@ -276,13 +280,35 @@ module Tessella
             WHOLE = [[0, 0, 1, 1]].freeze
 
             def self.decode(header, data)
+                passes = header.interlace == 1 ? PASSES : WHOLE
+                check_length(header, data, passes)
                 grid = Array.new(header.height) { Array.new(header.width) }
                 offset = 0
-                passes = header.interlace == 1 ? PASSES : WHOLE
                 passes.each do |geom|
                     offset = pass(header, data, offset, geom, grid)
                 end
                 grid
+            end
+
+            # The image data must hold every pass's rows before a grid
+            # the header's size is allocated: a few bytes may claim
+            # any width and height up to 2**31 - 1.
+            def self.check_length(header, data, passes)
+                return if data.bytesize >= byte_count(header, passes)
+
+                raise ArgumentError, "truncated PNG image data"
+            end
+
+            def self.byte_count(header, passes)
+                channels = Pixels.channel_count(header.colour_type)
+                passes.sum do |xs, ys, xstep, ystep|
+                    pw = dimension(header.width, xs, xstep)
+                    ph = dimension(header.height, ys, ystep)
+                    next 0 if pw.zero?
+
+                    ph * (1 + Unfilter.row_bytes(pw, channels,
+                                                 header.bit_depth))
+                end
             end
 
             def self.pass(header, data, offset, geom, grid)
@@ -374,7 +400,13 @@ module Tessella
             end
 
             def self.indexed(px, palette, trns)
-                r, g, b = palette[px[0]]
+                entry = palette[px[0]]
+                unless entry
+                    raise ArgumentError, "palette index #{px[0]} out of " \
+                                         "range (#{palette.size} entries)"
+                end
+
+                r, g, b = entry
                 alpha = trns ? trns[px[0]] : 255
                 Raster.luma(r / 255.0, g / 255.0, b / 255.0, alpha / 255.0)
             end

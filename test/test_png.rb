@@ -452,7 +452,7 @@ class TestPngRefusals < Minitest::Test
     end
 
     def test_bad_filter_type
-        raw = "\x07#{"\x00" * 6}"
+        raw = "\x07#{"\x00" * 6}\x00#{"\x00" * 6}"
         bytes = Tessella::Png::SIGNATURE + chunk("IHDR", ihdr) +
                 chunk("IDAT", Zlib::Deflate.deflate(raw)) + chunk("IEND", "")
         assert_includes(refused(bytes).message, "filter")
@@ -462,5 +462,42 @@ class TestPngRefusals < Minitest::Test
         bytes = Tessella::Png::SIGNATURE + chunk("IHDR", ihdr) +
                 chunk("IDAT", "not zlib data") + chunk("IEND", "")
         assert_includes(refused(bytes).message, "zlib")
+    end
+
+    def indexed(plte, raw)
+        Tessella::Png::SIGNATURE +
+            chunk("IHDR", ihdr(width: 2, height: 1, colour: 3)) +
+            chunk("PLTE", plte) +
+            chunk("IDAT", Zlib::Deflate.deflate(raw)) + chunk("IEND", "")
+    end
+
+    def test_palette_index_out_of_range
+        bytes = indexed("\xff\xff\xff\x00\x00\x00".b, "\x00\x00\x05".b)
+        assert_includes(refused(bytes).message, "palette index 5")
+    end
+
+    def test_plte_length_not_a_multiple_of_three
+        bytes = indexed("\xff\xff\xff\x00".b, "\x00\x00\x00".b)
+        assert_includes(refused(bytes).message, "PLTE")
+    end
+
+    # A 60000x60000 header over one byte of image data is refused
+    # from the data's length, before a grid that size is allocated.
+    def test_header_larger_than_its_image_data
+        bytes = Tessella::Png::SIGNATURE +
+                chunk("IHDR", ihdr(width: 60_000, height: 60_000,
+                                   colour: 0)) +
+                chunk("IDAT", Zlib::Deflate.deflate("\x00")) +
+                chunk("IEND", "")
+        assert_includes(refused(bytes).message, "truncated")
+    end
+
+    def test_interlaced_header_larger_than_its_image_data
+        bytes = Tessella::Png::SIGNATURE +
+                chunk("IHDR", ihdr(width: 60_000, height: 60_000,
+                                   colour: 0, interlace: 1)) +
+                chunk("IDAT", Zlib::Deflate.deflate("\x00")) +
+                chunk("IEND", "")
+        assert_includes(refused(bytes).message, "truncated")
     end
 end

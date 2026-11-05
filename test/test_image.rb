@@ -397,3 +397,29 @@ class TestImageBlank < Minitest::Test
         assert_equal(1, status, err.string)
     end
 end
+
+# The PNM reader's header and sample checks: comment lines anywhere
+# whitespace may go, maxval in 1..65535, and no sample above it.
+class TestPnmHeader < Minitest::Test
+    def test_a_pnm_header_with_consecutive_comment_lines_is_read
+        raster = Tessella::Raster.decode(
+            "P2\n# one\n# two\n2 1\n# three\n255\n0 255\n"
+        )
+        assert_equal([2, 1, [0.0, 1.0]],
+                     [raster.width, raster.height, raster.luma])
+    end
+
+    def test_a_pnm_maxval_out_of_range_is_refused
+        ["P2\n2 1\n0\n0 0\n", "P2\n1 1\n65536\n0\n"].each do |pnm|
+            error = assert_raises(ArgumentError) { Tessella.image(pnm) }
+            assert_match(/maxval/, error.message)
+        end
+    end
+
+    def test_a_pnm_sample_above_maxval_is_refused
+        error = assert_raises(ArgumentError) do
+            Tessella.image("P2\n2 1\n255\n0 400\n")
+        end
+        assert_match(/above maxval 255/, error.message)
+    end
+end

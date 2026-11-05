@@ -39,13 +39,14 @@ module Tessella
     # "#" comments in the header -- as the ascii-art skill's img2art.rb
     # reads them.
     module Pnm
-        HEADER = /\A(P[2356])(?:\s+(?:\#[^\n]*\n)?)+(\d+)
-                  (?:\s+(?:\#[^\n]*\n)?)+(\d+)(?:\s+(?:\#[^\n]*\n)?)+(\d+)\s/xn
+        HEADER = /\A(P[2356])(?:\s|\#[^\n]*\n)+(\d+)
+                  (?:\s|\#[^\n]*\n)+(\d+)(?:\s|\#[^\n]*\n)+(\d+)\s/xn
 
         def self.decode(bytes)
             m = HEADER.match(bytes) or
                 raise ArgumentError, "not a PGM/PPM (P2/P3/P5/P6) stream"
             magic, width, height, maxval = m[1], *m[2..4].map(&:to_i)
+            check_maxval(maxval)
             values = samples(magic, maxval, bytes[m.end(0)..])
             luma = %w[P3 P6].include?(magic) ? rgb(values) : values
             Raster.new(width: width, height: height, luma: luma)
@@ -57,7 +58,21 @@ module Tessella
                    else
                        raster.unpack(maxval < 256 ? "C*" : "n*")
                    end
+            check_samples(ints, maxval)
             ints.map { it.fdiv(maxval) }
+        end
+
+        def self.check_maxval(maxval)
+            return if (1..65_535).cover?(maxval)
+
+            raise ArgumentError, "PNM maxval out of 1..65535: #{maxval}"
+        end
+
+        def self.check_samples(ints, maxval)
+            over = ints.find { it > maxval }
+            return unless over
+
+            raise ArgumentError, "PNM sample #{over} above maxval #{maxval}"
         end
 
         def self.rgb(values) = values.each_slice(3).map { Raster.luma(*it) }
