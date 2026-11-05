@@ -52,6 +52,7 @@ All are shown with their output in
 | `cpu.txt`      | `chart --area`          | 60 load samples between 10 and 90             |
 | `temps.txt`    | `chart --xdate`         | a month of daily temperatures, ISO dates      |
 | `dose.txt`     | `chart --yerr`          | x, y and an error per point                   |
+| `os.csv`       | `chart --kind pie`      | nine shares, for the legend under the disc    |
 | `ohlc.txt`     | `chart --kind candlestick` | a week of open/high/low/close prices       |
 | `growth.txt`   | `chart --xscale`        | x over four decades                           |
 | `hosts.csv`    | `chart --kind bar`      | three series per label, for grouped/stacked   |

@@ -313,7 +313,8 @@ $ tessella chart --kind bar --stacked --orientation vertical \
 ```
 
 With more series than labels the legend no longer fits beside the
-bars, so it goes on one line under the frame (for upright columns,
+bars, so it goes under the frame, wrapped to the plot's width (for
+upright columns,
 whose names take that line, on the x-label line, unless `--xlabel`
 is given). Here the first two hosts only:
 
@@ -326,9 +327,10 @@ $ head -3 hosts.csv | tessella chart --kind bar --stacked --width 30
         █ cpu  ▓ io  ▒ net
 ```
 
-The series are filled `█ ▓ ▒` in turn, `# = +` under `--ascii`; only
-a `█` series ends in an eighth. Bars of several series need values
-of 0 or more.
+Each series has a fill of its own, from twelve: `█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○
+◆ ·`, or `# = + @ * : . o % & ~ x` under `--ascii`. So a chart holds
+at most 12 series; a 13th is refused. Only a `█` series ends in an
+eighth. Bars of several series need values of 0 or more.
 
 ```text
 $ tessella chart --kind bar --stacked --ascii --width 30 hosts.csv
@@ -604,22 +606,38 @@ $ tessella chart --kind pie --donut langs.csv
            ▓▓▓▓▓▓▓▓▓▓
 ```
 
-The slices are filled `█ ▓ ▒ ╳ ╱ ╲ ∴ ·` in turn (`# @ = + * : . o`
-under `--ascii`), and coloured under `--color`. `--height` sizes the
-disc, 12 rows by default; its width follows, a cell being about
+Each slice has a fill of its own, the twelve bars use (`█ ▓ ▒ ░ ╳ ╱
+╲ ∴ ● ○ ◆ ·`, or `# = + @ * : . o % & ~ x` under `--ascii`), and a
+colour under `--color`; a 13th slice is refused. `--height` sizes
+the disc, 12 rows by default; its width follows, a cell being about
 twice as tall as wide. With more slices than the disc has rows, the
-legend goes on one line under it.
+legend goes under it, wrapped to the disc's width or 40 columns,
+whichever is wider. `os.csv` has nine slices:
+
+```text
+$ tessella chart --kind pie --height 6 os.csv
+       ╳╱∴███
+     ░░░╳╲█████
+    ▒▒▒░░╳██████
+    ▒▒▒▒▒▓▓█████
+     ▒▒▓▓▓▓▓███
+       ▓▓▓▓▓▓
+    █ linux 41 %  ▓ macos 22 %
+    ▒ windows 18 %  ░ freebsd 9 %
+    ╳ openbsd 4 %  ╱ netbsd 2 %  ╲ haiku 2 %
+    ∴ plan9 1 %  ● qnx 1 %
+```
 
 ```text
 $ tessella chart --kind pie --ascii --height 8 langs.csv
-        ====####
-      ======######
-     @@@====#######  # ruby 24 %
-    @@@@@@@=######## @ c 61 %
-    @@@@@@@@@@@@@@@@ = rust 15 %
-     @@@@@@@@@@@@@@
-      @@@@@@@@@@@@
-        @@@@@@@@
+        ++++####
+      ++++++######
+     ===++++#######  # ruby 24 %
+    =======+######## = c 61 %
+    ================ + rust 15 %
+     ==============
+      ============
+        ========
 ```
 
 A pie takes no `--width`, `--xlim`, `--ylim`, `--canvas` or
