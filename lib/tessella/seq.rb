@@ -290,11 +290,12 @@ module Tessella
         # head, as ->> writes it.
         HEADS = { call: { right: "►", left: "◄" },
                   async: { right: "►►", left: "◄◄" } }.freeze
+        ASCII_HEADS = { call: { right: ">", left: "<" },
+                        async: { right: ">>", left: "<<" } }.freeze
 
         def self.arrowhead(kind, dir, style)
-            return dir == :right ? ">" : "<" if style[:ascii]
-
-            HEADS[kind == :async ? :async : :call][dir]
+            heads = style[:ascii] ? ASCII_HEADS : HEADS
+            heads[kind == :async ? :async : :call][dir]
         end
 
         def self.alt_dashes(n) = (0...n).map { |i| i.even? ? "-" : " " }.join

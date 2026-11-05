@@ -383,7 +383,8 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   B: async`, `A -> A: self`, `note over A[,B]: text`; columns widen
   to fit every label, and `numbered:` / `footer:` number the messages
   and repeat the participant boxes below. Heads are the full-size
-  `► ◄` for calls and replies, and a double `►► ◄◄` for async.
+  `► ◄` for calls and replies, and a double `►► ◄◄` for async (`> <`
+  and `>> <<` under `ascii: true`).
 
 Every one refuses bad input with an `ArgumentError` naming the line,
 and under `ascii: true` draws ASCII glyphs and refuses non-ASCII text.

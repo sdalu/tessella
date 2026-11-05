@@ -119,6 +119,13 @@ class TestSeqRender < Minitest::Test
         assert(Tessella.seq(text, ascii: true).to_s.ascii_only?)
     end
 
+    # ASCII mirrors ►► with >>: an async message is not a call.
+    def test_ascii_async_draws_a_double_head
+        out = Tessella.seq("A ->> B: ping\nB ->> A: pong\n", ascii: true).to_s
+        assert_includes(out, "->>|")
+        assert_includes(out, "|<<-")
+    end
+
     def test_a_note_over_two_participants_is_boxed
         out = Tessella.seq("A -> B: hi\nnote over A,B: both\n").to_s
         assert_includes(out, "both")
