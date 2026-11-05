@@ -234,6 +234,21 @@ frame -- dates when x holds times, formatted as a date axis's
 On the command line `--kind candlestick` reads `x open high low
 close` rows, `--xdate` for ISO 8601 dates.
 
+`Tessella.pie(labels, values)` draws the slices clockwise from the
+top on a disc twice as wide as tall, so it reads round in a terminal,
+each slice its own fill (`█ ▓ ▒ ╳ ╱ ╲ ∴ ·`, ASCII `# @ = + * : . o`)
+and, under `color: true`, its own colour; the legend beside the disc
+gives the shares in whole percents summing to 100 (on one line under
+it when the slices outnumber the rows). `donut: true` hollows the
+middle into a ring. `height:` (12 by default) sizes the disc;
+`width:`, the limits, `canvas:` and `xscale:` are refused. Values
+must be 0 or more, not all 0. On the command line `--kind pie` reads
+`label value` rows, `--donut` for the ring:
+
+```console
+$ printf 'ruby,12\nc,30\nrust,7\n' | tessella chart --kind pie --donut --height 8
+```
+
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
 each box stands three columns wide, whiskers running up and down
 (`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
@@ -597,7 +612,7 @@ $ tessella chart --kind bar --ascii --width 30 langs.csv
 ### Options
 
 Common to every kind: `--kind
-line|scatter|stairs|density|bar|histogram|box|stem|heatmap|candlestick`
+line|scatter|stairs|density|bar|histogram|box|stem|heatmap|candlestick|pie`
 (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,

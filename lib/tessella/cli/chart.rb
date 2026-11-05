@@ -124,6 +124,7 @@ module Tessella
                 end
                 @parser.on("--min A") { @opts[:min] = num(it) }
                 @parser.on("--max B") { @opts[:max] = num(it) }
+                @parser.on("--donut") { @opts[:donut] = true }
             end
         end
     end
@@ -137,7 +138,7 @@ module Tessella
             include KindFlags
 
             KINDS = %w[line scatter stairs density bar histogram box
-                       stem heatmap candlestick].freeze
+                       stem heatmap candlestick pie].freeze
 
             def self.parse(argv)
                 new.parse(argv)
@@ -325,6 +326,7 @@ module Tessella
                 box: %i[orientation],
                 heatmap: %i[cell_width colormap min max],
                 candlestick: %i[xdate],
+                pie: %i[donut],
                 stem: %i[scale]
             }.freeze
 
@@ -350,7 +352,8 @@ module Tessella
                      threshold: "--threshold", above: "--above",
                      below: "--below",
                      colormap: "--colormap", min: "--min", max: "--max",
-                     eighths: "--no-eighths", track: "--track" }.freeze
+                     eighths: "--no-eighths", track: "--track",
+                     donut: "--donut" }.freeze
 
             def self.check!(opts)
                 allowed = ChartOpts::EXTRA.fetch(opts[:kind], [])
@@ -417,6 +420,8 @@ module Tessella
         module Kinds
             SERIES = %i[line scatter stairs density].freeze
             BARLIKE = %i[bar histogram].freeze
+            OTHERS = { box: :BoxKind, heatmap: :HeatKind,
+                       candlestick: :CandleKind, pie: :PieKind }.freeze
 
             def self.build(opts, rows)
                 kind = opts[:kind]
@@ -424,11 +429,9 @@ module Tessella
                     SERIES.include?(kind)
                 return BarKind.build(kind, opts, rows) if
                     BARLIKE.include?(kind)
-                return BoxKind.build(opts, rows) if kind == :box
-                return HeatKind.build(opts, rows) if kind == :heatmap
-                return CandleKind.build(opts, rows) if kind == :candlestick
 
-                StemKind.build(opts, rows)
+                other = OTHERS.fetch(kind, :StemKind)
+                ChartCLI.const_get(other).build(opts, rows)
             end
         end
     end

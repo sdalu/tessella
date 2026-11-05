@@ -17,6 +17,7 @@ module Tessella
                   stem         one column, or two back to back
                   heatmap      label then a row of values
                   candlestick  x open high low close
+                  pie          label value
 
                 Options (some only for the kinds named):
             TEXT
@@ -53,6 +54,7 @@ module Tessella
                 "--colormap" => ["heatmap colours, C,C,... (--color)"],
                 "--min" => ["heatmap range bottom"],
                 "--max" => ["heatmap range top"],
+                "--donut" => ["pie: a ring, hollow in the middle"],
                 "--style" => ["stairs: post or pre"],
                 "--scale" => ["stem: the stem unit"],
                 "--area" => ["fill under the line (line, stairs)"],
