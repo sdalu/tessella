@@ -93,6 +93,7 @@ cell, using dithering for tone; `edges` draws outlines.
 | `sextant`  | 2 × 3           | Unicode 13 sextants `🬀`…`🬻`      |
 | `braille`  | 2 × 4           | braille patterns                |
 | `octant`   | 2 × 4           | Unicode 16 octants (see below)  |
+| `petscii`  | 4 × 8 tones     | about forty shapes (see below)  |
 | `edges`    | 1               | `─ │ ╱ ╲`, Sobel contours       |
 
 `disc.pgm` is a 64 × 64 grey disc, brightest at its centre:
@@ -170,6 +171,45 @@ newest terminals draw them (Ghostty and its like); elsewhere each
 cell shows as a box or a blank. That is why this page shows no
 octant render: try `tessella image --style octant disc.pgm` in your
 own terminal.
+
+`petscii` draws as the Commodore character set did: each cell's 4 × 8
+tones are matched to the glyph of least error among about forty
+shapes (halves, quadrants, `▏▕▔▁`, the triangles `◢◣◤◥`, `╱╲╳`, the
+shades `░▒▓`, lines, corners and tees, `● ○`). A soft picture comes out
+in shades:
+
+```text
+$ tessella image --style petscii --width 24 disc.pgm
+
+         ░░░░░░
+      ░░░▒▒▒▒▒▒░░░
+    ░░▒▒▒▒▒▒▒▒▒▒▒▒░░
+   ░░▒▒▒▓▓▓▓▓▓▓▓▒▒▒░░
+   ░░▒▒▓▓▓▓██▓▓▓▓▒▒▒░░
+   ░░▒▒▓▓▓▓██▓▓▓▓▒▒▒░░
+   ░░▒▒▒▓▓▓▓▓▓▓▓▒▒▒░░
+    ░░▒▒▒▒▒▒▒▒▒▒▒▒░░
+      ░░░▒▒▒▒▒▒░░░░
+         ░░░░░░
+```
+
+Hard edges are where it shows its shapes. `shapes.pgm` is a ring and
+a wedge in black and white:
+
+```text
+$ tessella image --style petscii --width 24 shapes.pgm
+      ▁▁▁▁     ├███████◤
+   ▗▄██████▙▖  ├██████▘
+  ◢███▀▀▀▀▜██▙ ├█████▘
+ ▕██▓      ▐██▌├████▘
+ ▕██▙      ▐██▌├███▘
+  ▜██▙▄▁▁▄▟██▛ ├█▛
+   ▝▜██████▓▀  ├▛
+      ▔▔▔▔     ╱
+```
+
+`petscii` takes no dithering, so `--threshold` and `--dither` do not
+apply to it.
 
 ## Tone
 

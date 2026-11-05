@@ -85,6 +85,7 @@ All are shown with their output in
 | `notes-fixed.md` | `lint --target web`  | `notes.md`'s diagram redrawn for the web      |
 | `figure.c`     | `lint --forbid`         | a diagram in a C comment, holding `*/`        |
 | `wide.txt`     | `lint --no-wide`        | a CJK label                                   |
+| `shapes.pgm`   | `image --style petscii` | a ring and a wedge, black and white, 96 × 64  |
 | `disc.pgm`     | `image`                 | a 64 × 64 grey disc, bright at its centre     |
 
 `trig.txt`, `normal.txt`, `cpu.txt` and `temps.txt` were generated:

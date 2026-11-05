@@ -807,10 +807,14 @@ of:
 | `half`    | `▄` `█`, one bar a column          | `▌` `█`, one bar a row             |
 | `block`   | quadrants, two bars a column       | quadrants, two bars a row          |
 | `braille` | dots, two bars a column            | dots, four bars a row              |
+| `sextant` | sextants, two bars a column        | sextants, three bars a row         |
+| `octant`  | octants, two bars a column         | octants, four bars a row           |
 
 `quadrant` is another name for `block`. The finer glyphs pack more
-bars into the same width; across, a row that holds several bars is
-named by its first and last, `ruby..c`:
+bars into the same width; across, a text row holds as many bars as
+its cell has pixel rows, and is named by its first and last bar,
+`ruby..c`. `sextant` and `octant` draw one series only, and need a
+font that has them (see [canvases](#canvases)).
 
 ```text
 $ tessella chart --kind bar --orientation vertical --blocks braille \
@@ -873,10 +877,30 @@ each holding a few pixels. `--canvas` picks it:
 | `braille` | 2 × 4           | braille patterns (default)   |
 | `block`   | 2 × 2           | quadrant blocks `▘▝▀▖▌▞▛…` (also named `quadrant`) |
 | `half`    | 1 × 2           | half blocks `▀ ▄ █`          |
+| `sextant` | 2 × 3           | teletext sextants (Unicode 13) |
+| `octant`  | 2 × 4           | octants (Unicode 16)         |
 | `eighths` | 1 × 8           | `▁`…`█`, for `--area` only   |
 | `dot`     | 1 × 2           | `'` `.` `:`                  |
 | `ascii`   | 3 × 3           | ASCII strokes `- \| / \ "`…  |
 | `density` | 1 × 2           | shades by hit count          |
+
+`sextant` and `octant` draw solid blocks where braille draws dots.
+Their glyphs are recent: sextants are Unicode 13 (2020), octants
+Unicode 16 (2024), drawn only by the newest terminals (Ghostty and its
+like), so this page shows no octant render. Check the reader's font
+before using either.
+
+```text
+$ tessella chart --canvas sextant --width 24 --height 5 trig.txt
+      ┌────────────────────────┐
+    1 │🬂🬪🬔🬂🬂🬩      🬞🬜🬂🬂🬧🬜🬂🬂🬩   │ sin
+      │🬦🬀🬈🬏  🬪     🬕  🬞🬆🬉🬓  🬧🬏 │ cos
+      │🬌🬋🬋🬎🬚🬋🬋🬪🬋🬋🬋🬜🬋🬋🬩🬌🬋🬋🬌🬚🬋🬋🬪🬚│
+      │    🬊🬏  🬪🬞🬔  🬦🬄    🬈🬏  🬈│
+   -1 │     🬉🬱🬭🬵🬎🬭🬭🬖🬀      🬊🬢🬭🬭│
+      └────────────────────────┘
+      0                       10
+```
 
 Braille gives the finest line, ASCII survives any font:
 
