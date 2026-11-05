@@ -26,7 +26,8 @@ One statement per line; blank lines and `#` comments are skipped.
 | `note over A: text`     | a note on A's lifeline                  |
 | `note over A,B: text`   | a note spanning A to B                  |
 
-A name is a run of letters, digits, `_`, `.` or `-`. Participants
+A name is a run of letters, digits, `_`, `.` or `-`, not ending in
+`-`, so `A-->B` reads as a reply with or without blanks. Participants
 take their columns in the order they are declared, or first appear;
 columns widen to fit every label, never truncating one.
 

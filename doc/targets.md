@@ -23,7 +23,9 @@ Tessella.target = :cjk                         # for the rest of the fiber
 Tessella::Target.with(:web) { Tessella.table(rows).to_s }
 ```
 
-An unknown target is a usage error:
+`--target` wins over `TESSELLA_TARGET`, and an empty variable means
+`term`. An unknown target, or `--target` with no name, is a usage
+error, exit 2, even before `--help`:
 
 ```text
 $ tessella --target vt100 table langs.csv

@@ -1101,7 +1101,11 @@ $ printf '%s\n' 't v' '2026-11-05T14:00 1' '2026-11-05T18:30 3' \
 ```
 
 The axis spans the data exactly, unless `--xlim` says otherwise
-(given as dates too). A date axis takes no `--xscale`; sideways
+(given as dates too); a single date, or one date repeated, spans a
+day on either side. Under `--xdate` a first row holding a date and
+numbers is data, not a header. `--xdate` takes the word after it as
+a format only when it holds a `%`, so `--xdate temps.txt` reads the
+file. A date axis takes no `--xscale`; sideways
 (`--orientation horizontal`), the dates label the rows. A value that
 is not an ISO 8601 date is bad input, exit 1:
 
@@ -1293,16 +1297,27 @@ $ tessella chart --kind histogram --width 30 --bins 8 --ascii normal.txt
 
 ## What a chart refuses
 
-A chart checks its input before drawing, and raises `ArgumentError`
-(exit 2 on the command line) naming what is wrong: an unknown option,
-kind, canvas, xscale, stairs style or closed side; a width or height
-that is not a positive Integer; x and y of different lengths; a value
-that is not a finite number (`nil`, a String, NaN, ±Infinity, or an x
-of 0 or less under a log `xscale`); a stem scale that is not
-positive.
+A chart checks its input before drawing, and refuses it naming what
+is wrong. Two kinds of refusal:
 
-On the command line, a row that cannot be read is bad input, exit 1,
-naming the row and the field:
+- **A bad call** raises `ArgumentError`, exit 2 on the command line:
+  an unknown option, kind, canvas, xscale, stairs style or closed
+  side; a width or height that is not a positive Integer; x and y of
+  different lengths; a stem scale that is not positive.
+- **A value it cannot draw** raises `Tessella::ValueError` (an
+  `ArgumentError` too), exit 1: a value that is not a finite number
+  (`nil`, a String, NaN, ±Infinity, or a number past Float's range),
+  an x of 0 or less under a log `xscale`, a negative pie slice, a
+  candle whose low and high do not hold its open and close, an empty
+  sample.
+
+```text
+$ printf '1\n1e400\n' | tessella chart
+tessella chart: y must be a finite number: Infinity
+```
+
+A row that cannot be read is bad input too, exit 1, naming the row
+and the field, and so is invalid UTF-8, in every command:
 
 ```text
 $ printf '1\nx\n' | tessella chart

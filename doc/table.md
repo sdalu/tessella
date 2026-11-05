@@ -172,9 +172,11 @@ Usage: tessella table [options] [file]  (stdin if none)
 
 ### ASCII
 
-Under `ascii: true` a named style draws as `ascii`; a custom set is
-drawn if it is all ASCII and refused if not. A cell or title that is
-not ASCII is refused.
+Under `ascii: true` a named style draws as `ascii`, except `markdown`,
+which is ASCII already and stays a pipe table; a custom set is drawn
+if it is all ASCII and refused if not. A cell or title that is not
+ASCII is refused. In a markdown table a `|` in a cell is written
+`\|`, so it does not split the cell.
 
 ```text
 $ tessella table --ascii --style '****=!+++++' langs.csv

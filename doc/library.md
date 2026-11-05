@@ -175,7 +175,11 @@ See [glyph sets](glyphs.md).
 
 Every refusal is an `ArgumentError` with a message that names what is
 wrong — the option, the value, the line of input — raised before
-anything is drawn. A figure is either right or not returned.
+anything is drawn. A figure is either right or not returned. A value
+that cannot be drawn (not finite, out of range, out of order) raises
+`Tessella::ValueError`, a subclass, so a caller can tell bad data
+from a bad call; the command line exits 1 for the first and 2 for
+the second.
 
 ```ruby
 # frozen_string_literal: true
@@ -200,7 +204,7 @@ end
 ```text
 $ ruby refusals.rb
 ArgumentError: x and y differ in length: 3 and 2
-ArgumentError: value must be a finite number: NaN
+Tessella::ValueError: value must be a finite number: NaN
 ArgumentError: width must be a positive Integer: 0
 ArgumentError: unknown option: :colour
 ArgumentError: line 3: indentation is not a multiple of 3
