@@ -1,0 +1,5 @@
+# name fraction
+/      0.62
+/home  0.87
+/var   0.31
+/tmp   0.04

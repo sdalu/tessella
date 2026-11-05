@@ -21,6 +21,7 @@ figure on stdout. Each has its own `--help`.
 | `seq`      | a sequence diagram                         | [seq](seq.md)                  |
 | `image`    | a picture as text                          | [images](images.md)            |
 | `lint`     | checks a text figure, drawn or hand-made   | [lint](lint.md)                |
+| `meter`    | a one-line progress bar or gauge           | [meter](meter.md)              |
 | `glyphs`   | lists glyph sets and their width classes   | [glyphs](glyphs.md)            |
 
 ## Exit status

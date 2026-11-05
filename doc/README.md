@@ -41,9 +41,10 @@ mosi ▒▒▒▒╳──CMD──╳─ADDR──╳─DATA──▒▒▒▒
    [bit fields](bitfield.md), [timing diagrams](wave.md),
    [sequence diagrams](seq.md).
 5. [Pictures](images.md): images as text.
-6. [Linting](lint.md): checking a figure, drawn or hand-made, for
+6. [Meters](meter.md): one-line progress bars and gauges.
+7. [Linting](lint.md): checking a figure, drawn or hand-made, for
    what breaks it on someone else's screen.
-7. [Glyph sets](glyphs.md): width classes, the named glyph sets, and
+8. [Glyph sets](glyphs.md): width classes, the named glyph sets, and
    checking a set of one's own.
 
 ## Reference

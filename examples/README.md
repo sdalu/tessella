@@ -37,6 +37,7 @@ from any directory. `tessella` must be on `PATH`:
 | `comment.sh` | an ASCII tree as a C block comment, held to 72 columns   |
 | `rfc.sh`     | an RFC-style figure: seq and bitfield, ASCII, indented   |
 | `status.sh`  | exit 1 (bad data) told apart from exit 2 (bad call)      |
+| `disks.sh`   | one meter per input line, titles aligned, framed         |
 
 All are shown with their output in
 [doc/cli.md](../doc/cli.md#scripts).
@@ -56,6 +57,7 @@ All are shown with their output in
 | `ages.txt`     | `chart --kind stem`     | two columns, for the back-to-back form        |
 | `bad.csv`      | `status.sh`             | a CSV with a value that is not a number       |
 | `plot.txt`     | `compose`               | a bar chart, as `tessella chart` printed it   |
+| `disks.txt`    | `disks.sh`              | mount points and how full each is             |
 | `boxes.txt`    | `compose fill`          | two hand-drawn boxes joined by a line         |
 | `note.txt`     | `compose`               | two lines of text                             |
 | `outline.txt`  | `tree`                  | an indented outline with notes                |

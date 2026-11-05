@@ -64,11 +64,13 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
 Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                threshold: 0.5, dither: :fs, invert: false,
                edge_threshold: 0.3, ascii: false)
+Tessella.meter(fraction, style: :block, width: 20, title: nil,
+               label: true, brackets: true, ascii: false)
 ```
 
 Each returns a `Block`. Pages: [tree](tree.md), [table](table.md),
 [bitfield](bitfield.md), [wave](wave.md), [seq](seq.md),
-[images](images.md).
+[images](images.md), [meter](meter.md).
 
 ### Lint
 
