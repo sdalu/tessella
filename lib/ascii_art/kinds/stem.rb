@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Stem-and-leaf plot (DESIGN.md, "Chart and kinds"): one sample, or
     # two back to back, laid out as unicode_plot's stemplot does --
     # stems beside a divider, leaves beside that, a key line below.

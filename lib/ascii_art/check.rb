@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # The argument checks every kind shares: each raises ArgumentError
     # naming what it refused, before anything is drawn.
     module Check

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # The five-glyph shapes for one box-and-whisker row, unicode and
     # ascii, by its position within the three rows a box takes
     # (DESIGN.md's box, as unicode_plot's boxplot draws it: a corner

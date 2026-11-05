@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Display width: the columns a terminal gives a string. East Asian
     # Wide and Fullwidth glyphs take two, invisible ones (combining
     # marks, zero-width and format characters, variation selectors)

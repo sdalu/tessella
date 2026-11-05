@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Turns a ready-made body of cells into text: border, title, axis
     # labels and legend (DESIGN.md, "Frame and Color"). Frame knows
     # nothing of data; the body and every label arrive as given. Labels

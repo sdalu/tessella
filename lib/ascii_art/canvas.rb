@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Glyphs written over a canvas's cells, whatever those cells draw:
     # text (annotate) and point marks (mark). Kept apart from Canvas so
     # Canvas's own class body stays under budget.

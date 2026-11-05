@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Axis extremes and number labels for a chart's scale (DESIGN.md).
     module Axis
         INT64_RANGE =

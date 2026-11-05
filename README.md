@@ -1,44 +1,45 @@
-# inkchart
+# ascii-art
 
-Charts for a monospace grid: line, scatter, stairs, bar, histogram,
-box, stem and density plots, drawn in Unicode (braille, block, dot,
-density canvases) or pure ASCII, with scaled axes. The output is meant
-for documents first, a terminal second: no trailing blank on any line,
+Text figures for a monospace grid, in Unicode or pure ASCII. It draws
+charts today: line, scatter, stairs, bar, histogram, box, stem and
+density plots, on braille, block, dot, density or ASCII canvases,
+with scaled axes. The output is meant for documents first, a terminal
+second: no trailing blank on any line,
 no escape code unless colour is asked for, and a `--ascii` mode that
 is ASCII from the first byte.
 
-inkchart has no runtime dependency: binning, percentiles and density
+ascii-art has no runtime dependency: binning, percentiles and density
 mapping are plain Ruby. See [DESIGN.md](DESIGN.md) for the internal
 interfaces and the decisions behind them.
 
 ## Install
 
-inkchart is not on rubygems.org, and it has no public remote. Install
+ascii-art is not on rubygems.org, and it has no public remote. Install
 it from a checkout of this repository:
 
 ```bash
-cd inkchart
+cd ascii-art
 make install
 ```
 
 `make install` builds the gem and installs it for this user (`gem
 install --user-install --local`). `make uninstall` removes it again.
-Running `exe/inkchart` directly out of a checkout, without installing,
+Running `exe/ascii-art` directly out of a checkout, without installing,
 also works.
 
 ## The library
 
 ```ruby
-require "inkchart"
+require "ascii-art"
 
-chart = Inkchart.line(x = nil, y, name: nil, **opts)   # also scatter,
+chart = AsciiArt.line(x = nil, y, name: nil, **opts)   # also scatter,
                                              #   stairs, density
 chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another series
-Inkchart.stairs(x = nil, y, style: :post, **opts)       # or style: :pre
-Inkchart.bar(labels, values, **opts)
-Inkchart.histogram(values, bins: nil, closed: :left, **opts)
-Inkchart.box(names, samples, **opts)        # samples: Array of Arrays
-Inkchart.stem(values, scale: nil, **opts)   # stem-and-leaf
+AsciiArt.stairs(x = nil, y, style: :post, **opts)       # or style: :pre
+AsciiArt.bar(labels, values, **opts)
+AsciiArt.histogram(values, bins: nil, closed: :left, **opts)
+AsciiArt.box(names, samples, **opts)        # samples: Array of Arrays
+AsciiArt.stem(values, scale: nil, **opts)   # stem-and-leaf
 
 chart.to_s                 # => String, already framed
 chart.render(io = $stdout)
@@ -55,7 +56,7 @@ height that is not a positive Integer, x and y of different lengths,
 and a value that is not a finite number (nil, a String, NaN,
 ±Infinity, or what an `xscale:` makes of an x of 0 or below).
 
-`mark:` (on `add`, and on `Inkchart.line`, `.scatter`, `.stairs` and
+`mark:` (on `add`, and on `AsciiArt.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
 the cell of each point, over whatever the cell holds, instead of the
 kind's own line or dots: `chart.add(xs, ys, name: "measured", mark:
@@ -85,14 +86,19 @@ under `ascii: true` or `eighths: false`:
      └                              ┘
 ```
 
-`Inkchart.stem` refuses a scale that is not positive, and a plot
+`AsciiArt.stem` refuses a scale that is not positive, and a plot
 that would need more than 1000 stems, one line each (raise `scale:`).
 
-## The `inkchart` command
+## The `ascii-art` command
 
 ```text
-inkchart [options] [file]
+ascii-art COMMAND [options] [file]
+ascii-art chart [options] [file]
 ```
+
+The first argument names the command; `ascii-art --help` lists them,
+and `chart` is the one there is. `ascii-art --version` prints the
+version. No command, or an unknown one, is a usage error (exit 2).
 
 Reads one file argument or stdin (blank lines and `#` comments
 skipped), draws one chart, and prints it. A line holding a comma
@@ -114,7 +120,7 @@ generated on the spot:
 ```text
 $ ruby -e 'puts "x sin cos"; 0.step(10, 0.1) { puts [it.round(1),
     Math.sin(it), Math.cos(it)].join(" ") }' |
-  inkchart --title trig --width 30 --height 6
+  ascii-art chart --title trig --width 30 --height 6
                    trig
       ┌──────────────────────────────┐
     1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
@@ -132,7 +138,7 @@ and `rust,7.5`, drawn as a bar chart with the house defaults
 (`eighths` on, `·` track):
 
 ```text
-$ inkchart --kind bar --width 30 langs.csv
+$ ascii-art chart --kind bar --width 30 langs.csv
         ┌                              ┐
    ruby ┤██████████▍··············· 12
       c ┤██████████████████████████ 30
@@ -143,7 +149,7 @@ $ inkchart --kind bar --width 30 langs.csv
 The same chart under `--ascii`:
 
 ```text
-$ inkchart --kind bar --ascii --width 30 langs.csv
+$ ascii-art chart --kind bar --ascii --width 30 langs.csv
         +                              +
    ruby |##########................ 12
       c |########################## 30
@@ -173,7 +179,7 @@ is due, a missing field) exits 1, naming the row and the field.
 Colour is off by default: `--color` on the command line, `color:
 true` in the library, turns on ANSI escapes for the chart's cells;
 the frame, labels and legend stay plain. The default is off because
-the first use of inkchart's output is documents, where an escape code
+the first use of ascii-art's output is documents, where an escape code
 is garbage.
 
 ### ASCII mode
@@ -186,14 +192,14 @@ rewrite it.
 
 ## Relation to unicode_plot
 
-inkchart is a full rewrite, not a fork or a wrapper, of
+ascii-art is a full rewrite, not a fork or a wrapper, of
 [unicode_plot](https://github.com/red-data-tools/unicode_plot) (the
 gem this project drew its chart kinds and canvases from). unicode_plot
 serves as a test oracle only — every kind and canvas is compared
 against it under test — and no code is copied from it; the ASCII
 canvas's glyph rule in particular is original. Under unicode_plot's
 own bar settings (`fill: "■"` for bars, `"▇"` for histograms, no
-eighths, no track), inkchart's output is byte-for-byte identical to
+eighths, no track), ascii-art's output is byte-for-byte identical to
 unicode_plot's.
 
 A few places depart from unicode_plot on purpose: the density canvas
@@ -213,7 +219,7 @@ make check    # preflight: every file parses, RuboCop clean
 make tests    # run the suite; ORACLE=path/to/gems also runs the
               # unicode_plot comparisons (unicode_plot is never a
               # runtime or install dependency)
-make bundle   # write dist/inkchart.rb, the library as one file
+make bundle   # write dist/ascii-art.rb, the library as one file
 ```
 
 See [DESIGN.md](DESIGN.md) for the module layout and interfaces, and

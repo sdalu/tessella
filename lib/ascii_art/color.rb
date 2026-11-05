@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Colour names to ANSI SGR, and nothing else (DESIGN.md, "Frame and
     # Color"). Color.wrap is the only way a cell or label becomes
     # coloured text; every other part treats colour as a name, never

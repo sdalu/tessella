@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Building one bar's row of cells: the fill run, the optional
     # eighths partial cell, the track run, the value label, padding.
     # Kept apart from Bar so Bar's own class body stays under budget.

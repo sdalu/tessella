@@ -4,104 +4,104 @@ require "stringio"
 
 require_relative "test_helper"
 
-# Inkchart.stem / Inkchart::Stem (DESIGN.md, "Chart and kinds"):
+# AsciiArt.stem / AsciiArt::Stem (DESIGN.md, "Chart and kinds"):
 # construction, document safety, and the shared option/error rules.
 # Oracle parity lives in TestStemOracle below.
 class TestStem < Minitest::Test
     def test_stem_builds_a_stem_chart
-        assert_kind_of(Inkchart::Stem, Inkchart.stem([1, 2, 3]))
+        assert_kind_of(AsciiArt::Stem, AsciiArt.stem([1, 2, 3]))
     end
 
     def test_to_s_ends_with_a_single_trailing_newline
-        out = Inkchart.stem([1, 2, 3]).to_s
+        out = AsciiArt.stem([1, 2, 3]).to_s
         assert(out.end_with?("\n"))
         refute(out.end_with?("\n\n"))
     end
 
     def test_no_line_ends_in_a_blank
-        out = Inkchart.stem([1, 2, 3], [40, 5, 60]).to_s
+        out = AsciiArt.stem([1, 2, 3], [40, 5, 60]).to_s
         lines = out.split("\n", -1)
         assert_equal("", lines.last)
         refute(lines[0..-2].any? { it.end_with?(" ") })
     end
 
     def test_color_false_never_emits_an_escape
-        out = Inkchart.stem([1, 2, 3], [4, 5, 6], color: false).to_s
+        out = AsciiArt.stem([1, 2, 3], [4, 5, 6], color: false).to_s
         refute_includes(out, "\e")
     end
 
     def test_color_true_emits_an_escape
-        out = Inkchart.stem([1, 2, 3], color: true).to_s
+        out = AsciiArt.stem([1, 2, 3], color: true).to_s
         assert_includes(out, "\e")
     end
 
     def test_color_true_colours_both_samples_of_a_back_to_back_plot
-        out = Inkchart.stem([1, 2, 3], [4, 5, 6], color: true).to_s
+        out = AsciiArt.stem([1, 2, 3], [4, 5, 6], color: true).to_s
         assert_includes(out, "\e[31m")
         assert_includes(out, "\e[32m")
     end
 
     def test_ascii_true_is_pure_ascii
-        out = Inkchart.stem([-12, 1, 35], ascii: true).to_s
+        out = AsciiArt.stem([-12, 1, 35], ascii: true).to_s
         refute_match(/[^\x00-\x7F]/, out)
     end
 
     def test_plain_output_is_already_pure_ascii
-        out = Inkchart.stem([-12, 1, 35]).to_s
+        out = AsciiArt.stem([-12, 1, 35]).to_s
         refute_match(/[^\x00-\x7F]/, out)
     end
 
     def test_key_line_names_the_scale
-        assert_match(/Key: 1\|0 = 10\b/, Inkchart.stem([1, 2]).to_s)
-        out = Inkchart.stem([1, 2], scale: 100).to_s
+        assert_match(/Key: 1\|0 = 10\b/, AsciiArt.stem([1, 2]).to_s)
+        out = AsciiArt.stem([1, 2], scale: 100).to_s
         assert_match(/Key: 1\|0 = 100\b/, out)
     end
 
     def test_unknown_option_raises_argument_error_naming_it
         error = assert_raises(ArgumentError) do
-            Inkchart.stem([1, 2], bogus: true)
+            AsciiArt.stem([1, 2], bogus: true)
         end
         assert_match(/bogus/, error.message)
     end
 
     def test_non_numeric_value_raises_argument_error_naming_it
-        error = assert_raises(ArgumentError) { Inkchart.stem([1, "x", 3]) }
+        error = assert_raises(ArgumentError) { AsciiArt.stem([1, "x", 3]) }
         assert_match(/x/, error.message)
     end
 
     def test_non_numeric_value_in_the_second_sample_also_raises
         error = assert_raises(ArgumentError) do
-            Inkchart.stem([1, 2], [3, "y"])
+            AsciiArt.stem([1, 2], [3, "y"])
         end
         assert_match(/y/, error.message)
     end
 
     def test_non_numeric_scale_raises_argument_error_naming_it
         error = assert_raises(ArgumentError) do
-            Inkchart.stem([1, 2], scale: "ten")
+            AsciiArt.stem([1, 2], scale: "ten")
         end
         assert_match(/ten/, error.message)
     end
 
     def test_render_writes_the_same_text_as_to_s
-        chart = Inkchart.stem([1, 2, 3])
+        chart = AsciiArt.stem([1, 2, 3])
         io = StringIO.new
         chart.render(io)
         assert_equal(chart.to_s, io.string)
     end
 
     def test_repeated_values_appear_as_repeated_leaves
-        out = Inkchart.stem([42, 42, 42]).to_s
+        out = AsciiArt.stem([42, 42, 42]).to_s
         assert_match(/4 \| 222/, out)
     end
 
     def test_a_single_negative_value_near_zero_gets_its_own_stem
-        out = Inkchart.stem([-7]).to_s
+        out = AsciiArt.stem([-7]).to_s
         assert_match(/-0 \| 7/, out)
     end
 end
 
-# Inkchart.stem against unicode_plot's stemplot (DESIGN.md's oracle
+# AsciiArt.stem against unicode_plot's stemplot (DESIGN.md's oracle
 # note): exact, line-for-line equality (colour off, trailing blanks
 # stripped on both sides) for the single-sample and the back-to-back
 # form, across datasets of integers, floats, negatives, mixed signs, a
@@ -148,9 +148,9 @@ class TestStemOracle < Minitest::Test
 
     def mine(values, other: nil, **)
         chart = if other
-                    Inkchart.stem(values, other, **)
+                    AsciiArt.stem(values, other, **)
                 else
-                    Inkchart.stem(values, **)
+                    AsciiArt.stem(values, **)
                 end
         normalize(chart.to_s)
     end
@@ -173,7 +173,7 @@ end
 # Leaves and stems computed without float truncation error, and the
 # scale and stem count kept to what can be drawn.
 class TestStemNumbers < Minitest::Test
-    def lines(*, **) = Inkchart.stem(*, **).to_s.lines.map(&:rstrip)
+    def lines(*, **) = AsciiArt.stem(*, **).to_s.lines.map(&:rstrip)
 
     def test_decimal_leaves_are_not_truncated_by_float_error
         assert_equal(["0 | 37", "1 | 1", "2 | 3"],
@@ -187,14 +187,14 @@ class TestStemNumbers < Minitest::Test
     def test_scale_must_be_positive
         [0, -10].each do |scale|
             error = assert_raises(ArgumentError) do
-                Inkchart.stem([1, 2], scale: scale)
+                AsciiArt.stem([1, 2], scale: scale)
             end
             assert_includes(error.message, "scale")
         end
     end
 
     def test_too_many_stems_is_refused
-        error = assert_raises(ArgumentError) { Inkchart.stem([1, 100_000]) }
+        error = assert_raises(ArgumentError) { AsciiArt.stem([1, 100_000]) }
         assert_includes(error.message, "scale")
     end
 
@@ -203,6 +203,6 @@ class TestStemNumbers < Minitest::Test
     end
 
     def test_a_non_finite_value_is_refused
-        assert_raises(ArgumentError) { Inkchart.stem([1, Float::NAN]) }
+        assert_raises(ArgumentError) { AsciiArt.stem([1, Float::NAN]) }
     end
 end

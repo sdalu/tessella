@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # One character cell of a chart body: its glyph, and the colour name
     # it is drawn in (nil: none). Canvases produce rows of these; the
     # frame renders them (DESIGN.md).

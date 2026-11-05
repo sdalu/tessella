@@ -2,5 +2,5 @@
 
 require "minitest/autorun"
 
-require_relative "../lib/inkchart"
+require_relative "../lib/ascii-art"
 require_relative "oracle"

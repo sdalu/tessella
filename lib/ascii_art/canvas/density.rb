@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     class Canvas
         # 1x2 sub-pixels per cell; the glyph is chosen by hit count
         # relative to the densest cell on the canvas, not by position

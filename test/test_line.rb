@@ -2,71 +2,71 @@
 
 require_relative "test_helper"
 
-# Inkchart.line / .scatter / .stairs / .density and their Chart
+# AsciiArt.line / .scatter / .stairs / .density and their Chart
 # subclasses (DESIGN.md, "Chart and kinds"): construction, add, and
 # stairs' style. Oracle parity lives in the *Oracle classes below.
 class TestLine < Minitest::Test
     def test_line_builds_a_line_chart_with_one_series
-        chart = Inkchart.line([1, 2, 3])
-        assert_kind_of(Inkchart::Line, chart)
+        chart = AsciiArt.line([1, 2, 3])
+        assert_kind_of(AsciiArt::Line, chart)
         assert_includes(chart.to_s, "1")
     end
 
     def test_scatter_builds_a_scatter_chart
-        assert_kind_of(Inkchart::Scatter, Inkchart.scatter([1, 2], [3, 4]))
+        assert_kind_of(AsciiArt::Scatter, AsciiArt.scatter([1, 2], [3, 4]))
     end
 
     def test_density_builds_a_density_chart
-        assert_kind_of(Inkchart::Density, Inkchart.density([1, 2], [3, 4]))
+        assert_kind_of(AsciiArt::Density, AsciiArt.density([1, 2], [3, 4]))
     end
 
     def test_stairs_builds_a_stairs_chart
-        assert_kind_of(Inkchart::Stairs, Inkchart.stairs([1, 2], [3, 4]))
+        assert_kind_of(AsciiArt::Stairs, AsciiArt.stairs([1, 2], [3, 4]))
     end
 
     def test_stairs_defaults_to_post_style
-        post = Inkchart.stairs([1, 2, 4], [1, 3, 4]).to_s
-        explicit = Inkchart.stairs([1, 2, 4], [1, 3, 4], style: :post).to_s
+        post = AsciiArt.stairs([1, 2, 4], [1, 3, 4]).to_s
+        explicit = AsciiArt.stairs([1, 2, 4], [1, 3, 4], style: :post).to_s
         assert_equal(explicit, post)
     end
 
     def test_stairs_post_and_pre_differ
-        post = Inkchart.stairs([1, 2, 4], [1, 3, 4], style: :post).to_s
-        pre = Inkchart.stairs([1, 2, 4], [1, 3, 4], style: :pre).to_s
+        post = AsciiArt.stairs([1, 2, 4], [1, 3, 4], style: :post).to_s
+        pre = AsciiArt.stairs([1, 2, 4], [1, 3, 4], style: :pre).to_s
         refute_equal(post, pre)
     end
 
     def test_stairs_unknown_style_raises_naming_it
         error = assert_raises(ArgumentError) do
-            Inkchart.stairs([1, 2], [1, 2], style: :bogus)
+            AsciiArt.stairs([1, 2], [1, 2], style: :bogus)
         end
         assert_match(/bogus/, error.message)
     end
 
     def test_add_grows_the_series_and_the_legend
-        chart = Inkchart.line([1, 2], [3, 4])
+        chart = AsciiArt.line([1, 2], [3, 4])
         chart.add([5, 6], [7, 8], name: "second")
         assert_includes(chart.to_s, "second")
     end
 
     def test_a_chart_can_be_built_without_x
-        chart = Inkchart.line([10, 20, 30])
+        chart = AsciiArt.line([10, 20, 30])
         assert_includes(chart.to_s, "1") # the default, 1-based, x
         assert_includes(chart.to_s, "3")
     end
 
     def test_density_always_uses_the_density_canvas
-        out = Inkchart.density([1, 2, 3], [3, 1, 2], canvas: :braille).to_s
+        out = AsciiArt.density([1, 2, 3], [3, 1, 2], canvas: :braille).to_s
         refute_match(/[⠀-⣿]/, out) # the override is ignored
     end
 
     def test_density_ascii_true_is_pure_ascii
-        out = Inkchart.density([1, 2, 3], [3, 1, 2], ascii: true).to_s
+        out = AsciiArt.density([1, 2, 3], [3, 1, 2], ascii: true).to_s
         refute_match(/[^\x00-\x7f]/, out)
     end
 
     def test_unknown_option_raises_through_the_factory_function
-        assert_raises(ArgumentError) { Inkchart.line([1, 2], bogus: true) }
+        assert_raises(ArgumentError) { AsciiArt.line([1, 2], bogus: true) }
     end
 end
 
@@ -124,11 +124,11 @@ module GridParity
     end
 end
 
-# Inkchart::Line against unicode_plot's lineplot (DESIGN.md's oracle
+# AsciiArt::Line against unicode_plot's lineplot (DESIGN.md's oracle
 # note): grid lines at x = 0 / y = 0 and a legend from named series.
 #
 # Body pixels match exactly on braille, block and dot: the canvas walks
-# a line by a running sum, as unicode_plot does (lib/inkchart/canvas.rb,
+# a line by a running sum, as unicode_plot does (lib/ascii_art/canvas.rb,
 # step_line). Only :ascii is compared without its body glyphs, which
 # differ by design (DESIGN.md).
 class TestLineOracle < Minitest::Test
@@ -155,7 +155,7 @@ class TestLineOracle < Minitest::Test
         need_oracle
         x1, y1 = SAMPLES[:integers]
         x2, y2 = SECOND_SERIES
-        chart = Inkchart::Line.new(width: WIDTH, height: HEIGHT)
+        chart = AsciiArt::Line.new(width: WIDTH, height: HEIGHT)
         chart.add(x1, y1, name: "alpha").add(x2, y2, name: "beta")
         plot = UnicodePlot.lineplot(
             x1, y1, name: "alpha", width: WIDTH, height: HEIGHT
@@ -177,7 +177,7 @@ class TestLineOracle < Minitest::Test
     end
 
     def mine(canvas, x, y)
-        Inkchart::Line.new(width: WIDTH, height: HEIGHT,
+        AsciiArt::Line.new(width: WIDTH, height: HEIGHT,
                            canvas: canvas).add(x, y).to_s
     end
 
@@ -187,7 +187,7 @@ class TestLineOracle < Minitest::Test
     end
 end
 
-# Inkchart::Scatter against unicode_plot's scatterplot: as Line above,
+# AsciiArt::Scatter against unicode_plot's scatterplot: as Line above,
 # but points only, never connected.
 class TestScatterOracle < Minitest::Test
     include Oracle::Test
@@ -210,7 +210,7 @@ class TestScatterOracle < Minitest::Test
         need_oracle
         x1, y1 = SAMPLES[:integers]
         x2, y2 = SECOND_SERIES
-        chart = Inkchart::Scatter.new(width: WIDTH, height: HEIGHT)
+        chart = AsciiArt::Scatter.new(width: WIDTH, height: HEIGHT)
         chart.add(x1, y1, name: "alpha").add(x2, y2, name: "beta")
         plot = UnicodePlot.scatterplot(
             x1, y1, name: "alpha", width: WIDTH, height: HEIGHT
@@ -228,7 +228,7 @@ class TestScatterOracle < Minitest::Test
     private
 
     def mine(canvas, x, y)
-        Inkchart::Scatter.new(width: WIDTH, height: HEIGHT,
+        AsciiArt::Scatter.new(width: WIDTH, height: HEIGHT,
                               canvas: canvas).add(x, y).to_s
     end
 
@@ -238,7 +238,7 @@ class TestScatterOracle < Minitest::Test
     end
 end
 
-# Inkchart::Stairs against unicode_plot's stairs: both style: :post
+# AsciiArt::Stairs against unicode_plot's stairs: both style: :post
 # (default) and style: :pre, over the same datasets and canvases.
 class TestStairsOracle < Minitest::Test
     include Oracle::Test
@@ -257,7 +257,7 @@ class TestStairsOracle < Minitest::Test
         need_oracle
         x1, y1 = SAMPLES[:integers]
         x2, y2 = SECOND_SERIES
-        chart = Inkchart::Stairs.new(style: :post, width: WIDTH, height: HEIGHT)
+        chart = AsciiArt::Stairs.new(style: :post, width: WIDTH, height: HEIGHT)
         chart.add(x1, y1, name: "alpha").add(x2, y2, name: "beta")
         plot = UnicodePlot.stairs(
             x1, y1, style: :post, name: "alpha", width: WIDTH, height: HEIGHT
@@ -276,7 +276,7 @@ class TestStairsOracle < Minitest::Test
     private
 
     def mine(style, x, y, canvas = :braille)
-        Inkchart::Stairs.new(style: style, width: WIDTH, height: HEIGHT,
+        AsciiArt::Stairs.new(style: style, width: WIDTH, height: HEIGHT,
                              canvas: canvas).add(x, y).to_s
     end
 
@@ -286,7 +286,7 @@ class TestStairsOracle < Minitest::Test
     end
 end
 
-# Inkchart::Density against unicode_plot's densityplot: always the
+# AsciiArt::Density against unicode_plot's densityplot: always the
 # :density canvas, no x = 0 / y = 0 lines (densityplot's own default is
 # grid: false, unlike line/scatter/stairs). No :ascii comparison here:
 # unicode_plot's density canvas has no ASCII mode to compare against;
@@ -305,7 +305,7 @@ class TestDensityOracle < Minitest::Test
         need_oracle
         x1, y1 = SAMPLES[:integers]
         x2, y2 = SECOND_SERIES
-        chart = Inkchart::Density.new(width: WIDTH, height: HEIGHT)
+        chart = AsciiArt::Density.new(width: WIDTH, height: HEIGHT)
         chart.add(x1, y1, name: "alpha").add(x2, y2, name: "beta")
         plot = UnicodePlot.densityplot(
             x1, y1, name: "alpha", width: WIDTH, height: HEIGHT
@@ -317,7 +317,7 @@ class TestDensityOracle < Minitest::Test
     private
 
     def mine(x, y)
-        Inkchart::Density.new(width: WIDTH, height: HEIGHT).add(x, y).to_s
+        AsciiArt::Density.new(width: WIDTH, height: HEIGHT).add(x, y).to_s
     end
 
     def theirs(x, y)
@@ -331,7 +331,7 @@ end
 class TestLineFirstName < Minitest::Test
     def test_first_series_named
         %i[line scatter stairs density].each do |kind|
-            text = Inkchart.public_send(kind, [1, 2, 3], name: "first").to_s
+            text = AsciiArt.public_send(kind, [1, 2, 3], name: "first").to_s
             assert_includes text, "first", kind.to_s
         end
     end

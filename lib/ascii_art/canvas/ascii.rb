@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     class Canvas
         # 3x3 sub-pixels per cell, drawn with ASCII only. There is no
         # Unicode or ASCII standard for "this 3x3 dot pattern means

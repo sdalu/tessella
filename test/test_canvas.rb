@@ -9,7 +9,7 @@ require_relative "test_helper"
 # lookup table that is itself the behaviour being approximated; there
 # is no formula or standard (unlike braille dots or block quadrants)
 # to re-derive it from, and DESIGN.md forbids copying code from the
-# oracle. Inkchart::Canvas::Ascii therefore uses its own, independent
+# oracle. AsciiArt::Canvas::Ascii therefore uses its own, independent
 # shape rule, so only the oracle tests below that do not depend on the
 # exact glyph (blank-cell agreement, ASCII-only output) cover :ascii;
 # the glyph-for-glyph tests cover :braille, :block, :dot and :density,
@@ -19,7 +19,7 @@ class TestCanvas < Minitest::Test
     YLIM = [0.0, 10.0].freeze
 
     def build(type, **)
-        Inkchart::Canvas.build(type, width: 10, height: 5,
+        AsciiArt::Canvas.build(type, width: 10, height: 5,
                                      xlim: XLIM, ylim: YLIM, **)
     end
 
@@ -40,7 +40,7 @@ class TestCanvas < Minitest::Test
     def test_blank_canvas_is_space_never_braille_blank
         %i[braille block dot ascii density].each do |type|
             build(type).rows.flatten.each do |cell|
-                assert_equal(Inkchart::Cell.blank, cell)
+                assert_equal(AsciiArt::Cell.blank, cell)
             end
         end
     end
@@ -106,8 +106,8 @@ class TestCanvas < Minitest::Test
         assert_empty(chars - [" ", ".", ":", "+", "#"])
     end
 
-    def test_unknown_type_raises_inkchart_error
-        assert_raises(Inkchart::Error) { build(:nonsense) }
+    def test_unknown_type_raises_ascii_art_error
+        assert_raises(AsciiArt::Error) { build(:nonsense) }
     end
 
     # D3: a caller forgetting a required keyword gets Ruby's own
@@ -117,7 +117,7 @@ class TestCanvas < Minitest::Test
         %i[width height xlim ylim].each do |key|
             rest = opts.reject { |k, _| k == key }
             err = assert_raises(ArgumentError) do
-                Inkchart::Canvas.build(:block, **rest)
+                AsciiArt::Canvas.build(:block, **rest)
             end
             assert_equal("missing keyword: :#{key}", err.message)
         end
@@ -125,7 +125,7 @@ class TestCanvas < Minitest::Test
 
     def test_build_names_several_missing_keywords
         err = assert_raises(ArgumentError) do
-            Inkchart::Canvas.build(:block, width: 10, height: 5)
+            AsciiArt::Canvas.build(:block, width: 10, height: 5)
         end
         assert_equal("missing keywords: :xlim, :ylim", err.message)
     end
@@ -189,7 +189,7 @@ class TestCanvasOracle < Minitest::Test
     end
 
     def mine_glyphs(type)
-        c = Inkchart::Canvas.build(type, width: 10, height: 5,
+        c = AsciiArt::Canvas.build(type, width: 10, height: 5,
                                          xlim: XLIM, ylim: YLIM)
         yield c
         c.rows.map { |row| row.map(&:char).join }
@@ -232,7 +232,7 @@ end
 # 20+ random multi-segment lines at varied sizes, with a fixed seed
 # so the run is reproducible. unicode_plot's DensityCanvas clamps
 # width/height to a minimum of 5 (MIN_WIDTH/MIN_HEIGHT);
-# Inkchart::Canvas::Density does not (DESIGN.md gives no minimum),
+# AsciiArt::Canvas::Density does not (DESIGN.md gives no minimum),
 # so sizes are kept >= 5 here -- that is the oracle's own domain,
 # not a dodge around the difference.
 class TestCanvasDensityFuzz < Minitest::Test
@@ -270,7 +270,7 @@ class TestCanvasDensityFuzz < Minitest::Test
     def mine_rows(dims, lims, points)
         width, height = dims
         xlim, ylim = lims
-        c = Inkchart::Canvas.build(:density, width: width, height: height,
+        c = AsciiArt::Canvas.build(:density, width: width, height: height,
                                              xlim: xlim, ylim: ylim)
         c.lines(*points)
         c.rows.map { |row| row.map(&:char).join }
@@ -298,14 +298,14 @@ class TestCanvasDensityFuzz < Minitest::Test
     end
 end
 
-# D2: Inkchart::Canvas::Ascii's shape rule, by pattern -- the data
+# D2: AsciiArt::Canvas::Ascii's shape rule, by pattern -- the data
 # plus the small function that reads it, exercised directly rather
 # than through drawn points and lines (no oracle involved: the
 # ascii glyph is deliberately not oracle-derived, see test_canvas.rb
 # above and ascii.rb).
 class TestCanvasAsciiGlyph < Minitest::Test
     def ascii
-        @ascii ||= Inkchart::Canvas.build(:ascii, width: 1, height: 1,
+        @ascii ||= AsciiArt::Canvas.build(:ascii, width: 1, height: 1,
                                                   xlim: [0.0, 1.0],
                                                   ylim: [0.0, 1.0])
     end

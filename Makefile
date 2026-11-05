@@ -1,4 +1,5 @@
-# inkchart -- charts for a monospace grid, in Unicode or pure ASCII.
+# ascii-art -- charts and text figures for a monospace grid, in Unicode
+# or pure ASCII.
 # The targets follow the make skill: help first, check is preflight,
 # tests is the suite, all is check plus build.
 
@@ -7,12 +8,12 @@ GEM       ?= gem
 RUBOCOP   ?= rubocop
 ORACLE    ?=
 
-VERSION   != sed -n 's/.*VERSION = "\(.*\)"/\1/p' lib/inkchart/version.rb
-GEMFILE    = inkchart-$(VERSION).gem
+VERSION   != sed -n 's/.*VERSION = "\(.*\)"/\1/p' lib/ascii_art/version.rb
+GEMFILE    = ascii-art-$(VERSION).gem
 SOURCES   != find lib exe tools test -name '*.rb' -o -path 'exe/*' -type f
 
 help:						## show this help (the default)
-	@echo 'inkchart -- charts for a monospace grid, in Unicode or pure ASCII'
+	@echo 'ascii-art -- charts and text figures for a monospace grid, in Unicode or pure ASCII'
 	@echo ''
 	@echo 'Targets:'
 	@awk -F':.*## ' '/^[a-z][a-z0-9-]*:.*## /{ \
@@ -31,9 +32,9 @@ help:						## show this help (the default)
 	    RUBY     '$(RUBY)' \
 	    RUBOCOP  '$(RUBOCOP)  (the gate: the ruby skill'"'"'s rules, .rubocop.yml)' \
 	    ORACLE   '$(ORACLE)  (a GEM_PATH holding unicode_plot; empty: oracle tests skip)' \
-	    VERSION  '$(VERSION)  (from lib/inkchart/version.rb)'
+	    VERSION  '$(VERSION)  (from lib/ascii_art/version.rb)'
 	@echo ''
-	@echo 'There is no deploy target, and no publishing one: inkchart is not'
+	@echo 'There is no deploy target, and no publishing one: ascii-art is not'
 	@echo 'published (a gem push waits for an explicit decision; see README).'
 
 all: check build				## check, then build the gem
@@ -48,14 +49,14 @@ check-style:					## the ruby skill's RuboCop gate (.rubocop.yml)
 
 build: $(GEMFILE)				## build the gem file
 
-$(GEMFILE): inkchart.gemspec $(SOURCES)
-	$(GEM) build inkchart.gemspec
+$(GEMFILE): ascii-art.gemspec $(SOURCES)
+	$(GEM) build ascii-art.gemspec
 
-bundle:					## write dist/inkchart.rb, the library as one file
-	@mkdir -p dist && $(RUBY) tools/bundle.rb dist/inkchart.rb
+bundle:					## write dist/ascii-art.rb, the library as one file
+	@mkdir -p dist && $(RUBY) tools/bundle.rb dist/ascii-art.rb
 
 tests:						## run the suite; ORACLE=path also runs the unicode_plot comparisons
-	@INKCHART_ORACLE='$(ORACLE)' $(RUBY) -w test/run.rb
+	@ASCII_ART_ORACLE='$(ORACLE)' $(RUBY) -w test/run.rb
 
 version:					## print the release, bare
 	@echo '$(VERSION)'
@@ -64,7 +65,7 @@ install: build					## install the gem for this user (gem install --user-install)
 	$(GEM) install --user-install --local $(GEMFILE)
 
 uninstall:					## remove what install put down
-	$(GEM) uninstall --user-install -x inkchart
+	$(GEM) uninstall --user-install -x ascii-art
 
 clean:						## remove the built gem and dist/
 	rm -rf $(GEMFILE) dist

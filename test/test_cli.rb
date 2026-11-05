@@ -5,20 +5,22 @@ require "stringio"
 
 require_relative "test_helper"
 
-# Shared by both CLI test classes below: Inkchart::CLI.run, in process,
+# Shared by the CLI test classes below: `ascii-art chart` through
+# AsciiArt::CLI.run, in process,
 # against StringIO rather than real files or a real stdin.
 module CLIHelper
     def run_cli(argv, input = "")
         out = StringIO.new
         err = StringIO.new
-        status = Inkchart::CLI.run(
-            argv, stdin: StringIO.new(input), stdout: out, stderr: err
+        status = AsciiArt::CLI.run(
+            ["chart",
+             *argv], stdin: StringIO.new(input), stdout: out, stderr: err
         )
         [status, out.string, err.string]
     end
 end
 
-# Inkchart::CLI (DESIGN.md, "Command line"): every kind drawn through
+# AsciiArt::ChartCLI (DESIGN.md, "Command line"): every kind drawn through
 # CLI.run on a small data set, and the header row naming columns.
 class TestCLIKinds < Minitest::Test
     include CLIHelper
@@ -97,9 +99,9 @@ class TestCLIKinds < Minitest::Test
     end
 end
 
-# Inkchart::CLI, continued: every exit status, a usage error per class
-# (unknown option, an option the kind does not take, a bad value), and
-# exe/inkchart end to end as a subprocess.
+# AsciiArt::ChartCLI, continued: every exit status, a usage error per
+# class (unknown option, an option the kind does not take, a bad
+# value), and exe/ascii-art end to end as a subprocess.
 class TestCLIErrors < Minitest::Test
     include CLIHelper
 
@@ -157,13 +159,13 @@ class TestCLIErrors < Minitest::Test
     def test_version_exits_0_and_prints_the_version
         status, out, = run_cli(["--version"])
         assert_equal(0, status)
-        assert_includes(out, Inkchart::VERSION)
+        assert_includes(out, AsciiArt::VERSION)
     end
 
-    def test_exe_inkchart_runs_end_to_end
-        exe = File.expand_path("../exe/inkchart", __dir__)
+    def test_exe_ascii_art_runs_end_to_end
+        exe = File.expand_path("../exe/ascii-art", __dir__)
         out, status = Open3.capture2(
-            RbConfig.ruby, exe, "--kind", "line", "--width", "10",
+            RbConfig.ruby, exe, "chart", "--kind", "line", "--width", "10",
             stdin_data: "0 0\n1 1\n2 4\n"
         )
         assert(status.success?)
@@ -176,8 +178,8 @@ class TestCLIHeaderNames < Minitest::Test
     def test_every_series_named
         input = "x sin cos\n0 0 1\n1 0.8 0.5\n2 0.9 -0.4\n"
         out = StringIO.new
-        status = Inkchart::CLI.run([], stdin: StringIO.new(input),
-                                       stdout: out, stderr: StringIO.new)
+        status = AsciiArt::CLI.run(["chart"], stdin: StringIO.new(input),
+                                              stdout: out, stderr: StringIO.new)
         assert_equal 0, status
         assert_includes out.string, "sin"
         assert_includes out.string, "cos"
@@ -221,5 +223,48 @@ class TestCLIFields < Minitest::Test
         status, _, err = run_cli(["--width", "0"], "1\n2\n")
         assert_equal(2, status)
         assert_includes(err, "width")
+    end
+end
+
+# AsciiArt::CLI, the dispatcher: the command is the first argument;
+# none, or an unknown one, is a usage error listing the commands.
+class TestCLIDispatch < Minitest::Test
+    def run_top(argv)
+        out = StringIO.new
+        err = StringIO.new
+        status = AsciiArt::CLI.run(argv, stdin: StringIO.new(""),
+                                         stdout: out, stderr: err)
+        [status, out.string, err.string]
+    end
+
+    def test_no_command_is_a_usage_error_listing_the_commands
+        status, _, err = run_top([])
+        assert_equal(2, status)
+        assert_includes(err, "no command")
+        assert_includes(err, "chart")
+    end
+
+    def test_an_unknown_command_is_a_usage_error_naming_it
+        status, _, err = run_top(%w[--kind bar])
+        assert_equal(2, status)
+        assert_includes(err, "unknown command: --kind")
+    end
+
+    def test_help_lists_the_commands
+        status, out, = run_top(["--help"])
+        assert_equal(0, status)
+        assert_includes(out, "chart")
+    end
+
+    def test_version_prints_the_version
+        status, out, = run_top(["--version"])
+        assert_equal(0, status)
+        assert_equal("#{AsciiArt::VERSION}\n", out)
+    end
+
+    def test_chart_help_names_the_chart_command
+        status, out, = run_top(%w[chart --help])
+        assert_equal(0, status)
+        assert_includes(out, "Usage: ascii-art chart")
     end
 end

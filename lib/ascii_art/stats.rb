@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Binning, percentiles, and the value transforms a chart's scale can
     # apply before drawing (DESIGN.md, Stats and Axis).
     module Stats

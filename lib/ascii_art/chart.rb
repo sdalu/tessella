@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # Marked series (add's mark:): one glyph in the cell of each point,
     # in place of the kind's own drawing. Kept apart from Chart so
     # Chart's own class body stays under budget.

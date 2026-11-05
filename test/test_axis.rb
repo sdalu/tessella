@@ -2,7 +2,7 @@
 
 require_relative "test_helper"
 
-# Inkchart::Axis.limits and .label (DESIGN.md).
+# AsciiArt::Axis.limits and .label (DESIGN.md).
 class TestAxis < Minitest::Test
     include Oracle::Test
 
@@ -15,40 +15,40 @@ class TestAxis < Minitest::Test
     ].freeze
 
     def test_label_integer_as_is
-        assert_equal "5", Inkchart::Axis.label(5)
-        assert_equal "-3", Inkchart::Axis.label(-3)
+        assert_equal "5", AsciiArt::Axis.label(5)
+        assert_equal "-3", AsciiArt::Axis.label(-3)
     end
 
     def test_label_float_keeps_its_digits
-        assert_equal "5.0", Inkchart::Axis.label(5.0)
-        assert_equal "3.14", Inkchart::Axis.label(3.14)
+        assert_equal "5.0", AsciiArt::Axis.label(5.0)
+        assert_equal "3.14", AsciiArt::Axis.label(3.14)
     end
 
     def test_label_no_exponent_in_range
-        assert_equal "0.0001", Inkchart::Axis.label(0.0001)
+        assert_equal "0.0001", AsciiArt::Axis.label(0.0001)
         assert_equal "999999999999999.0",
-                     Inkchart::Axis.label(999_999_999_999_999.0)
+                     AsciiArt::Axis.label(999_999_999_999_999.0)
     end
 
     def test_limits_given_not_zero_is_kept
-        assert_equal [2.0, 9.0], Inkchart::Axis.limits([1, 2, 3], [2, 9])
+        assert_equal [2.0, 9.0], AsciiArt::Axis.limits([1, 2, 3], [2, 9])
     end
 
     def test_limits_equal_values_widen_by_one
-        assert_equal [4.0, 6.0], Inkchart::Axis.limits([5, 5, 5])
+        assert_equal [4.0, 6.0], AsciiArt::Axis.limits([5, 5, 5])
     end
 
     def test_limits_narrows_to_a_nice_round_extent
-        assert_equal [1.0, 10.0], Inkchart::Axis.limits([1, 2, 3, 4, 10])
+        assert_equal [1.0, 10.0], AsciiArt::Axis.limits([1, 2, 3, 4, 10])
     end
 
     def test_oracle_limits_matches_extend_limits
         need_oracle
         DATASETS.each do |x, y|
             assert_equal UnicodePlot::Utils.extend_limits(x, [0, 0]),
-                         Inkchart::Axis.limits(x)
+                         AsciiArt::Axis.limits(x)
             assert_equal UnicodePlot::Utils.extend_limits(y, [0, 0]),
-                         Inkchart::Axis.limits(y)
+                         AsciiArt::Axis.limits(y)
         end
     end
 
@@ -59,8 +59,8 @@ class TestAxis < Minitest::Test
 
     def assert_rendered_extremes_match(x, y)
         xmin_s, xmax_s, ymin_s, ymax_s = rendered_extremes(x, y)
-        xlim = Inkchart::Axis.limits(x)
-        ylim = Inkchart::Axis.limits(y)
+        xlim = AsciiArt::Axis.limits(x)
+        ylim = AsciiArt::Axis.limits(y)
         assert_label_or_known_divergence(xlim[0], xmin_s)
         assert_label_or_known_divergence(xlim[1], xmax_s)
         assert_label_or_known_divergence(ylim[0], ymin_s)
@@ -75,9 +75,9 @@ class TestAxis < Minitest::Test
     def assert_label_or_known_divergence(value, oracle_s)
         if value.to_i == value
             assert_equal value.to_i.to_s, oracle_s
-            assert_equal "#{value.to_i}.0", Inkchart::Axis.label(value)
+            assert_equal "#{value.to_i}.0", AsciiArt::Axis.label(value)
         else
-            assert_equal oracle_s, Inkchart::Axis.label(value)
+            assert_equal oracle_s, AsciiArt::Axis.label(value)
         end
     end
 
@@ -105,19 +105,19 @@ end
 class TestAxisHugeConstant < Minitest::Test
     def test_constant_values_at_1e16_widen_to_a_nonzero_range
         [1e16, 10**17, -2e18].each do |v|
-            lo, hi = Inkchart::Axis.limits([v, v])
+            lo, hi = AsciiArt::Axis.limits([v, v])
             assert_operator(lo, :<, hi)
         end
     end
 
     def test_constant_values_at_1e16_draw_in_every_grid_kind
         %i[line scatter stairs density].each do |kind|
-            assert_includes(Inkchart.public_send(kind, [1e16, 1e16]).to_s, "┐")
+            assert_includes(AsciiArt.public_send(kind, [1e16, 1e16]).to_s, "┐")
         end
-        assert_includes(Inkchart.box(["a"], [[1e16, 1e16]]).to_s, "┐")
+        assert_includes(AsciiArt.box(["a"], [[1e16, 1e16]]).to_s, "┐")
     end
 
     def test_widening_below_1e16_is_unchanged
-        assert_equal([2.0, 4.0], Inkchart::Axis.limits([3, 3]))
+        assert_equal([2.0, 4.0], AsciiArt::Axis.limits([3, 3]))
     end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     class Canvas
         # 2x4 sub-pixels per cell, packed into the Unicode Braille
         # Patterns block: dot n sets bit 2**(n-1) of the base U+2800,

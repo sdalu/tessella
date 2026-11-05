@@ -2,17 +2,17 @@
 
 require_relative "test_helper"
 
-# Inkchart::Frame: border, labels, title, legend, render (DESIGN.md,
+# AsciiArt::Frame: border, labels, title, legend, render (DESIGN.md,
 # "Frame and Color"). Frame knows nothing of data; every case below
 # hands it a body and labels built by hand.
 class TestFrame < Minitest::Test
     def test_every_assembled_part_at_once
-        frame = Inkchart::Frame.new(**fixture_options)
+        frame = AsciiArt::Frame.new(**fixture_options)
         assert_equal(fixture_expected, frame.to_s)
     end
 
     def test_no_line_ends_in_a_blank
-        frame = Inkchart::Frame.new(
+        frame = AsciiArt::Frame.new(
             body: solid_body(3, 2, "#"), title: "T", xlabel: "x",
             left: { 0 => "a" }, right: { 0 => "bb" }, bottom: %w[lo hi]
         )
@@ -22,27 +22,27 @@ class TestFrame < Minitest::Test
     end
 
     def test_box_border_draws_a_full_frame
-        out = Inkchart::Frame.new(body: solid_body(2, 1, "#")).to_s
+        out = AsciiArt::Frame.new(body: solid_body(2, 1, "#")).to_s
         assert_includes(out, "┌──┐")
         assert_includes(out, "└──┘")
         assert_includes(out, "│##│")
     end
 
     def test_bar_border_ticks_every_row_with_no_right_edge
-        frame = Inkchart::Frame.new(body: solid_body(2, 2, "#"), border: :bar)
+        frame = AsciiArt::Frame.new(body: solid_body(2, 2, "#"), border: :bar)
         rows = frame.to_s.split("\n")[1..2]
         assert(rows.all? { |row| row.include?("┤") })
         refute(rows.any? { |row| row.include?("│") })
     end
 
     def test_none_border_draws_no_border_at_all
-        frame = Inkchart::Frame.new(body: solid_body(2, 1, "#"), border: :none)
+        frame = AsciiArt::Frame.new(body: solid_body(2, 1, "#"), border: :none)
         refute_match(/[┌┐└┘│┤+\-|]/, frame.to_s)
         assert_includes(frame.to_s, "##")
     end
 
     def test_ascii_draws_plus_dash_pipe_and_nothing_non_ascii
-        frame = Inkchart::Frame.new(body: solid_body(2, 1, "#"), ascii: true,
+        frame = AsciiArt::Frame.new(body: solid_body(2, 1, "#"), ascii: true,
                                     title: "T")
         assert_includes(frame.to_s, "+--+")
         assert_includes(frame.to_s, "|##|")
@@ -50,20 +50,20 @@ class TestFrame < Minitest::Test
     end
 
     def test_ascii_bar_tick_is_a_pipe
-        frame = Inkchart::Frame.new(body: solid_body(2, 1, "#"), border: :bar,
+        frame = AsciiArt::Frame.new(body: solid_body(2, 1, "#"), border: :bar,
                                     ascii: true)
         assert_includes(frame.to_s, "|##")
         refute_match(/[^\x00-\x7F]/, frame.to_s)
     end
 
     def test_color_false_never_emits_an_escape
-        body = [[Inkchart::Cell.new(char: "a", color: :red)]]
-        frame = Inkchart::Frame.new(body: body, color: false)
+        body = [[AsciiArt::Cell.new(char: "a", color: :red)]]
+        frame = AsciiArt::Frame.new(body: body, color: false)
         refute_includes(frame.to_s, "\e")
     end
 
     def test_color_true_wraps_each_run_and_resets
-        frame = Inkchart::Frame.new(body: [mixed_color_row], color: true,
+        frame = AsciiArt::Frame.new(body: [mixed_color_row], color: true,
                                     border: :none)
         assert_includes(frame.to_s, "\e[31mab\e[0mc\e[34md\e[0m")
     end
@@ -71,7 +71,7 @@ class TestFrame < Minitest::Test
     def test_title_is_centred_over_the_frame
         # width 10, "Hi": offset = (10/2.0 - 2/2.0).round = 4, over a
         # border that itself starts 4 columns in (no left labels).
-        frame = Inkchart::Frame.new(body: solid_body(10, 1, "#"), title: "Hi")
+        frame = AsciiArt::Frame.new(body: solid_body(10, 1, "#"), title: "Hi")
         title_line, border_line = frame.to_s.split("\n")
         assert_equal(4, border_line.index("┌"))
         assert_equal(8, title_line.index("Hi"))
@@ -81,16 +81,16 @@ class TestFrame < Minitest::Test
 
     def solid_body(width, height, char)
         Array.new(height) do
-            Array.new(width) { Inkchart::Cell.new(char: char, color: nil) }
+            Array.new(width) { AsciiArt::Cell.new(char: char, color: nil) }
         end
     end
 
     def mixed_color_row
         [
-            Inkchart::Cell.new(char: "a", color: :red),
-            Inkchart::Cell.new(char: "b", color: :red),
-            Inkchart::Cell.new(char: "c", color: nil),
-            Inkchart::Cell.new(char: "d", color: :blue)
+            AsciiArt::Cell.new(char: "a", color: :red),
+            AsciiArt::Cell.new(char: "b", color: :red),
+            AsciiArt::Cell.new(char: "c", color: nil),
+            AsciiArt::Cell.new(char: "d", color: :blue)
         ]
     end
 
@@ -138,7 +138,7 @@ class TestFrameOracle < Minitest::Test
     private
 
     def assert_oracle_match(plot, border)
-        frame = Inkchart::Frame.new(**frame_options(plot, border))
+        frame = AsciiArt::Frame.new(**frame_options(plot, border))
         assert_equal(normalize(Oracle.render(plot)), normalize(frame.to_s))
     end
 
@@ -158,7 +158,7 @@ class TestFrameOracle < Minitest::Test
     def oracle_row_cells(plot, row)
         io = StringIO.new
         plot.print_row(UnicodePlot::IOContext.new(io, color: false), row)
-        io.string.each_char.map { |c| Inkchart::Cell.new(char: c, color: nil) }
+        io.string.each_char.map { |c| AsciiArt::Cell.new(char: c, color: nil) }
     end
 
     def normalize(text)
@@ -170,21 +170,21 @@ end
 # terminal draws them, so the frame stays aligned.
 class TestFrameWideLabels < Minitest::Test
     def test_a_wide_character_label_keeps_the_frame_aligned
-        lines = Inkchart.bar(%w[日本 b], [1, 2]).to_s.lines
-        columns = lines.map { Inkchart::Width.of(it[/\A[^┤┌└]*/]) }
+        lines = AsciiArt.bar(%w[日本 b], [1, 2]).to_s.lines
+        columns = lines.map { AsciiArt::Width.of(it[/\A[^┤┌└]*/]) }
         assert_equal(1, columns.uniq.size, lines.join)
     end
 
     def test_a_wide_title_is_centred_by_its_columns
-        chart = Inkchart.line([1, 2], title: "温度温度", width: 20)
+        chart = AsciiArt.line([1, 2], title: "温度温度", width: 20)
         title, top = chart.to_s.lines
         offset = title.index("温") - top.index("┌")
         assert_equal(6, offset) # (20 - 8 columns) / 2
     end
 
     def test_width_counts_wide_characters_as_two
-        assert_equal(6, Inkchart::Width.of("日本ab"))
-        assert_equal(1, Inkchart::Width.of("é"))
+        assert_equal(6, AsciiArt::Width.of("日本ab"))
+        assert_equal(1, AsciiArt::Width.of("é"))
     end
 end
 
@@ -193,16 +193,16 @@ end
 # goes wrong.
 class TestWidthTables < Minitest::Test
     def test_wide_emoji_outside_the_cjk_blocks_take_two
-        assert_equal(2, Inkchart::Width.of("⌚"))   # U+231A
-        assert_equal(2, Inkchart::Width.of("⭐"))   # U+2B50
+        assert_equal(2, AsciiArt::Width.of("⌚"))   # U+231A
+        assert_equal(2, AsciiArt::Width.of("⭐"))   # U+2B50
     end
 
     def test_neutral_symbols_inside_cjk_neighbourhoods_take_one
-        assert_equal(1, Inkchart::Width.of("䷀"))   # U+4DC0, a hexagram
+        assert_equal(1, AsciiArt::Width.of("䷀"))   # U+4DC0, a hexagram
     end
 
     def test_invisible_format_characters_take_none
-        assert_equal(0, Inkchart::Width.of("⁠")) # word joiner
-        assert_equal(0, Inkchart::Width.of("﻿")) # zero-width no-break
+        assert_equal(0, AsciiArt::Width.of("⁠")) # word joiner
+        assert_equal(0, AsciiArt::Width.of("﻿")) # zero-width no-break
     end
 end

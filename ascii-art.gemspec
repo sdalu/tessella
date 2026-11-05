@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/inkchart/version"
+require_relative "lib/ascii_art/version"
 
 Gem::Specification.new do |s|
-    s.name = "inkchart"
-    s.version = Inkchart::VERSION
+    s.name = "ascii-art"
+    s.version = AsciiArt::VERSION
     s.summary = "Charts for a monospace grid, in Unicode or pure ASCII"
     s.description = "Line, scatter, stairs, bar, histogram, box, stem " \
                     "and density plots with scaled axes, drawn in braille, " \
@@ -14,6 +14,6 @@ Gem::Specification.new do |s|
     s.required_ruby_version = ">= 3.4"
     s.files = Dir["lib/**/*.rb", "exe/*", "LICENSE", "README.md"]
     s.bindir = "exe"
-    s.executables = ["inkchart"]
+    s.executables = ["ascii-art"]
     s.metadata["rubygems_mfa_required"] = "true"
 end

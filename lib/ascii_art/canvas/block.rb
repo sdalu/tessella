@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     class Canvas
         # 2x2 sub-pixels per cell, packed into the Unicode quadrant
         # block characters (Block Elements / Symbols for Legacy

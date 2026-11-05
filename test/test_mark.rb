@@ -9,7 +9,7 @@ class TestMark < Minitest::Test
     LIMITS = { xlim: [0, 10], ylim: [0, 10] }.freeze
 
     def canvas
-        Inkchart::Canvas.build(:braille, width: 10, height: 5, **LIMITS)
+        AsciiArt::Canvas.build(:braille, width: 10, height: 5, **LIMITS)
     end
 
     def chars(canvas) = canvas.rows.map { it.map(&:char).join }
@@ -44,7 +44,7 @@ class TestMark < Minitest::Test
     end
 
     def test_a_marked_series_draws_its_marks_and_no_line
-        chart = Inkchart.line([0, 10], [0, 10], mark: "x", width: 10,
+        chart = AsciiArt.line([0, 10], [0, 10], mark: "x", width: 10,
                                                 height: 5, **LIMITS)
         cells = body(chart).join
         assert_equal(2, cells.count("x"))
@@ -52,7 +52,7 @@ class TestMark < Minitest::Test
     end
 
     def test_a_marked_series_sits_over_a_line_series
-        chart = Inkchart.line([0, 10], [5, 5], width: 10, height: 5,
+        chart = AsciiArt.line([0, 10], [5, 5], width: 10, height: 5,
                                                **LIMITS)
         chart.add([5], [5], mark: "x")
         assert_equal("x", body(chart)[2][5])
@@ -60,12 +60,12 @@ class TestMark < Minitest::Test
     end
 
     def test_stairs_marks_the_points_given_not_the_step_corners
-        chart = Inkchart.stairs([1, 2, 4], [1, 3, 4], mark: "x")
+        chart = AsciiArt.stairs([1, 2, 4], [1, 3, 4], mark: "x")
         assert_equal(3, body(chart).join.count("x"))
     end
 
     def test_the_legend_shows_the_mark_before_the_name
-        chart = Inkchart.line([1, 2], [1, 2], name: "fit")
+        chart = AsciiArt.line([1, 2], [1, 2], name: "fit")
         chart.add([1, 2], [1, 2], name: "measured", mark: "o")
         lines = chart.to_s.lines
         assert(lines[1].rstrip.end_with?("fit"))
@@ -73,15 +73,15 @@ class TestMark < Minitest::Test
     end
 
     def test_a_mark_takes_its_series_colour
-        chart = Inkchart.line([0, 10], [0, 10], mark: "x", color: true,
+        chart = AsciiArt.line([0, 10], [0, 10], mark: "x", color: true,
                                                 **LIMITS)
         assert_match(/\e\[[0-9;]*mx/, chart.to_s)
-        plain = Inkchart.line([0, 10], [0, 10], mark: "x", **LIMITS)
+        plain = AsciiArt.line([0, 10], [0, 10], mark: "x", **LIMITS)
         refute_includes(plain.to_s, "\e")
     end
 
     def test_ascii_true_with_an_ascii_mark_is_ascii_only
-        chart = Inkchart.line([1, 2, 3], ascii: true)
+        chart = AsciiArt.line([1, 2, 3], ascii: true)
         chart.add([1, 3], [1, 3], mark: "o")
         assert(chart.to_s.ascii_only?)
     end
@@ -89,7 +89,7 @@ class TestMark < Minitest::Test
     def test_a_mark_of_other_than_one_character_is_refused
         ["", "ab", :x, 1].each do |mark|
             error = assert_raises(ArgumentError) do
-                Inkchart.line([1, 2]).add([1, 2], mark: mark)
+                AsciiArt.line([1, 2]).add([1, 2], mark: mark)
             end
             assert_includes(error.message, "one character")
         end
@@ -97,14 +97,14 @@ class TestMark < Minitest::Test
 
     def test_a_unicode_mark_under_ascii_is_refused
         error = assert_raises(ArgumentError) do
-            Inkchart.line([1, 2], ascii: true, mark: "●")
+            AsciiArt.line([1, 2], ascii: true, mark: "●")
         end
         assert_includes(error.message, "ASCII")
     end
 
     def test_bar_kinds_take_no_mark
         assert_raises(ArgumentError) do
-            Inkchart.bar(%w[a], [1]).add(%w[b], [2], mark: "x")
+            AsciiArt.bar(%w[a], [1]).add(%w[b], [2], mark: "x")
         end
     end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     class Canvas
         # 1x2 sub-pixels per cell: the top pixel alone draws a raised
         # mark, the bottom alone a mark on the baseline, both a colon.

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # The command line (DESIGN.md, "Command line"): parses argv, reads
-    # a file or stdin, calls one Inkchart.<kind>, and prints. Split
+    # a file or stdin, calls one AsciiArt.<kind>, and prints. Split
     # into the small classes and modules below (each kept under the
     # ruby skill's size budget); every reopening of CLI adds one.
-    class CLI
+    class ChartCLI
         # The family of refusals CLI.run turns into an exit status
         # rather than letting bubble past it. UsageError (exit 2) is a
         # bad invocation; DataError (exit 1) is input that cannot
@@ -26,9 +26,9 @@ module Inkchart
             end
         end
 
-        BANNER = "Usage: inkchart [options] [file]"
+        BANNER = "Usage: ascii-art chart [options] [file]"
 
-        # argv is read, never mutated; the kind's one Inkchart.<kind>
+        # argv is read, never mutated; the kind's one AsciiArt.<kind>
         # call draws the chart, printed to stdout. Returns the exit
         # status: 0 drawn, 1 bad input, 2 usage.
         def self.run(argv, stdin:, stdout:, stderr:)
@@ -55,13 +55,13 @@ module Inkchart
         end
 
         def self.usage_error(error, stderr)
-            stderr.puts("inkchart: #{error.message}")
+            stderr.puts("ascii-art chart: #{error.message}")
             stderr.puts(BANNER)
             2
         end
 
         def self.data_error(error, stderr)
-            stderr.puts("inkchart: #{error.message}")
+            stderr.puts("ascii-art chart: #{error.message}")
             1
         end
     end
@@ -69,7 +69,7 @@ module Inkchart
     # Integer-or-Float parsing that keeps a number's own kind
     # (DESIGN.md: "A number keeps its kind"), shared by option values
     # and data fields. nil when neither parses.
-    class CLI
+    class ChartCLI
         module Num
             def self.parse(raw)
                 Integer(raw, 10, exception: false) ||
@@ -82,7 +82,7 @@ module Inkchart
     # key ChartOpts and KindOptions know about. Raises Halt for
     # --help/--version, or lets OptionParser::ParseError escape for a
     # bad flag, missing argument, or disallowed value.
-    class CLI
+    class ChartCLI
         class Options
             KINDS = %w[line scatter stairs density bar histogram box
                        stem].freeze
@@ -94,13 +94,13 @@ module Inkchart
             def initialize
                 @opts = { kind: :line }
                 @parser = OptionParser.new
-                @parser.banner = CLI::BANNER
+                @parser.banner = ChartCLI::BANNER
                 build
             end
 
             def parse(argv)
                 @parser.parse!(argv)
-                raise CLI::UsageError, "one file argument at most" if
+                raise ChartCLI::UsageError, "one file argument at most" if
                     argv.size > 1
 
                 [@opts, argv.first]
@@ -162,9 +162,9 @@ module Inkchart
             end
 
             def add_meta
-                @parser.on("--help") { raise CLI::Halt.new(0, @parser.to_s) }
+                @parser.on("--help") { raise ChartCLI::Halt.new(0, @parser.to_s) }
                 @parser.on("--version") do
-                    raise CLI::Halt.new(0, "#{Inkchart::VERSION}\n")
+                    raise ChartCLI::Halt.new(0, "#{AsciiArt::VERSION}\n")
                 end
             end
 
@@ -183,7 +183,7 @@ module Inkchart
     # One numeric column out of parsed rows, naming the row and the
     # field in any refusal (DESIGN.md's CLI input rules: "the message
     # naming the row number and the field").
-    class CLI
+    class ChartCLI
         module Columns
             def self.numeric(rows, index, name)
                 rows.each_with_index.map { |row, i| field(row, index, name, i) }
@@ -208,7 +208,7 @@ module Inkchart
     # Splits a header row from the data (DESIGN.md: "a first row that
     # is not all numbers names the columns"; bar looks only at the
     # value field).
-    class CLI
+    class ChartCLI
         module Header
             def self.split(rows, bar_like: false)
                 return [nil, rows] unless header?(rows.first, bar_like)
@@ -233,10 +233,10 @@ module Inkchart
         end
     end
 
-    # The subset of parsed options forwarded to Inkchart.<kind>: the
+    # The subset of parsed options forwarded to AsciiArt.<kind>: the
     # options common to every kind, plus the ones its own kind takes
     # (DESIGN.md's "Command line" and "Chart and kinds").
-    class CLI
+    class ChartCLI
         module ChartOpts
             COMMON = %i[title xlabel ylabel width height xlim ylim canvas
                         ascii color xscale].freeze
@@ -258,7 +258,7 @@ module Inkchart
     # (DESIGN.md's "Command line"): --style, --scale, --bins,
     # --closed, and bar's own --fill/--no-eighths/--track only fit
     # certain kinds.
-    class CLI
+    class ChartCLI
         module KindOptions
             FLAG = { style: "--style", scale: "--scale", bins: "--bins",
                      closed: "--closed", fill: "--fill",
@@ -284,7 +284,7 @@ module Inkchart
     # them too). A line holding a comma splits on commas only, one
     # holding a tab on tabs only, so a label may hold spaces; only a
     # line with neither splits on runs of spaces.
-    class CLI
+    class ChartCLI
         class Reader
             def self.fields(line)
                 return line.split(/\s*,\s*/) if line.include?(",")
@@ -317,7 +317,7 @@ module Inkchart
 
     # Dispatches to the one builder for opts[:kind] (DESIGN.md's CLI
     # input rules: the column shape differs by kind).
-    class CLI
+    class ChartCLI
         module Kinds
             SERIES = %i[line scatter stairs density].freeze
             BARLIKE = %i[bar histogram].freeze
@@ -337,10 +337,10 @@ module Inkchart
 
     # line, scatter, stairs, density: one column is y against 1..n,
     # two are x y, more are x and one series per further column
-    # (DESIGN.md's CLI input rules). The one Inkchart.<kind> call
+    # (DESIGN.md's CLI input rules). The one AsciiArt.<kind> call
     # below makes the first series, named by its header field, and
     # chart.add the rest, each named the same way.
-    class CLI
+    class ChartCLI
         class SeriesKind
             def self.build(kind, opts, rows)
                 header, data = Header.split(rows)
@@ -365,7 +365,7 @@ module Inkchart
             def self.first_call(kind, opts, columns, header)
                 args = columns.size == 1 ? [columns[0]] : columns[0, 2]
                 name = header && header[columns.size == 1 ? 0 : 1]
-                Inkchart.public_send(kind, *args, name: name,
+                AsciiArt.public_send(kind, *args, name: name,
                                                   **ChartOpts.for(opts))
             end
 
@@ -379,7 +379,7 @@ module Inkchart
 
     # bar: label value; histogram: one column of samples, over
     # Stats.histogram's bins (DESIGN.md's CLI input rules).
-    class CLI
+    class ChartCLI
         class BarKind
             def self.build(kind, opts, rows)
                 _header, data = Header.split(rows, bar_like: kind == :bar)
@@ -389,19 +389,19 @@ module Inkchart
             def self.bar(opts, data)
                 labels = data.map { it[0] }
                 values = Columns.numeric(data, 1, "value")
-                Inkchart.bar(labels, values, **ChartOpts.for(opts))
+                AsciiArt.bar(labels, values, **ChartOpts.for(opts))
             end
 
             def self.histogram(opts, data)
                 samples = Columns.numeric(data, 0, "sample")
-                Inkchart.histogram(samples, **ChartOpts.for(opts))
+                AsciiArt.histogram(samples, **ChartOpts.for(opts))
             end
         end
     end
 
     # box: one or more columns, one box per column, named by the
     # header or 1..n (DESIGN.md's CLI input rules).
-    class CLI
+    class ChartCLI
         class BoxKind
             def self.build(opts, rows)
                 header, data = Header.split(rows)
@@ -410,14 +410,14 @@ module Inkchart
                 columns = (0...ncols).map do |i|
                     Columns.numeric(data, i, names[i])
                 end
-                Inkchart.box(names, columns, **ChartOpts.for(opts))
+                AsciiArt.box(names, columns, **ChartOpts.for(opts))
             end
         end
     end
 
     # stem: one column, or two for the back-to-back form (DESIGN.md's
     # CLI input rules).
-    class CLI
+    class ChartCLI
         class StemKind
             def self.build(opts, rows)
                 header, data = Header.split(rows)
@@ -425,7 +425,7 @@ module Inkchart
                 check_ncols!(ncols)
                 values = Columns.numeric(data, 0, "value")
                 other = ncols == 2 ? Columns.numeric(data, 1, "other") : nil
-                Inkchart.stem(values, other, **ChartOpts.for(opts))
+                AsciiArt.stem(values, other, **ChartOpts.for(opts))
             end
 
             def self.check_ncols!(ncols)

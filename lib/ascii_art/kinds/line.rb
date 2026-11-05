@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Inkchart
+module AsciiArt
     # A connected path through (x, y) points (DESIGN.md, "Chart and
     # kinds"): the x = 0 / y = 0 axis lines draw when in range, as
     # unicode_plot's lineplot does.
