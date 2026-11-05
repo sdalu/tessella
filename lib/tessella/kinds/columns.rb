@@ -19,6 +19,7 @@ module Tessella
         def check_layout!(opts)
             @orientation = pick!(opts, :orientation, ORIENTATIONS)
             @blocks = pick!(opts, :blocks, BLOCKS)
+            upright_track!(opts)
             return if @blocks == :eighths
 
             if @ascii
@@ -26,6 +27,13 @@ module Tessella
                                      "ascii: true"
             end
             glyph_options!(opts)
+        end
+
+        # Columns draw no track: one given is refused, not ignored.
+        def upright_track!(opts)
+            return unless @orientation == :vertical && opts.key?(:track)
+
+            raise ArgumentError, "track: only with horizontal bars"
         end
 
         def pick!(opts, key, allowed)
@@ -48,8 +56,8 @@ module Tessella
             values = @bars.map { |_, value, _| @xscale.call(value) }
             return values if values.all? { it >= 0 }
 
-            raise ArgumentError, "a #{@orientation} or #{@blocks} bar " \
-                                 "chart needs values of 0 or more"
+            raise ArgumentError, "a #{@orientation} #{@blocks} bar chart " \
+                                 "needs values of 0 or more"
         end
 
         def layout_frame_options
@@ -70,7 +78,13 @@ module Tessella
 
         def share(value, max) = max.positive? ? value / max : 0.0
 
-        def pixels(value, max, span) = (share(value, max) * span).round
+        # At least one step for a value above zero, so a small bar
+        # never draws as an empty one.
+        def pixels(value, max, span) = steps(share(value, max) * span, value)
+
+        def steps(exact, value)
+            value.positive? ? [exact.round, 1].max : exact.round
+        end
     end
 
     # orientation: :vertical -- columns rising from a floor, value
@@ -103,7 +117,8 @@ module Tessella
             rows = Array.new(column_height) { [] }
             values.each_with_index do |v, i|
                 blank_columns(rows, i.zero? ? 0 : gap)
-                append_column(rows, rise_units(share(v, max)), bw, color_of(i))
+                append_column(rows, rise_units(share(v, max), v), bw,
+                              color_of(i))
             end
             [rows, bw + gap]
         end
@@ -121,10 +136,10 @@ module Tessella
             [gap, [((width + gap) / n) - gap, 1].max]
         end
 
-        def rise_units(fraction)
-            return (fraction * column_height).round * 8 unless @eighths
+        def rise_units(fraction, value)
+            return steps(fraction * column_height, value) * 8 unless @eighths
 
-            (fraction * column_height * 8).round
+            steps(fraction * column_height * 8, value)
         end
 
         def append_column(rows, units, bw, color)

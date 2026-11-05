@@ -381,7 +381,9 @@ line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--ascii`, `--color`, `--xscale ln|log2|log10`.
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
-`--style post|pre` (stairs only); `--orientation horizontal|vertical`
+`--style post|pre` (stairs only); `--blocks
+eighths|braille|block|quadrant|half` (bar and histogram only);
+`--orientation horizontal|vertical`
 (every kind but stem: the direction the value axis runs, bars and
 boxes horizontal by default, the plotted kinds vertical); `--area`
 and `--gradient C,C,...`

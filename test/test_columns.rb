@@ -104,5 +104,40 @@ class TestColumns < Minitest::Test
                             "1\n2\n3\n"))
         assert_equal(2, cli(%w[--blocks braille], "1\n2\n"))
         assert_equal(2, cli(%w[--kind bar --orientation sideways]))
+        assert_equal(2, cli(%w[--kind bar --orientation vertical --track .]))
+    end
+end
+
+# What the new layouts refuse, and how they round.
+class TestColumnsRules < Minitest::Test
+    def body(chart)
+        chart.to_s.lines[1..-2].filter_map { it[/[│|](.*)[│|]/, 1] }
+    end
+
+    def test_a_negative_value_names_the_exact_layout
+        error = assert_raises(ArgumentError) do
+            Tessella.bar(%w[a b], [1, -1], orientation: :vertical).to_s
+        end
+        assert_match(/a vertical eighths bar chart needs values of 0/,
+                     error.message)
+    end
+
+    def test_track_is_refused_for_upright_bars
+        assert_raises(ArgumentError) do
+            Tessella.bar(%w[a], [1], orientation: :vertical, track: ".")
+        end
+    end
+
+    # A value above zero shows at least one step, however small.
+    def test_a_small_value_is_never_drawn_empty
+        [{}, { ascii: true }, { blocks: :braille }, { blocks: :half }]
+            .each do |opts|
+            chart = Tessella.bar(%w[a b], [1, 1000], orientation: :vertical,
+                                                     height: 2, width: 4,
+                                                     **opts)
+            assert_match(/\S/, body(chart).last[0, 2], opts.inspect)
+        end
+        across = Tessella.bar(%w[a b], [1, 1000], blocks: :braille, width: 4)
+        refute_equal("⠀", body(across).first[0])
     end
 end
