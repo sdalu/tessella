@@ -28,8 +28,10 @@ The format is told by the bytes' own signature, not a file name:
   PGM first.
 
 ```text
-$ printf 'GIF89a' | tessella image
-tessella image: not a PNM or PNG image, and the rmagick gem is not installed: install it, or convert the image first (magick IMAGE pgm:- | tessella image)
+$ printf 'GIF89a' | tessella image 2>&1 | fold -s -w 72 | sed 's/ $//'
+tessella image: not a PNM or PNG image, and the rmagick gem is not
+installed: install it, or convert the image first (magick IMAGE pgm:- |
+tessella image)
 ```
 
 ```sh
@@ -266,8 +268,10 @@ threshold above every tone — is refused, naming what to change,
 rather than printed as nothing (exit 1):
 
 ```text
-$ tessella image --style braille --threshold 1 --dither none disc.pgm
-tessella image: the picture renders blank at style braille: lower threshold, or try invert or another style
+$ tessella image --style braille --threshold 1 --dither none disc.pgm 2>&1 | \
+    fold -s -w 72 | sed 's/ $//'
+tessella image: the picture renders blank at style braille: lower
+threshold, or try invert or another style
 ```
 
 A malformed or truncated image is bad input (exit 1); an unknown

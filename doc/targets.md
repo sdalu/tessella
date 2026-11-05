@@ -97,7 +97,7 @@ $ tessella --target cjk table --no-ascii --style light cities.csv
 
 ```text
 $ tessella --target cjk compose frame --style light note.txt 2>&1 | head -1
-tessella compose: --style light conflicts with the cjk target's ASCII default (--no-ascii for Unicode)
+tessella compose: --style light needs --no-ascii under target cjk
 ```
 
 From Ruby, `ascii: false`:

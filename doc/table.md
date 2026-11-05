@@ -160,8 +160,10 @@ $ tessella table --style '╒╕╘╛═│╤╧╞╪╡' langs.csv
 Six glyphs are not enough for a table:
 
 ```text
-$ tessella table --style '╓╖╙╜─║' langs.csv
-tessella table: a table's border set needs 11 glyphs, its tees after the six of a frame: "╓╖╙╜─║"
+$ tessella table --style '╓╖╙╜─║' langs.csv 2>&1 | \
+    fold -s -w 72 | sed 's/ $//'
+tessella table: a table's border set needs 11 glyphs, its tees after
+the six of a frame: "╓╖╙╜─║"
 Usage: tessella table [options] [file]  (stdin if none)
     --tsv --no-header --align SPEC --style NAME|GLYPHS --ascii
     --title TEXT --max-width N
