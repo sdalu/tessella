@@ -147,9 +147,10 @@ module Tessella
             end)
         end
 
+        # gap blank rows between blocks, or gap on each side of a rule.
         def self.separator(gap, rule, width)
             rows = [""] * count!("gap", gap)
-            rows + (rule ? [rule * width] : []) + rows
+            rule ? rows + [rule * width] + rows : rows
         end
 
         def self.joined(blocks, separator)

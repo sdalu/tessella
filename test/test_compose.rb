@@ -199,3 +199,18 @@ class TestComposeCLI < Minitest::Test
             end
     end
 end
+
+# stack's gap: N blank rows between blocks, or N on each side of a rule.
+class TestStackGap < Minitest::Test
+    def test_gap_without_a_rule_is_n_rows_between
+        assert_equal(%w[a b], Tessella.stack("a", "b").lines)
+        assert_equal(["a", "", "b"], Tessella.stack("a", "b", gap: 1).lines)
+        assert_equal(["a", "", "", "b"],
+                     Tessella.stack("a", "b", gap: 2).lines)
+    end
+
+    def test_gap_with_a_rule_is_n_rows_on_each_side
+        assert_equal(["a", "", "=", "", "b"],
+                     Tessella.stack("a", "b", gap: 1, rule: "=").lines)
+    end
+end

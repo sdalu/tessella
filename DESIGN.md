@@ -116,7 +116,10 @@ every framed figure; under `ascii: true` the set is `ascii` and any
 other style, block or text holding a non-ASCII character is refused
 rather than rewritten. These rules, and the exact output, are the
 ascii-art skill's compose.rb's, which `tessella compose` replaces
-byte for byte; its lint pass stays in the skill.
+byte for byte; its lint pass stays in the skill. One departure:
+stack's `gap:` without a rule is N blank rows between blocks, as
+compose.rb's help said, where its code put 2N (N on each side of a
+rule that was not there).
 
 ## Diagram modules
 
