@@ -429,7 +429,10 @@ A plot that would need more than 1000 stems is refused: raise
 
 A heatmap draws a matrix as a grid of cells, each shaded by its value
 along ` ░▒▓█`, with the row names on the left and a key on the right
-giving the range. `week.txt` is a load per day and per three hours:
+giving the range. `week.txt` is a load per day and per three hours.
+Its first row names the columns because `0h`, `3h` are not numbers;
+a header of `00 03 06` would be read as a row of data, by the rule of
+[the input format](#the-input-format):
 
 ```text
 $ head -3 week.txt
@@ -736,6 +739,7 @@ whitespace to a text tool.
 | `--canvas C`        | `canvas: :c`          | `braille` (`ascii` with ASCII) |
 | `--xscale F`        | `xscale: :f`          | none                           |
 | `--yscale F`        | `yscale: :f`          | none (plotted kinds only)      |
+| `--xdate [FMT]`     | `xdate: "FMT"`        | by span (plotted kinds only)   |
 | `--ascii`           | `ascii: true`         | off                            |
 | `--color`           | `color: true`         | off                            |
 | (none)              | `border: :box`        | by kind                        |
@@ -797,6 +801,83 @@ both, not something silently ignored:
 $ tessella chart --kind bar --bins 3 langs.csv
 tessella chart: --bins is not valid with --kind bar
 Usage: tessella chart [options] [file]
+```
+
+## Dates on the x axis
+
+When x is a time, the axis is labelled with dates. On the command
+line `--xdate` reads the x column as ISO 8601: a date (`2026-11-05`),
+or a date and time (`2026-11-05T14:30`), with an offset (`Z`,
+`+01:00`) or none, which means UTC. `temps.txt` is a month of daily
+temperatures:
+
+```text
+$ head -3 temps.txt
+date temp
+2026-10-01 12.0
+2026-10-02 13.5
+```
+
+```text
+$ tessella chart --xdate --width 40 --height 6 temps.txt
+      ┌────────────────────────────────────────┐
+   20 │     ⣀⡠⠤⠤⠤⠤⣀⡀                           │ temp
+      │ ⣀⠤⠒⠉       ⠈⠑⠢⢄                    ⡠⠔⠊⠉│
+      │⠊⠁              ⠉⠲⢄              ⡠⠖⠉    │
+      │                   ⠉⠒⠤⣀⡀    ⢀⡠⠤⠒⠉       │
+      │                       ⠉⠉⠉⠉⠉⠉           │
+    0 │                                        │
+      └────────────────────────────────────────┘
+      2026-10-01                      2026-10-30
+```
+
+The labels are in UTC, and their format follows the span: `%Y-%m-%d`
+for a day or more, `%m-%d %H:%M` for an hour or more, `%H:%M:%S`
+below. `--xdate FMT` sets it, in `strftime` form:
+
+```text
+$ tessella chart --xdate %d/%m --width 40 --height 6 temps.txt
+      ┌────────────────────────────────────────┐
+   20 │     ⣀⡠⠤⠤⠤⠤⣀⡀                           │ temp
+      │ ⣀⠤⠒⠉       ⠈⠑⠢⢄                    ⡠⠔⠊⠉│
+      │⠊⠁              ⠉⠲⢄              ⡠⠖⠉    │
+      │                   ⠉⠒⠤⣀⡀    ⢀⡠⠤⠒⠉       │
+      │                       ⠉⠉⠉⠉⠉⠉           │
+    0 │                                        │
+      └────────────────────────────────────────┘
+      01/10                                30/10
+```
+
+An offset is converted, so the last point here, 23:00 at `+01:00`,
+is 22:00 UTC:
+
+```text
+$ printf '%s\n' 't v' '2026-11-05T14:00 1' '2026-11-05T18:30 3' \
+    '2026-11-05T23:00+01:00 2' | tessella chart --xdate --width 30 --height 4
+     ┌──────────────────────────────┐
+   3 │             ⣀⠤⠒⠉⠉⠑⠒⠤⢄⣀⡀      │ v
+     │        ⢀⡠⠤⠒⠉          ⠈⠉⠒⠢⠤⣀⣀│
+     │    ⢀⡠⠔⠊⠁                     │
+   1 │⣀⡠⠔⠊⠁                         │
+     └──────────────────────────────┘
+     11-05 14:00          11-05 22:00
+```
+
+The axis spans the data exactly, unless `--xlim` says otherwise
+(given as dates too). A date axis takes no `--xscale`; sideways
+(`--orientation horizontal`), the dates label the rows. A value that
+is not an ISO 8601 date is bad input, exit 1:
+
+```text
+$ printf 'x v\n2026-13-01 1\n' | tessella chart --xdate
+tessella chart: row 1: x is not an ISO 8601 date: "2026-13-01"
+```
+
+In Ruby the x values are `Time`s (or `Date`s, taken as midnight UTC,
+or `DateTime`s), and `xdate: "FMT"` sets the format:
+
+```ruby
+Tessella.line(times, temps, xdate: "%b %d")
 ```
 
 ## Several series, and marks
