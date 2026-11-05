@@ -35,11 +35,16 @@ written here about another, so they can be built and tested apart.
   pass rewrite it.
 - **Values as given.** An Integer label stays an Integer (`12`, not
   `12.0`); a Float keeps its digits.
-- **One file, one load order.** `lib/tessella.rb` requires every other
-  file, in dependency order, and the standard library (`optparse`, for
-  the CLI) above them; no other lib file calls `require` or
-  `require_relative`. `tools/bundle.rb` relies on
-  that to concatenate the library into one file for vendoring.
+- **Two entries, one load order each.** `lib/tessella.rb` requires the
+  library's files, in dependency order, with the standard library it
+  needs (`zlib`) above them; `lib/tessella/cli.rb` requires the library,
+  `optparse`, and the command line's files (`lib/tessella/cli/`), so
+  `require "tessella"` loads no command line and no option parser. No
+  other file calls `require` or `require_relative`, except
+  `rmagick_reader.rb`, which loads the optional rmagick gem when an
+  image needs it ("Images"). `tools/bundle.rb` follows the two entries,
+  in that order, to concatenate library and command line into one file
+  for vendoring.
 - **House Ruby**: the ruby skill (`.rubocop.yml` is its gate, copied
   here): 4-space indent, 80 columns, methods of 10 lines or fewer,
   classes of 100 or fewer, double quotes, `it` for a single block
@@ -65,15 +70,19 @@ lib/tessella/canvas/*.rb   braille, block, dot, ascii, density
 lib/tessella/frame.rb      border, labels, title, legend, render
 lib/tessella/chart.rb      shared options, series, render entry
 lib/tessella/kinds/*.rb    one file per kind
-lib/tessella/chart_cli.rb  `tessella chart`: options, input, one chart
-lib/tessella/compose_cli.rb
-                           `tessella compose`: subcommands, exits
-lib/tessella/compose_options.rb
-                           its options, and the block reader
-lib/tessella/<name>.rb     tree, table, bitfield, wave, seq: one file
-                           per module
-lib/tessella/<name>_cli.rb `tessella <name>`, one file per command
-lib/tessella/cli.rb        `tessella`: dispatches on the command
+lib/tessella/<name>.rb     tree, table, bitfield, wave, seq, image: one
+                           file per module (table_cells.rb: table's
+                           multi-line cells, fitting and wrapping)
+lib/tessella/raster.rb     Raster: a greyscale image; PNM; the decoder
+                           dispatch
+lib/tessella/png.rb        the built-in PNG decoder
+lib/tessella/rmagick_reader.rb
+                           every other format, through optional rmagick
+lib/tessella/cli.rb        the command line's entry: loads the library,
+                           optparse, and lib/tessella/cli/
+lib/tessella/cli/<name>.rb `tessella <name>`: one file per command
+                           (compose_options.rb: compose's options)
+lib/tessella/cli/main.rb   `tessella`: dispatches on the command
 exe/tessella               the command line
 tools/bundle.rb            single-file build for vendoring
 test/                      minitest; test/oracle.rb loads unicode_plot
@@ -144,6 +153,32 @@ rule:
 
 The lint pass the scripts ran on their output (artlint) stays in the
 skill: it is a policy tool for documents, not part of drawing.
+
+## Images
+
+`Tessella.image` draws a picture as text, from a `Raster`: width,
+height, and luma in 0..1, colour folded by Rec. 601, alpha composited
+over black so a transparent pixel is empty. `Raster.decode` picks the
+decoder by the bytes' own signature:
+
+- **PNM and PNG, always.** PGM/PPM is what the ascii-art skill's
+  img2art.rb read, so its pipelines keep working with nothing
+  installed; PNG covers screenshots, plots and logos, the usual
+  sources, in plain Ruby over `zlib`, which ships with Ruby.
+- **Everything else, through rmagick when it is installed.** A soft
+  dependency, never declared in the gemspec: `rmagick_reader.rb` loads
+  it only when such an image arrives, and without it the image is
+  refused, naming the gem and the `magick ... pgm:-` pipe instead. A
+  required RMagick would be a C extension built against ImageMagick at
+  install, the kind of dependency the project exists to avoid.
+
+The rendering is the skill's img2art.rb, ported byte for byte (182
+cases): its sampling, dithering (Floyd-Steinberg, Atkinson, Bayer) and
+glyph tables. Where it differs, it keeps a library rule: a blank
+braille cell is a space, never U+2800; trailing blanks go (its `--pad`
+is dropped, composition pads); `ascii: true` allows only the ramp style
+with an ASCII ramp; and a picture that renders blank is refused,
+naming the threshold to lower, rather than returned as nothing.
 
 ## Stats and Axis
 

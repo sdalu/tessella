@@ -18,7 +18,8 @@ break is caught before the slow oracle run.
 - [ ] `make build` — the gem builds from `tessella.gemspec`, whose
   errors no other gate loads it to find.
 - [ ] `make bundle` — regenerates `dist/tessella.rb` from
-  `lib/tessella.rb`'s require order; a new file or a changed load order
+  the require order of `lib/tessella.rb` then `lib/tessella/cli.rb`; a new
+  file or a changed load order
   needs it even when `make check` is silent.
 - [ ] `env TESSELLA_SRC=$PWD sh /home/sdalu/skills/docs/ascii-art/tests/check-plot.sh`
   — passes after `dist/tessella.rb` has been copied over the ascii-art

@@ -61,6 +61,9 @@ Decisions:
 - 2026-11-05 — the five skill generators (tree, table, bitfield, wave, seq) ported into the library by parallel Sonnet agents, each gated by byte parity with its script (47-77 cases), reviewed and rerun by me; one exit-status contract imposed across commands (unreadable file = 1, --period < 2 = 2); table has its own RFC 4180 reader, csv being a bundled gem in 3.4 — by me
 - 2026-11-05 — new name chosen: tessella (free on rubygems.org, no near-duplicate in its full name list), to apply after the ports merge — by user
 - 2026-11-05 — renamed ascii-art -> tessella (gem tessella, module Tessella, require "tessella", command `tessella`, repo ~/Repos/tessella); the ascii-art skill keeps its name — by user
+- 2026-11-05 — table: multi-line cells, width:/min_width: fitting (widest column only, ArgumentError below min), ANSI kept across wraps, bold header under color:, align: symbols — asked by climat (CCIface) on the user's behalf, design mine, confirmed by CCIface
+- 2026-11-05 — images: img2art ported (Tessella.image, `tessella image`); PNM and a built-in pure-Ruby PNG decoder always; every other format through rmagick as a soft dependency, never declared, loaded lazily in rmagick_reader.rb (the one file outside the entries that may require); without it, refused naming the gem and the magick pipe — by user (soft rmagick, PNM+PNG built in)
+- 2026-11-05 — the command line is its own entry, lib/tessella/cli.rb (optparse + lib/tessella/cli/*); require "tessella" loads the library alone; the bundle carries both — by user
 
 Pieces:
 - P0 [kept: interface judgment, verified] — scaffold the repo (git init, gemspec, Makefile per make, minitest harness, oracle harness) and write the internal interfaces the other pieces share: Canvas (pixel grid → rows), Stats (bins, percentiles, density, scales), Layout (frame, axes, title, legend, colour) — evidence: DESIGN.md; make check 23 files no offences; make tests 3/3; make bundle parses and loads

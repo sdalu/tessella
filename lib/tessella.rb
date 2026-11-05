@@ -7,8 +7,10 @@
 # tessella file is required: tools/bundle.rb concatenates the files in
 # exactly this order into one, for vendoring (DESIGN.md). Standard
 # library requires live here too, above the parts, and nowhere else.
+# The command line is not part of it: lib/tessella/cli.rb loads it, on
+# top of this file.
 
-require "optparse"
+require "zlib"
 
 require_relative "tessella/version"
 require_relative "tessella/error"
@@ -23,6 +25,10 @@ require_relative "tessella/table_cells"
 require_relative "tessella/bitfield"
 require_relative "tessella/wave"
 require_relative "tessella/seq"
+require_relative "tessella/raster"
+require_relative "tessella/png"
+require_relative "tessella/rmagick_reader"
+require_relative "tessella/image"
 require_relative "tessella/cell"
 require_relative "tessella/stats"
 require_relative "tessella/axis"
@@ -39,12 +45,3 @@ require_relative "tessella/kinds/line"
 require_relative "tessella/kinds/bar"
 require_relative "tessella/kinds/box"
 require_relative "tessella/kinds/stem"
-require_relative "tessella/chart_cli"
-require_relative "tessella/compose_cli"
-require_relative "tessella/compose_options"
-require_relative "tessella/tree_cli"
-require_relative "tessella/table_cli"
-require_relative "tessella/bitfield_cli"
-require_relative "tessella/wave_cli"
-require_relative "tessella/seq_cli"
-require_relative "tessella/cli"

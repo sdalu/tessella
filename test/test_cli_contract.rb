@@ -11,7 +11,7 @@ require_relative "test_helper"
 # so a command added later is held to the same contract.
 class TestCLIContract < Minitest::Test
     COMMANDS = [%w[chart], %w[compose frame], %w[tree], %w[table],
-                %w[bitfield], %w[wave], %w[seq]].freeze
+                %w[bitfield], %w[wave], %w[seq], %w[image]].freeze
 
     def run_cli(argv)
         out = StringIO.new

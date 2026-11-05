@@ -29,10 +29,15 @@ constraints and facts behind it, and the decision log with its reasons
 
 - **The rules nothing mechanical catches.** DESIGN.md's "Rules that
   hold in every part" — no runtime dependency, no trailing blank,
-  ASCII from the first byte, one load order in `lib/tessella.rb` — can
-  break with `make check` and `make tests` both green. Read them
-  before a change, not after.
+  ASCII from the first byte, two entries each with one load order
+  (`lib/tessella.rb`, `lib/tessella/cli.rb`) — can break with
+  `make check` and `make tests` both green. Read them before a
+  change, not after.
 - **No oracle installed by default.** The `unicode_plot` copy the
   oracle tests need is not kept anywhere; install one with
   `gem install --install-dir DIR --no-document unicode_plot` and pass
   `ORACLE=DIR`.
+- **RMagick tests skip without the gem.** The optional rmagick path
+  is tested only when it loads: install it the same way
+  (`gem install --install-dir DIR --no-document rmagick`) and run
+  `GEM_PATH=DIR make tests` after a change to images.

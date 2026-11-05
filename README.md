@@ -167,6 +167,33 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
 Every one refuses bad input with an `ArgumentError` naming the line,
 and under `ascii: true` draws ASCII glyphs and refuses non-ASCII text.
 
+### Pictures
+
+```ruby
+Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
+               threshold: 0.5, dither: :fs, invert: false,
+               edge_threshold: 0.3, ascii: false)
+```
+
+`source` is a `Tessella::Raster`, an IO, or a String of image bytes.
+PGM/PPM and PNG are decoded with nothing installed; any other format
+(JPEG, TIFF, WebP, ...) needs the `rmagick` gem, used when it is
+installed and never required, and without it is refused with the
+`magick IMAGE pgm:- | tessella image` pipe as the way round. Styles
+trade tone for resolution: `ramp` and `blocks` give one tone per cell,
+`half`, `quadrant`, `sextant` and `braille` pack 2 to 8 pixels into a
+cell, and `edges` draws Sobel contours as `─ │ ╱ ╲`. `dither:` is
+`:none`, `:fs` (Floyd-Steinberg), `:atkinson` or `:bayer`; `invert:
+true` is for a light background. `ascii: true` allows only the `ramp`
+style with an ASCII ramp. A picture that renders blank is refused,
+naming the threshold to lower.
+
+### The command line from Ruby
+
+`require "tessella"` loads the library alone. The command classes
+(`Tessella::CLI`, `Tessella::ChartCLI`, ...) and `optparse` come with
+`require "tessella/cli"`, which loads the library too.
+
 ## The `tessella` command
 
 ```text
@@ -175,7 +202,7 @@ tessella chart [options] [file]
 ```
 
 The first argument names the command; `tessella --help` lists them:
-`chart`, `compose`, `tree`, `table`, `bitfield`, `wave` and `seq`, each
+`chart`, `compose`, `tree`, `table`, `bitfield`, `wave`, `seq` and `image`, each
 with its own `--help`. A file that cannot be read is bad input (exit
 1) in every command, a bad option a usage error (exit 2).
 `tessella --version` prints the version. No command, or an unknown
@@ -302,6 +329,9 @@ tessella table    [--tsv] [--no-header] [--style S] [--ascii]
 tessella bitfield [--word N] [--octets] [--no-ruler] [--abbrev] [file]
 tessella wave     [--period N] [--ascii] [--ruler] [file]
 tessella seq      [--ascii] [--numbered] [--footer] [file]
+tessella image    [--style S] [--width N] [--dither M] [--ramp STR]
+                  [--gamma F] [--threshold F] [--edge-threshold F]
+                  [--invert] [--ascii] [file]
 ```
 
 Each reads its file or stdin and takes `--max-width N`, refusing
