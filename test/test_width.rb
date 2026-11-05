@@ -37,4 +37,13 @@ class TestWidth < Minitest::Test
         grid = Tessella::Compose.cell_grid(block)
         assert(grid.all? { it.size == block.width })
     end
+
+    # Every nonspacing and enclosing mark takes no column, in any
+    # script, and so do the Hangul medial and final jamo.
+    def test_combining_marks_outside_latin_take_no_column
+        assert_equal(1, width("กิ"))
+        assert_equal(1, width("שָׁ"))
+        assert_equal(1, width("\u0628\u064E"))
+        assert_equal(2, width("\u1100\u1161\u11A8"))
+    end
 end

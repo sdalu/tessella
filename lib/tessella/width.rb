@@ -2,12 +2,14 @@
 
 module Tessella
     # Display width: the columns a terminal gives a string. East Asian
-    # Wide and Fullwidth glyphs take two, invisible ones (combining
-    # marks, zero-width and format characters, variation selectors)
-    # none, everything else one -- ambiguous glyphs (box drawing,
-    # blocks) included, the Western terminal width. The two tables,
-    # generated from Unicode 15.1, came from the ascii-art skill's
-    # artlint.rb and are now shared with Tessella.lint (lint.rb); the
+    # Wide and Fullwidth glyphs take two, invisible ones (every
+    # nonspacing and enclosing mark, Mn and Me, in every script; the
+    # Hangul medial and final jamo; zero-width and format characters;
+    # variation selectors) none, everything else one -- ambiguous
+    # glyphs (box drawing, blocks) included, the Western terminal
+    # width. The two tables are generated from Unicode 15.1's
+    # UnicodeData.txt and EastAsianWidth.txt (a range WIDE holds is not
+    # repeated in INVISIBLE), shared with Tessella.lint (lint.rb); the
     # markdown skill's check_md.rb keeps a copy that must stay
     # identical to them.
     module Width
@@ -47,11 +49,6 @@ module Tessella
             0x1FA70..0x1FA7C, 0x1FA80..0x1FA88, 0x1FA90..0x1FABD,
             0x1FABF..0x1FAC5, 0x1FACE..0x1FADB, 0x1FAE0..0x1FAE8,
             0x1FAF0..0x1FAF8, 0x20000..0x2FFFD, 0x30000..0x3FFFD
-        ].freeze
-
-        INVISIBLE = [
-            0x0300..0x036F, 0x1AB0..0x1AFF, 0x1DC0..0x1DFF, 0x200B..0x200F,
-            0x2060..0x206F, 0xFE00..0xFE0F, 0xFE20..0xFE2F, 0xFEFF..0xFEFF
         ].freeze
 
         # An ANSI colour sequence (a chart drawn with color: true) takes
@@ -112,9 +109,14 @@ module Tessella
         # target: what its width class is read from.
         def self.base(code)
             return 1 if code < 0x300
-            return 2 if WIDE.any? { it.cover?(code) }
+            return 2 if in?(WIDE, code)
 
-            INVISIBLE.any? { it.cover?(code) } ? 0 : 1
+            in?(INVISIBLE, code) ? 0 : 1
+        end
+
+        # Whether code falls in one of a table's sorted ranges.
+        def self.in?(table, code)
+            table.bsearch { it.end >= code }&.cover?(code) || false
         end
     end
 end

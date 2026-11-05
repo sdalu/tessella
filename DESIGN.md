@@ -60,6 +60,8 @@ lib/tessella/error.rb      Tessella::Error < StandardError
 lib/tessella/check.rb      the argument checks every kind shares
 lib/tessella/target.rb     where a figure is read: term, cjk, web
 lib/tessella/width.rb      display width: columns a terminal gives text
+lib/tessella/width_invisible*.rb the zero-width ranges (every Mn, Me;
+                           tools/invisible_ranges.rb makes them)
 lib/tessella/width_class.rb width classes N, A, W (Unicode 15.1)
 lib/tessella/glyphs.rb     the named glyph sets and their classes
 lib/tessella/meter.rb      a one-line meter (progress bar, gauge)
