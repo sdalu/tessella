@@ -5,14 +5,14 @@ require "stringio"
 
 require_relative "test_helper"
 
-# Shared by the CLI test classes below: `ascii-art chart` through
-# AsciiArt::CLI.run, in process,
+# Shared by the CLI test classes below: `tessella chart` through
+# Tessella::CLI.run, in process,
 # against StringIO rather than real files or a real stdin.
 module CLIHelper
     def run_cli(argv, input = "")
         out = StringIO.new
         err = StringIO.new
-        status = AsciiArt::CLI.run(
+        status = Tessella::CLI.run(
             ["chart",
              *argv], stdin: StringIO.new(input), stdout: out, stderr: err
         )
@@ -20,7 +20,7 @@ module CLIHelper
     end
 end
 
-# AsciiArt::ChartCLI (DESIGN.md, "Command line"): every kind drawn through
+# Tessella::ChartCLI (DESIGN.md, "Command line"): every kind drawn through
 # CLI.run on a small data set, and the header row naming columns.
 class TestCLIKinds < Minitest::Test
     include CLIHelper
@@ -99,9 +99,9 @@ class TestCLIKinds < Minitest::Test
     end
 end
 
-# AsciiArt::ChartCLI, continued: every exit status, a usage error per
+# Tessella::ChartCLI, continued: every exit status, a usage error per
 # class (unknown option, an option the kind does not take, a bad
-# value), and exe/ascii-art end to end as a subprocess.
+# value), and exe/tessella end to end as a subprocess.
 class TestCLIErrors < Minitest::Test
     include CLIHelper
 
@@ -159,11 +159,11 @@ class TestCLIErrors < Minitest::Test
     def test_version_exits_0_and_prints_the_version
         status, out, = run_cli(["--version"])
         assert_equal(0, status)
-        assert_includes(out, AsciiArt::VERSION)
+        assert_includes(out, Tessella::VERSION)
     end
 
-    def test_exe_ascii_art_runs_end_to_end
-        exe = File.expand_path("../exe/ascii-art", __dir__)
+    def test_exe_tessella_runs_end_to_end
+        exe = File.expand_path("../exe/tessella", __dir__)
         out, status = Open3.capture2(
             RbConfig.ruby, exe, "chart", "--kind", "line", "--width", "10",
             stdin_data: "0 0\n1 1\n2 4\n"
@@ -178,7 +178,7 @@ class TestCLIHeaderNames < Minitest::Test
     def test_every_series_named
         input = "x sin cos\n0 0 1\n1 0.8 0.5\n2 0.9 -0.4\n"
         out = StringIO.new
-        status = AsciiArt::CLI.run(["chart"], stdin: StringIO.new(input),
+        status = Tessella::CLI.run(["chart"], stdin: StringIO.new(input),
                                               stdout: out, stderr: StringIO.new)
         assert_equal 0, status
         assert_includes out.string, "sin"
@@ -226,13 +226,13 @@ class TestCLIFields < Minitest::Test
     end
 end
 
-# AsciiArt::CLI, the dispatcher: the command is the first argument;
+# Tessella::CLI, the dispatcher: the command is the first argument;
 # none, or an unknown one, is a usage error listing the commands.
 class TestCLIDispatch < Minitest::Test
     def run_top(argv)
         out = StringIO.new
         err = StringIO.new
-        status = AsciiArt::CLI.run(argv, stdin: StringIO.new(""),
+        status = Tessella::CLI.run(argv, stdin: StringIO.new(""),
                                          stdout: out, stderr: err)
         [status, out.string, err.string]
     end
@@ -259,12 +259,12 @@ class TestCLIDispatch < Minitest::Test
     def test_version_prints_the_version
         status, out, = run_top(["--version"])
         assert_equal(0, status)
-        assert_equal("#{AsciiArt::VERSION}\n", out)
+        assert_equal("#{Tessella::VERSION}\n", out)
     end
 
     def test_chart_help_names_the_chart_command
         status, out, = run_top(%w[chart --help])
         assert_equal(0, status)
-        assert_includes(out, "Usage: ascii-art chart")
+        assert_includes(out, "Usage: tessella chart")
     end
 end

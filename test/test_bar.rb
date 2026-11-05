@@ -2,127 +2,127 @@
 
 require_relative "test_helper"
 
-# AsciiArt.bar / .histogram and their Chart subclasses (DESIGN.md,
+# Tessella.bar / .histogram and their Chart subclasses (DESIGN.md,
 # "Chart and kinds"): construction, add, option checking, and the
 # house defaults (fill, eighths, track, Axis.label value). Oracle
 # parity lives in the *Oracle classes below.
 class TestBar < Minitest::Test
     def test_bar_builds_a_bar_chart_with_one_set_of_bars
-        chart = AsciiArt.bar(%w[a b], [1, 2])
-        assert_kind_of(AsciiArt::Bar, chart)
+        chart = Tessella.bar(%w[a b], [1, 2])
+        assert_kind_of(Tessella::Bar, chart)
         assert_includes(chart.to_s, "a")
         assert_includes(chart.to_s, "2")
     end
 
     def test_histogram_builds_a_histogram_chart
-        chart = AsciiArt.histogram([1, 2, 2, 3, 3, 3])
-        assert_kind_of(AsciiArt::Histogram, chart)
-        assert_kind_of(AsciiArt::Bar, chart)
+        chart = Tessella.histogram([1, 2, 2, 3, 3, 3])
+        assert_kind_of(Tessella::Histogram, chart)
+        assert_kind_of(Tessella::Bar, chart)
     end
 
     def test_add_appends_more_bars
-        chart = AsciiArt.bar(["a"], [1])
+        chart = Tessella.bar(["a"], [1])
         chart.add(["b"], [2])
         assert_includes(chart.to_s, "a")
         assert_includes(chart.to_s, "b")
     end
 
     def test_add_returns_self_for_chaining
-        chart = AsciiArt::Bar.new
+        chart = Tessella::Bar.new
         assert_same(chart, chart.add(["a"], [1]))
     end
 
     def test_unknown_option_raises_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.bar(["a"], [1], bogus: true)
+            Tessella.bar(["a"], [1], bogus: true)
         end
         assert_match(/bogus/, error.message)
     end
 
     def test_fill_longer_than_one_character_raises_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.bar(["a"], [1], fill: "ab")
+            Tessella.bar(["a"], [1], fill: "ab")
         end
         assert_match(/ab/, error.message)
     end
 
     def test_unknown_xscale_raises_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.bar(["a"], [1], xscale: :bogus)
+            Tessella.bar(["a"], [1], xscale: :bogus)
         end
         assert_match(/bogus/, error.message)
     end
 
     def test_value_label_keeps_an_integer_whole
-        assert_includes(AsciiArt.bar(["a"], [5]).to_s, "5")
-        refute_includes(AsciiArt.bar(["a"], [5]).to_s, "5.0")
+        assert_includes(Tessella.bar(["a"], [5]).to_s, "5")
+        refute_includes(Tessella.bar(["a"], [5]).to_s, "5.0")
     end
 
     def test_value_label_keeps_a_float_s_digits
-        assert_includes(AsciiArt.bar(["a"], [3.5]).to_s, "3.5")
+        assert_includes(Tessella.bar(["a"], [3.5]).to_s, "3.5")
     end
 
     def test_default_fill_is_a_solid_block
-        assert_includes(AsciiArt.bar(["a"], [5]).to_s, "█")
+        assert_includes(Tessella.bar(["a"], [5]).to_s, "█")
     end
 
     def test_ascii_true_uses_hash_as_the_fill
-        out = AsciiArt.bar(["a"], [5], ascii: true).to_s
+        out = Tessella.bar(["a"], [5], ascii: true).to_s
         assert_includes(out, "#")
         refute_includes(out, "█")
     end
 
     def test_track_default_fills_the_rest_of_the_bar_s_width
-        out = AsciiArt.bar(%w[a b], [1, 10], width: 20).to_s
+        out = Tessella.bar(%w[a b], [1, 10], width: 20).to_s
         assert_includes(out, "·")
     end
 
     def test_track_nil_disables_it
-        out = AsciiArt.bar(%w[a b], [1, 10], width: 20, track: nil).to_s
+        out = Tessella.bar(%w[a b], [1, 10], width: 20, track: nil).to_s
         refute_includes(out, "·")
     end
 
     def test_eighths_default_draws_a_partial_cell
-        out = AsciiArt.bar(%w[a b], [1, 3], width: 20).to_s
+        out = Tessella.bar(%w[a b], [1, 3], width: 20).to_s
         assert_match(/[▉-▏]/, out)
     end
 
     def test_eighths_never_appear_under_ascii
-        out = AsciiArt.bar(["a"], [1], width: 20, ascii: true).to_s
+        out = Tessella.bar(["a"], [1], width: 20, ascii: true).to_s
         refute_match(/[^\x00-\x7F]/, out)
     end
 
     def test_no_line_ends_in_a_blank
-        out = AsciiArt.bar(%w[a b], [1, 2], title: "T", xlabel: "x").to_s
+        out = Tessella.bar(%w[a b], [1, 2], title: "T", xlabel: "x").to_s
         lines = out.split("\n", -1)
         assert_equal("", lines.last)
         refute(lines[0..-2].any? { it.end_with?(" ") })
     end
 
     def test_color_false_never_emits_an_escape
-        out = AsciiArt.bar(["a"], [1], color: false).to_s
+        out = Tessella.bar(["a"], [1], color: false).to_s
         refute_includes(out, "\e")
     end
 
     def test_color_true_emits_an_escape
-        out = AsciiArt.bar(["a"], [1], color: true).to_s
+        out = Tessella.bar(["a"], [1], color: true).to_s
         assert_includes(out, "\e")
     end
 
     def test_ascii_true_is_pure_ascii
-        out = AsciiArt.bar(%w[a b], [1, 2], ascii: true).to_s
+        out = Tessella.bar(%w[a b], [1, 2], ascii: true).to_s
         refute_match(/[^\x00-\x7F]/, out)
     end
 
     def test_histogram_closed_right_uses_a_different_bracket
-        left = AsciiArt.histogram([1, 2, 3, 4], closed: :left).to_s
-        right = AsciiArt.histogram([1, 2, 3, 4], closed: :right).to_s
+        left = Tessella.histogram([1, 2, 3, 4], closed: :left).to_s
+        right = Tessella.histogram([1, 2, 3, 4], closed: :right).to_s
         assert_includes(left, ")")
         assert_includes(right, "]")
     end
 end
 
-# AsciiArt::Bar against unicode_plot's barplot (DESIGN.md's oracle
+# Tessella::Bar against unicode_plot's barplot (DESIGN.md's oracle
 # note): fill square, eighths off, no track -- the exact rendering
 # unicode_plot's own barplot produces, line for line.
 class TestBarOracle < Minitest::Test
@@ -161,7 +161,7 @@ class TestBarOracle < Minitest::Test
     end
 
     def mine(labels, values, **)
-        AsciiArt.bar(labels, values, width: WIDTH, fill: "■",
+        Tessella.bar(labels, values, width: WIDTH, fill: "■",
                                      eighths: false, track: nil, **).to_s
     end
 
@@ -171,7 +171,7 @@ class TestBarOracle < Minitest::Test
     end
 end
 
-# AsciiArt::Histogram against unicode_plot's histogram: Stats.histogram
+# Tessella::Histogram against unicode_plot's histogram: Stats.histogram
 # bins, the "[lo, hi)" labels unicode_plot prints (plain text -- its
 # own labels carry ANSI escapes, stripped here before comparing).
 class TestHistogramOracle < Minitest::Test
@@ -211,7 +211,7 @@ class TestHistogramOracle < Minitest::Test
     end
 
     def mine(values, **)
-        AsciiArt.histogram(values, width: WIDTH, fill: "▇",
+        Tessella.histogram(values, width: WIDTH, fill: "▇",
                                    eighths: false, track: nil, **).to_s
     end
 
@@ -224,7 +224,7 @@ end
 # grow left from it and positive ones right, each in proportion.
 class TestBarNegative < Minitest::Test
     def rows(labels, values, **)
-        AsciiArt.bar(labels, values, width: 30, **).to_s.lines
+        Tessella.bar(labels, values, width: 30, **).to_s.lines
                 .select { it.include?("┤") || it.include?("|") }
                 .map { it.chomp.sub(/\A.*?[┤|]/, "") }
     end
@@ -253,7 +253,7 @@ class TestBarNegative < Minitest::Test
     end
 
     def test_every_row_is_as_wide_as_the_frame
-        lines = AsciiArt.bar(%w[a b], [-12.5, 3], width: 30).to_s.lines
+        lines = Tessella.bar(%w[a b], [-12.5, 3], width: 30).to_s.lines
         bars = lines.select { it.include?("┤") }
         frame = lines.first.rstrip.length
         bars.each { assert_operator(it.index(" ", it.index("┤")), :<, frame) }
@@ -266,13 +266,13 @@ class TestBarNegative < Minitest::Test
     end
 
     def test_negative_bars_under_ascii_are_ascii
-        out = AsciiArt.bar(%w[a b], [-6, 3], ascii: true).to_s
+        out = Tessella.bar(%w[a b], [-6, 3], ascii: true).to_s
         assert(out.ascii_only?)
         assert_includes(out, "#")
     end
 
     def test_values_all_nonnegative_keep_the_layout
-        plain = AsciiArt.bar(%w[a b], [6, 3], width: 30).to_s
+        plain = Tessella.bar(%w[a b], [6, 3], width: 30).to_s
         assert_includes(plain, "a ┤#{"█" * 25}")
     end
 end

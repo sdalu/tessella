@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 # The oracle: unicode_plot, loaded only for tests that compare against
-# it. Never installed by this project; point ASCII_ART_ORACLE (or the
+# it. Never installed by this project; point TESSELLA_ORACLE (or the
 # Makefile's ORACLE) at a GEM_PATH holding it. Without it, oracle tests
 # skip, and the run says how many did.
 require "stringio"
 
 module Oracle
     def self.load
-        path = ENV.fetch("ASCII_ART_ORACLE", "")
+        path = ENV.fetch("TESSELLA_ORACLE", "")
         Gem.paths = { "GEM_PATH" => path } unless path.empty?
         require "unicode_plot"
         true

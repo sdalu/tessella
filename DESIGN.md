@@ -1,4 +1,4 @@
-# ascii-art — design
+# tessella — design
 
 Text figures for a monospace grid, drawn in Unicode or pure ASCII, for
 documents first and terminals second. Plain Ruby 3.4, no runtime
@@ -13,8 +13,8 @@ A chart, a table, a tree and a timing diagram need the same parts: a
 grid of cells, display width, a frame, an ASCII glyph set drawn from
 the first byte. They live in one library so those parts are written
 once, gated once and kept to the same rules, rather than copied into
-a script per figure. Each drawing module adds factories on `AsciiArt`
-and one command to `ascii-art`; factory names are unique across
+a script per figure. Each drawing module adds factories on `Tessella`
+and one command to `tessella`; factory names are unique across
 modules (a framed block will be `frame`, since `box` is the box
 plot), and the command is the first argument, so one module's options
 never collide with another's.
@@ -35,7 +35,7 @@ written here about another, so they can be built and tested apart.
   pass rewrite it.
 - **Values as given.** An Integer label stays an Integer (`12`, not
   `12.0`); a Float keeps its digits.
-- **One file, one load order.** `lib/ascii-art.rb` requires every other
+- **One file, one load order.** `lib/tessella.rb` requires every other
   file, in dependency order, and the standard library (`optparse`, for
   the CLI) above them; no other lib file calls `require` or
   `require_relative`. `tools/bundle.rb` relies on
@@ -48,50 +48,52 @@ written here about another, so they can be built and tested apart.
 ## Layout
 
 ```text
-lib/ascii-art.rb            the public entry: requires, AsciiArt.<kind>
-lib/ascii_art/version.rb    VERSION, the one place it is written
-lib/ascii_art/error.rb      AsciiArt::Error < StandardError
-lib/ascii_art/check.rb      the argument checks every kind shares
-lib/ascii_art/width.rb      display width: columns a terminal gives text
-lib/ascii_art/borders.rb    border glyph sets: light heavy double rounded ascii
-lib/ascii_art/block.rb      AsciiArt::Block: a finished figure as lines
-lib/ascii_art/compose.rb    frame, beside, stack, indent, caption
-lib/ascii_art/cell.rb       AsciiArt::Cell (Data: char, color), Cell.blank
-lib/ascii_art/stats.rb      binning, percentiles, transforms
-lib/ascii_art/axis.rb       limits, nice rounding, number labels
-lib/ascii_art/color.rb      colour names to ANSI, and nothing else
-lib/ascii_art/canvas.rb     the base grid
-lib/ascii_art/canvas/*.rb   braille, block, dot, ascii, density
-lib/ascii_art/frame.rb      border, labels, title, legend, render
-lib/ascii_art/chart.rb      shared options, series, render entry
-lib/ascii_art/kinds/*.rb    one file per kind
-lib/ascii_art/chart_cli.rb  `ascii-art chart`: options, input, one chart
-lib/ascii_art/compose_cli.rb     `ascii-art compose`: subcommands, exits
-lib/ascii_art/compose_options.rb its options, and the block reader
-lib/ascii_art/<name>.rb     tree, table, bitfield, wave, seq: one file
-                            per module
-lib/ascii_art/<name>_cli.rb `ascii-art <name>`, one file per command
-lib/ascii_art/cli.rb        `ascii-art`: dispatches on the command
-exe/ascii-art               the command line
-tools/bundle.rb             single-file build for vendoring
-test/                       minitest; test/oracle.rb loads unicode_plot
+lib/tessella.rb            the public entry: requires, Tessella.<kind>
+lib/tessella/version.rb    VERSION, the one place it is written
+lib/tessella/error.rb      Tessella::Error < StandardError
+lib/tessella/check.rb      the argument checks every kind shares
+lib/tessella/width.rb      display width: columns a terminal gives text
+lib/tessella/borders.rb    border glyph sets: light heavy double rounded ascii
+lib/tessella/block.rb      Tessella::Block: a finished figure as lines
+lib/tessella/compose.rb    frame, beside, stack, indent, caption
+lib/tessella/cell.rb       Tessella::Cell (Data: char, color), Cell.blank
+lib/tessella/stats.rb      binning, percentiles, transforms
+lib/tessella/axis.rb       limits, nice rounding, number labels
+lib/tessella/color.rb      colour names to ANSI, and nothing else
+lib/tessella/canvas.rb     the base grid
+lib/tessella/canvas/*.rb   braille, block, dot, ascii, density
+lib/tessella/frame.rb      border, labels, title, legend, render
+lib/tessella/chart.rb      shared options, series, render entry
+lib/tessella/kinds/*.rb    one file per kind
+lib/tessella/chart_cli.rb  `tessella chart`: options, input, one chart
+lib/tessella/compose_cli.rb
+                           `tessella compose`: subcommands, exits
+lib/tessella/compose_options.rb
+                           its options, and the block reader
+lib/tessella/<name>.rb     tree, table, bitfield, wave, seq: one file
+                           per module
+lib/tessella/<name>_cli.rb `tessella <name>`, one file per command
+lib/tessella/cli.rb        `tessella`: dispatches on the command
+exe/tessella               the command line
+tools/bundle.rb            single-file build for vendoring
+test/                      minitest; test/oracle.rb loads unicode_plot
 ```
 
 ## Blocks and composition
 
-Every module's result can become an `AsciiArt::Block`: a finished
+Every module's result can become an `Tessella::Block`: a finished
 figure as lines of text, measured in display columns (`Width`, which
 also skips ANSI colour codes, so a coloured chart composes by what it
 shows). Composition takes any figure -- a Block, a String, a chart --
 through `Block.from`, and returns a Block:
 
 ```ruby
-AsciiArt.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
-AsciiArt.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
-AsciiArt.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
+Tessella.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
+Tessella.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
+Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
                ascii: false)
-AsciiArt.indent(fig, prefix:, ascii: false)
-AsciiArt.caption(fig, text:, above: false, ascii: false)
+Tessella.indent(fig, prefix:, ascii: false)
+Tessella.caption(fig, text:, above: false, ascii: false)
 block.lines; block.width; block.height; block.to_s
 block.check_width!(max)     # ArgumentError naming the line and width
 ```
@@ -104,7 +106,7 @@ is an empty block. Border glyphs come from `Borders`, shared with
 every framed figure; under `ascii: true` the set is `ascii` and any
 other style, block or text holding a non-ASCII character is refused
 rather than rewritten. These rules, and the exact output, are the
-ascii-art skill's compose.rb's, which `ascii-art compose` replaces
+ascii-art skill's compose.rb's, which `tessella compose` replaces
 byte for byte; its lint pass stays in the skill.
 
 ## Diagram modules
@@ -139,24 +141,24 @@ skill: it is a policy tool for documents, not part of drawing.
 ## Stats and Axis
 
 ```ruby
-AsciiArt::Stats.histogram(values, bins: nil, closed: :left)
-    # => AsciiArt::Stats::Histogram (Data: edges, counts, closed)
+Tessella::Stats.histogram(values, bins: nil, closed: :left)
+    # => Tessella::Stats::Histogram (Data: edges, counts, closed)
     #    bins: nil = the count unicode_plot picks for the same data;
     #    edges ascending, counts.size == edges.size - 1; :left means
     #    [a, b), :right (a, b]; every value lands in exactly one bin
-AsciiArt::Stats.percentiles(values, ps)   # ps in 0..100, linear
+Tessella::Stats.percentiles(values, ps)   # ps in 0..100, linear
     # interpolation between order statistics (the definition
     # enumerable-statistics uses), => Array of Float
-AsciiArt::Stats.transform(name)           # :identity :ln :log2 :log10
+Tessella::Stats.transform(name)           # :identity :ln :log2 :log10
     # => a callable; nil and :identity are the identity
-AsciiArt::Axis.limits(values, lim = nil)  # => [lo, hi]
+Tessella::Axis.limits(values, lim = nil)  # => [lo, hi]
     # lim [a, b] given and not [0, 0]: returned as is; otherwise the
     # data's extent widened to round values exactly as unicode_plot
     # widens it (its axis labels are the oracle)
-AsciiArt::Axis.label(number)              # => String for a value
+Tessella::Axis.label(number)              # => String for a value
     # label (a bar's value): Integer as is; Float in the shortest form
     # that round-trips, no exponent for |x| in 1e-4...1e15
-AsciiArt::Axis.tick(number)               # => String for an axis
+Tessella::Axis.tick(number)               # => String for an axis
     # extreme: as label, but a whole Float drops its ".0" (limits are
     # always Floats; 10 not 10.0, as unicode_plot prints them)
 ```
@@ -167,7 +169,7 @@ A grid of character cells, each cell a block of pixels; data coordinates
 map onto pixels, pixel (0, 0) is the bottom-left.
 
 ```ruby
-AsciiArt::Canvas.build(type, width:, height:, xlim:, ylim:)
+Tessella::Canvas.build(type, width:, height:, xlim:, ylim:)
     # type :braille (2x4 px per cell), :block (2x2), :dot (1x2),
     # :ascii (3x3), :density (1x2, glyph by hit count)
 canvas.width, canvas.height              # cells
@@ -177,7 +179,7 @@ canvas.line(x0, y0, x1, y1, color: nil)  #   the limits: clipped
 canvas.points(xs, ys, color: nil)
 canvas.lines(xs, ys, color: nil)         # joins consecutive points
 canvas.rows                              # => Array (top row first) of
-    # Array of AsciiArt::Cell (Data: char, color); char " " is blank
+    # Array of Tessella::Cell (Data: char, color); char " " is blank
 canvas.annotate(col, row, text, color: nil)  # writes text into cells
 canvas.mark(x, y, char, color: nil)  # char in the cell holding (x, y),
     # over what the cell draws; outside the limits: nothing
@@ -192,8 +194,8 @@ Colour per cell: the last colour drawn into a cell wins. `:ascii` and
 The frame turns a body of cells into text; it knows nothing of data.
 
 ```ruby
-AsciiArt::Frame.new(
-    body:,              # Array of rows of AsciiArt::Cell, equal width
+Tessella::Frame.new(
+    body:,              # Array of rows of Tessella::Cell, equal width
     border: :box,       # :box (full frame), :bar (corners + left ticks
                         #   on every row, as a bar chart), :none
     ascii: false,       # + - | instead of box drawing
@@ -205,25 +207,25 @@ AsciiArt::Frame.new(
     bottom: nil         # [left_text, right_text] under the frame, at
                         #   its two ends (x-axis extremes)
 ).to_s                  # => String, "\n"-terminated, no trailing blank
-AsciiArt::Color.wrap(text, name)  # ANSI wrap; name nil => text as is
-AsciiArt::Color::NAMES            # :red :green :yellow :blue :magenta
+Tessella::Color.wrap(text, name)  # ANSI wrap; name nil => text as is
+Tessella::Color::NAMES            # :red :green :yellow :blue :magenta
                                   #   :cyan :white, the series cycle
 ```
 
 ## Chart and kinds
 
 ```ruby
-chart = AsciiArt.line(x = nil, y, name: nil, **opts)  # also scatter,
+chart = Tessella.line(x = nil, y, name: nil, **opts)  # also scatter,
                                             #   stairs, density; name:
                                             #   names the first series
 chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another
                                             #   series
-AsciiArt.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
+Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
-AsciiArt.bar(labels, values, **opts)
-AsciiArt.histogram(values, bins: nil, closed: :left, **opts)
-AsciiArt.box(names, samples, **opts)        # samples: Array of Arrays
-AsciiArt.stem(values, scale: nil, **opts)   # stem-and-leaf
+Tessella.bar(labels, values, **opts)
+Tessella.histogram(values, bins: nil, closed: :left, **opts)
+Tessella.box(names, samples, **opts)        # samples: Array of Arrays
+Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf
 chart.to_s; chart.render(io = $stdout)
 ```
 
@@ -232,7 +234,7 @@ The common options, their defaults and the bar options (`fill:`,
 every series' x through `Stats.transform` before limits and drawing,
 the same transform Stats offers for any other value.
 
-`AsciiArt::Chart` is the base class every kind subclasses, so bar,
+`Tessella::Chart` is the base class every kind subclasses, so bar,
 histogram, box and stem build on the same contract as line, scatter,
 stairs and density do. The base provides: parsing and validating the
 common options above, with their defaults; `add`'s series bookkeeping
@@ -268,26 +270,26 @@ bins of width 10 or more render.
 ## Command line
 
 ```ruby
-AsciiArt::CLI.run(argv, stdin:, stdout:, stderr:)  # => exit status:
+Tessella::CLI.run(argv, stdin:, stdout:, stderr:)  # => exit status:
     # argv[0] names the command (CLI::COMMANDS), the rest go to it;
     # --help and --version answer 0; none or an unknown one, 2
-AsciiArt::ChartCLI.run(argv, stdin:, stdout:, stderr:)  # `chart`:
+Tessella::ChartCLI.run(argv, stdin:, stdout:, stderr:)  # `chart`:
     # 0 drawn; 1 bad input (ChartCLI::DataError); 2 usage
     # (OptionParser::ParseError, ChartCLI::UsageError, or an
     # ArgumentError from the chart itself: an unknown canvas, xscale,
     # style or closed, or a fill longer than one character)
 ```
 
-`exe/ascii-art` is a thin wrapper: `exit AsciiArt::CLI.run(ARGV, stdin:
+`exe/tessella` is a thin wrapper: `exit Tessella::CLI.run(ARGV, stdin:
 $stdin, stdout: $stdout, stderr: $stderr)` after requiring the library
 relative to itself (tests call `CLI.run` in process with StringIO
-instead). `ascii-art chart` parses argv, reads one file argument or
-stdin, calls one `AsciiArt.<kind>` (plus `chart.add` for extra
+instead). `tessella chart` parses argv, reads one file argument or
+stdin, calls one `Tessella.<kind>` (plus `chart.add` for extra
 line/scatter/stairs/density series), and prints the result -- nothing
 more.
 
 The options, the input format and the exit statuses are the README's
-("The `ascii-art` command"); what the CLI owns beyond them is that a
+("The `tessella` command"); what the CLI owns beyond them is that a
 kind refuses an option it does not take (a usage error naming both)
 rather than ignoring it, and that a bad value for an option it does
 take is left to the chart's own ArgumentError, so the library and the
@@ -298,12 +300,12 @@ print as given; histogram ignores any column after the first, and box
 names its boxes by the header or 1..n.
 
 For line, scatter, stairs and density, a header names every series:
-the `AsciiArt.<kind>` call names the first (its `name:`), and
+the `Tessella.<kind>` call names the first (its `name:`), and
 `chart.add` each further one.
 
 ## Why it is shaped so
 
-ascii-art rewrites [unicode_plot][up] 0.0.5, whose chart kinds and
+tessella rewrites [unicode_plot][up] 0.0.5, whose chart kinds and
 canvases it takes over. It exists because drawing through unicode_plot
 meant patching every output afterwards — colour stripped, trailing
 blanks trimmed, bars redrawn, an ASCII frame rebuilt from the Unicode
@@ -319,7 +321,7 @@ one; the rewrite builds those rules in instead.
   its behaviour.
 - **An original ASCII glyph rule.** unicode_plot's ASCII canvas is a
   hand-made lookup table; matching it exactly would mean reproducing
-  the table. ascii-art's glyphs follow the stroke (top, middle or bottom
+  the table. tessella's glyphs follow the stroke (top, middle or bottom
   row, a column, a diagonal), and a cell with at least 7 of its 9
   pixels set is `#`, checked before the crossings — any such cell holds
   a full row and a full column, so the other order makes `#`
@@ -333,12 +335,12 @@ one; the rewrite builds those rules in instead.
   `eighths: false`, `track: nil` give unicode_plot's output byte for
   byte, which is what lets the bar kinds be tested against it.
 
-Where ascii-art departs from unicode_plot, it does so on purpose:
+Where tessella departs from unicode_plot, it does so on purpose:
 
 - **Density canvas below 5 cells.** unicode_plot clamps it to 5,
-  drawing a larger chart than was asked for; ascii-art honours the size.
+  drawing a larger chart than was asked for; tessella honours the size.
 - **Histogram labels on bins of width 10 or more.** unicode_plot's
-  label rounding returns an Integer there and crashes; ascii-art
+  label rounding returns an Integer there and crashes; tessella
   computes labels as Floats.
 - **`10`, not `10.0`, at an axis extreme.** Limits are always Floats,
   so formatting them as values printed `10.0` on every axis;
@@ -346,12 +348,12 @@ Where ascii-art departs from unicode_plot, it does so on purpose:
   `Axis.label` keeps a plotted value's own form.
 - **Exact stem leaves.** unicode_plot truncates `value / (scale / 10)`
   as a Float, so 0.3 at scale 1 (2.9999999999999996 tenths) lands on
-  leaf 2; ascii-art rounds to 9 decimals before truncating.
+  leaf 2; tessella rounds to 9 decimals before truncating.
 - **Constant data of 1e16 and more.** unicode_plot widens a constant
   by ±1, which a Float that large cannot hold: its axis crashes and
-  its histogram bins come out empty. ascii-art grows the step by tens
+  its histogram bins come out empty. tessella grows the step by tens
   until it changes the value; below 1e16 the result is unicode_plot's.
-- **Negative bars.** unicode_plot refuses them. ascii-art splits the
+- **Negative bars.** unicode_plot refuses them. tessella splits the
   bar area at a zero column so both signs draw to one scale; with no
   negative value the layout is unicode_plot's, byte for byte.
 - **Refusals before drawing.** A value that is not a finite number, a
@@ -366,7 +368,10 @@ Where ascii-art departs from unicode_plot, it does so on purpose:
   output count the same columns; copied, not required, because the
   library has no dependency.
 
-The name: `inkplot` was the first choice and is taken on rubygems.org
-by an unrelated gem.
+The name: a tessella is one tile of a mosaic, as one character cell is
+one tile of every figure here. It is free on rubygems.org with no gem
+one edit or one `-`/`_` away, which rubygems.org would refuse as too
+close; `ascii-art` was not (`ascii_art` exists), nor were `inkplot`
+and charts-only names once the library went past charts.
 
 [up]: https://github.com/red-data-tools/unicode_plot

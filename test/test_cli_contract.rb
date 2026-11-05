@@ -5,7 +5,7 @@ require "tmpdir"
 
 require_relative "test_helper"
 
-# What every `ascii-art` command shares (DESIGN.md, "Command line"):
+# What every `tessella` command shares (DESIGN.md, "Command line"):
 # a file that cannot be read is bad input, exit 1; an unknown option is
 # a usage error, exit 2; --help answers 0. One loop over the commands,
 # so a command added later is held to the same contract.
@@ -16,14 +16,14 @@ class TestCLIContract < Minitest::Test
     def run_cli(argv)
         out = StringIO.new
         err = StringIO.new
-        status = AsciiArt::CLI.run(argv, stdin: StringIO.new(""),
+        status = Tessella::CLI.run(argv, stdin: StringIO.new(""),
                                          stdout: out, stderr: err)
         [status, err.string]
     end
 
     def test_every_command_is_listed_in_the_help
         out = StringIO.new
-        AsciiArt::CLI.run(["--help"], stdin: StringIO.new, stdout: out,
+        Tessella::CLI.run(["--help"], stdin: StringIO.new, stdout: out,
                                       stderr: StringIO.new)
         COMMANDS.each { assert_includes(out.string, "  #{it.first} ") }
     end

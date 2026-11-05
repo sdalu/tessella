@@ -2,44 +2,44 @@
 
 require_relative "test_helper"
 
-# AsciiArt.box and its Chart subclass (DESIGN.md, "Chart and kinds"):
+# Tessella.box and its Chart subclass (DESIGN.md, "Chart and kinds"):
 # construction, add, option checking, document safety. Oracle parity
 # lives in TestBoxOracle below.
 class TestBox < Minitest::Test
     def test_box_builds_a_box_chart
-        chart = AsciiArt.box(["s1"], [[1, 2, 3]])
-        assert_kind_of(AsciiArt::Box, chart)
+        chart = Tessella.box(["s1"], [[1, 2, 3]])
+        assert_kind_of(Tessella::Box, chart)
         assert_includes(chart.to_s, "s1")
     end
 
     def test_add_appends_more_boxes
-        chart = AsciiArt.box(["s1"], [[1, 2, 3]])
+        chart = Tessella.box(["s1"], [[1, 2, 3]])
         chart.add(["s2"], [[4, 5, 6]])
         assert_includes(chart.to_s, "s1")
         assert_includes(chart.to_s, "s2")
     end
 
     def test_add_returns_self_for_chaining
-        chart = AsciiArt::Box.new
+        chart = Tessella::Box.new
         assert_same(chart, chart.add(["s1"], [[1, 2, 3]]))
     end
 
     def test_each_box_draws_three_rows
-        one = AsciiArt.box(["s1"], [[1, 2, 3]]).to_s.split("\n", -1)
-        two = AsciiArt.box(%w[s1 s2], [[1, 2, 3], [4, 5, 6]])
+        one = Tessella.box(["s1"], [[1, 2, 3]]).to_s.split("\n", -1)
+        two = Tessella.box(%w[s1 s2], [[1, 2, 3], [4, 5, 6]])
                       .to_s.split("\n", -1)
         assert_equal(3, two.length - one.length)
     end
 
     def test_unknown_option_raises_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.box(["s1"], [[1, 2, 3]], bogus: true)
+            Tessella.box(["s1"], [[1, 2, 3]], bogus: true)
         end
         assert_match(/bogus/, error.message)
     end
 
     def test_no_line_ends_in_a_blank
-        out = AsciiArt.box(%w[s1 s2], [[1, 2, 3], [4, 5, 6]],
+        out = Tessella.box(%w[s1 s2], [[1, 2, 3], [4, 5, 6]],
                            title: "T", xlabel: "x", ylabel: "y").to_s
         lines = out.split("\n", -1)
         assert_equal("", lines.last)
@@ -47,22 +47,22 @@ class TestBox < Minitest::Test
     end
 
     def test_color_false_never_emits_an_escape
-        out = AsciiArt.box(["s1"], [[1, 2, 3]], color: false).to_s
+        out = Tessella.box(["s1"], [[1, 2, 3]], color: false).to_s
         refute_includes(out, "\e")
     end
 
     def test_color_true_emits_an_escape
-        out = AsciiArt.box(["s1"], [[1, 2, 3]], color: true).to_s
+        out = Tessella.box(["s1"], [[1, 2, 3]], color: true).to_s
         assert_includes(out, "\e")
     end
 
     def test_ascii_true_is_pure_ascii
-        out = AsciiArt.box(["s1"], [[1, 2, 3]], ascii: true).to_s
+        out = Tessella.box(["s1"], [[1, 2, 3]], ascii: true).to_s
         refute_match(/[^\x00-\x7F]/, out)
     end
 
     def test_unnamed_box_shows_no_left_label
-        out = AsciiArt.box([""], [[1, 2, 3]]).to_s
+        out = Tessella.box([""], [[1, 2, 3]]).to_s
         refute_match(/[a-zA-Z]/, out)
     end
 end
@@ -97,7 +97,7 @@ class TestBoxAscii < Minitest::Test
     private
 
     def mine(names, samples, **)
-        AsciiArt.box(names, samples, width: 30, **).to_s
+        Tessella.box(names, samples, width: 30, **).to_s
     end
 
     def assert_mapped_match(names, samples)
@@ -108,10 +108,10 @@ class TestBoxAscii < Minitest::Test
     end
 end
 
-# AsciiArt::Box against unicode_plot's boxplot (DESIGN.md's oracle
+# Tessella::Box against unicode_plot's boxplot (DESIGN.md's oracle
 # note): the percentile shapes, the corner border with blank sides --
 # Frame has no such border type, so Box builds it into the body cells
-# itself (see lib/ascii_art/kinds/box.rb) -- and the min/mean/max line
+# itself (see lib/tessella/kinds/box.rb) -- and the min/mean/max line
 # below it.
 class TestBoxOracle < Minitest::Test
     include Oracle::Test
@@ -143,7 +143,7 @@ class TestBoxOracle < Minitest::Test
     end
 
     def mine(names, samples, opts)
-        AsciiArt.box(names, samples, **opts).to_s
+        Tessella.box(names, samples, **opts).to_s
     end
 
     def theirs(names, samples, opts)

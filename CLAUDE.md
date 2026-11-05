@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-ascii-art draws text figures on a monospace grid, in Unicode or pure
+tessella draws text figures on a monospace grid, in Unicode or pure
 ASCII, with no runtime dependency; charts (line, scatter, stairs, bar,
 histogram, box, stem, density) are its first module. What it is and
 how to use it is in [README.md](README.md); why it is shaped as it
@@ -29,7 +29,7 @@ constraints and facts behind it, and the decision log with its reasons
 
 - **The rules nothing mechanical catches.** DESIGN.md's "Rules that
   hold in every part" — no runtime dependency, no trailing blank,
-  ASCII from the first byte, one load order in `lib/ascii-art.rb` — can
+  ASCII from the first byte, one load order in `lib/tessella.rb` — can
   break with `make check` and `make tests` both green. Read them
   before a change, not after.
 - **No oracle installed by default.** The `unicode_plot` copy the

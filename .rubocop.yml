@@ -127,9 +127,3 @@ Style/Documentation:
 Naming/MethodParameterName:
   Enabled: false
 
-# Project-local: the gem is "ascii-art" and loads with require
-# "ascii-art" (the user's choice: ascii_art is another gem's name), so
-# the entry file keeps the dash; every other file stays snake_case.
-Naming/FileName:
-  Exclude:
-    - lib/ascii-art.rb

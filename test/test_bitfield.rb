@@ -5,8 +5,8 @@ require "tmpdir"
 
 require_relative "test_helper"
 
-# AsciiArt.bitfield and AsciiArt::Bitfield.parse: an RFC-style
-# packet/bit-field diagram, ported byte for byte from the ascii-art
+# Tessella.bitfield and Tessella::Bitfield.parse: an RFC-style
+# packet/bit-field diagram, ported byte for byte from the tessella
 # skill's scripts/bitfield.rb (test/check-bitfield.sh's own cases).
 class TestBitfield < Minitest::Test
     RECIPE = "Source Port:16\nDestination Port:16\nSequence Number:32\n"
@@ -22,7 +22,7 @@ class TestBitfield < Minitest::Test
     TEXT
 
     def test_the_recipes_own_32_bit_figure_byte_for_byte
-        assert_equal(RECIPE_WANT, AsciiArt.bitfield(RECIPE).to_s)
+        assert_equal(RECIPE_WANT, Tessella.bitfield(RECIPE).to_s)
     end
 
     def test_a_hand_derived_8_bit_figure_byte_for_byte
@@ -33,37 +33,37 @@ class TestBitfield < Minitest::Test
             | High  |  Low  |
             +-+-+-+-+-+-+-+-+
         TEXT
-        assert_equal(want, AsciiArt.bitfield("High:4\nLow:4\n", word: 8).to_s)
+        assert_equal(want, Tessella.bitfield("High:4\nLow:4\n", word: 8).to_s)
     end
 
     def test_octets_ticks_every_8_bits_not_every_bit
-        lines = AsciiArt.bitfield("Source Port:16\nDestination Port:16\n",
+        lines = Tessella.bitfield("Source Port:16\nDestination Port:16\n",
                                   octets: true).lines
         assert_equal("+---------------+---------------+---------------+" \
                      "---------------+", lines.first)
     end
 
     def test_octets_drops_the_two_row_bit_ruler
-        lines = AsciiArt.bitfield("Source Port:16\nDestination Port:16\n",
+        lines = Tessella.bitfield("Source Port:16\nDestination Port:16\n",
                                   octets: true).lines
         refute(lines.any? { it.start_with?(" ") })
     end
 
     def test_no_ruler_keeps_per_bit_ticks_and_drops_the_header
-        lines = AsciiArt.bitfield("Source Port:16\nDestination Port:16\n",
+        lines = Tessella.bitfield("Source Port:16\nDestination Port:16\n",
                                   ruler: false).lines
         assert_equal(RECIPE_WANT.lines[2].chomp, lines.first)
         refute(lines.any? { it.start_with?(" ") })
     end
 
     def test_a_field_wider_than_its_row_wraps_repeating_its_name
-        block = AsciiArt.bitfield("Data:12\n", word: 8)
+        block = Tessella.bitfield("Data:12\n", word: 8)
         assert_equal(2, block.lines.count { it.include?("Data") })
         assert_equal(3, block.lines.count { it.start_with?("+") })
     end
 
     def test_output_is_ascii_only
-        assert(AsciiArt.bitfield(RECIPE).ascii?)
+        assert(Tessella.bitfield(RECIPE).ascii?)
     end
 end
 
@@ -73,48 +73,48 @@ class TestBitfieldRefusals < Minitest::Test
 
     def test_a_name_too_wide_for_its_cell_is_refused_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.bitfield("Supercalifragilistic:4\n", word: 8)
+            Tessella.bitfield("Supercalifragilistic:4\n", word: 8)
         end
         assert_includes(error.message, "Supercalifragilistic")
     end
 
     def test_abbrev_truncates_with_a_trailing_dot_instead
-        block = AsciiArt.bitfield("Supercalifragilistic:4\n", word: 8,
+        block = Tessella.bitfield("Supercalifragilistic:4\n", word: 8,
                                                               abbrev: true)
         assert_includes(block.to_s, "|Superc.|")
     end
 
     def test_check_width_names_the_line_and_the_budget
-        block = AsciiArt.bitfield(RECIPE)
+        block = Tessella.bitfield(RECIPE)
         assert_raises(ArgumentError) { block.check_width!(40) }
     end
 
     def test_an_unparseable_line_is_refused_naming_it
         error = assert_raises(ArgumentError) do
-            AsciiArt.bitfield("this is not a field line\n")
+            Tessella.bitfield("this is not a field line\n")
         end
         assert_includes(error.message, "not a field line")
     end
 
     def test_a_zero_bit_field_is_refused
-        error = assert_raises(ArgumentError) { AsciiArt.bitfield("A:0\n") }
+        error = assert_raises(ArgumentError) { Tessella.bitfield("A:0\n") }
         assert_includes(error.message, "has 0 bits")
     end
 
     def test_no_fields_is_refused
-        assert_raises(ArgumentError) { AsciiArt.bitfield("\n\n") }
-        assert_raises(ArgumentError) { AsciiArt.bitfield("# only a comment\n") }
+        assert_raises(ArgumentError) { Tessella.bitfield("\n\n") }
+        assert_raises(ArgumentError) { Tessella.bitfield("# only a comment\n") }
     end
 
     def test_comments_and_blank_lines_are_skipped
         text = "# header\n\nSource Port:16\n# mid\nDestination Port:16\n\n"
-        assert_equal(AsciiArt.bitfield(RECIPE.lines.first(2).join).to_s,
-                     AsciiArt.bitfield(text).to_s)
+        assert_equal(Tessella.bitfield(RECIPE.lines.first(2).join).to_s,
+                     Tessella.bitfield(text).to_s)
     end
 
     def test_an_unsupported_word_is_refused
         error = assert_raises(ArgumentError) do
-            AsciiArt.bitfield(RECIPE, word: 24)
+            Tessella.bitfield(RECIPE, word: 24)
         end
         assert_includes(error.message, "word")
     end
@@ -122,28 +122,28 @@ class TestBitfieldRefusals < Minitest::Test
     def test_an_array_of_name_bits_pairs_matches_the_text_form
         pairs = [["Source Port", 16], ["Destination Port", 16],
                  ["Sequence Number", 32]]
-        assert_equal(AsciiArt.bitfield(RECIPE).to_s,
-                     AsciiArt.bitfield(pairs).to_s)
+        assert_equal(Tessella.bitfield(RECIPE).to_s,
+                     Tessella.bitfield(pairs).to_s)
     end
 
     def test_an_array_pair_with_bad_bits_is_refused
-        assert_raises(ArgumentError) { AsciiArt.bitfield([["A", 0]]) }
-        assert_raises(ArgumentError) { AsciiArt.bitfield([%w[A x]]) }
+        assert_raises(ArgumentError) { Tessella.bitfield([["A", 0]]) }
+        assert_raises(ArgumentError) { Tessella.bitfield([%w[A x]]) }
     end
 
     def test_bitfield_parse_exposes_the_fields
-        fields = AsciiArt::Bitfield.parse("A:4\nB:4\n")
+        fields = Tessella::Bitfield.parse("A:4\nB:4\n")
         assert_equal(%w[A B], fields.map(&:name))
         assert_equal([4, 4], fields.map(&:bits))
     end
 
     def test_a_1_bit_field_draws_a_single_column_cell
-        block = AsciiArt.bitfield("F:1\n", word: 8)
+        block = Tessella.bitfield("F:1\n", word: 8)
         assert_includes(block.to_s, "|F|")
     end
 end
 
-# `ascii-art bitfield` (test/check-bitfield.sh's own cases, minus the
+# `tessella bitfield` (test/check-bitfield.sh's own cases, minus the
 # dropped --no-lint, plus the usage refusals).
 class TestBitfieldCLI < Minitest::Test
     RECIPE = TestBitfield::RECIPE
@@ -151,7 +151,7 @@ class TestBitfieldCLI < Minitest::Test
     def run_cli(*argv, stdin: "")
         out = StringIO.new
         err = StringIO.new
-        status = AsciiArt::CLI.run(["bitfield", *argv],
+        status = Tessella::CLI.run(["bitfield", *argv],
                                    stdin: StringIO.new(stdin),
                                    stdout: out, stderr: err)
         [status, out.string, err.string]
@@ -177,7 +177,7 @@ class TestBitfieldCLI < Minitest::Test
         status, out, err = run_cli("/no/such/file")
         assert_equal(1, status)
         assert_equal("", out)
-        assert_includes(err, "ascii-art bitfield: ")
+        assert_includes(err, "tessella bitfield: ")
     end
 
     def test_bad_input_exits_one_naming_it
@@ -242,6 +242,6 @@ class TestBitfieldCLI < Minitest::Test
     def test_help_prints_usage_and_exits_zero
         status, out, = run_cli("--help")
         assert_equal(0, status)
-        assert_includes(out, "Usage: ascii-art bitfield")
+        assert_includes(out, "Usage: tessella bitfield")
     end
 end
