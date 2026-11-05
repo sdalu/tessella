@@ -52,6 +52,18 @@ class TestColumns < Minitest::Test
                      line.to_s)
     end
 
+    # Halves: one bar per character, half a cell per step.
+    def test_half_blocks_step_by_half_a_cell
+        up = Tessella.bar(%w[a b], [2, 1], blocks: :half, height: 1,
+                                           orientation: :vertical, width: 2)
+        assert_equal(["█▄"], body(up))
+        across = Tessella.bar(%w[a b], [2, 1], blocks: :half, width: 1)
+        assert_equal(["█", "▌"], body(across))
+        area = Tessella.line([2, 1], xlim: [0.5, 2.5], area: true,
+                                     canvas: :half, width: 2, height: 1)
+        assert_equal(["█▄"], body(area))
+    end
+
     def test_a_vertical_histogram_names_its_axis_ends_and_frequency
         out = Tessella.histogram([1, 2, 2, 3, 3, 3], bins: 3,
                                                      orientation: :vertical,

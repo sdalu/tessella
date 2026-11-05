@@ -115,10 +115,12 @@ per bar, so two columns per character, 4 steps per cell; or, kept
 horizontal, four bars per text row, each row named by the bars it
 holds) or `:block`, also named `:quadrant` (the 2x2 quadrant glyphs,
 as `canvas: :quadrant` for an area fill: two per character, 2
-steps). Both need values of
+steps) or `:half` (half blocks, one bar per character: `▄`/`█` up a
+column, 2 steps per cell, `▌`/`█` along a row, half a cell per step;
+`canvas: :half` fills an area by halves). All need values of
 0 or more; `:braille` and `:block` refuse `ascii: true`, `fill:`,
 `eighths:` and `track:`. On the command line: `--orientation
-horizontal|vertical` and `--blocks eighths|braille|block|quadrant`.
+horizontal|vertical` and `--blocks eighths|braille|block|quadrant|half`.
 
 ```text
 $ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
@@ -360,7 +362,7 @@ Common to every kind: `--kind
 line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
-`--canvas braille|block|quadrant|dot|ascii|density`,
+`--canvas braille|block|quadrant|half|dot|ascii|density`,
 `--ascii`, `--color`, `--xscale ln|log2|log10`.
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);

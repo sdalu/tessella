@@ -8,7 +8,7 @@ module Tessella
     # vertical), block two. Values must be zero or more. Kept apart
     # from Bar so Bar's own class body stays under budget.
     module BarLayouts
-        BLOCKS = %i[eighths braille block quadrant].freeze
+        BLOCKS = %i[eighths braille block quadrant half].freeze
         ORIENTATIONS = %i[horizontal vertical].freeze
 
         private
@@ -162,14 +162,24 @@ module Tessella
             end
         end
 
-        def column_chars(n) = [width, (n + 1) / 2].max
+        def column_chars(n) = [width, (n + across - 1) / across].max
+
+        # Bars side by side in one character: 2, or 1 with halves.
+        def across = @blocks == :half ? 1 : 2
 
         # A name's room under a dot column, when bars fill whole cells.
-        def slot_chars(per) = per.even? ? per / 2 : nil
+        def slot_chars(per) = (per % across).zero? ? per / across : nil
 
         def dot_canvas(cols, rows)
-            Canvas.build(@blocks, width: cols, height: rows, xlim: [0, 1],
-                                  ylim: [0, 1])
+            Canvas.build(canvas_name, width: cols, height: rows,
+                                      xlim: [0, 1], ylim: [0, 1])
+        end
+
+        # Half blocks run along the bar: "▄" up a column, "▌" across.
+        def canvas_name
+            return :half_wide if @blocks == :half && @orientation == :horizontal
+
+            @blocks
         end
 
         # Names under the columns when each fits its slot (a column's
@@ -206,7 +216,7 @@ module Tessella
         end
 
         def dot_row_count(n) = (n + per_row - 1) / per_row
-        def per_row = @blocks == :braille ? 4 : 2
+        def per_row = { braille: 4, half: 1 }.fetch(@blocks, 2)
 
         def dot_row_labels(canvas)
             (0...canvas.height).to_h do |r|

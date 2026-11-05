@@ -273,7 +273,8 @@ map onto pixels, pixel (0, 0) is the bottom-left.
 
 ```ruby
 Tessella::Canvas.build(type, width:, height:, xlim:, ylim:)
-    # type :braille (2x4 px per cell), :block (2x2), :dot (1x2),
+    # type :braille (2x4 px per cell), :block or :quadrant (2x2),
+    #   :half (1x2, ▀▄█; :half_wide 2x1, ▌▐█, for a bar), :dot (1x2),
     # :ascii (3x3), :density (1x2, glyph by hit count)
 canvas.width, canvas.height              # cells
 canvas.pixel_width, canvas.pixel_height
@@ -338,7 +339,8 @@ Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
 Tessella.bar(labels, values, **opts)
 Tessella.histogram(values, bins: nil, closed: :left, **opts)
     # bar, histogram: orientation: :horizontal | :vertical (columns),
-    #   blocks: :eighths | :braille | :block (kinds/columns.rb); only
+    #   blocks: :eighths | :braille | :block (:quadrant) | :half
+    #   (kinds/columns.rb); only
     #   horizontal :eighths is unicode_plot's layout, the oracle's
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf
