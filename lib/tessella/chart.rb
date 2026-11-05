@@ -105,7 +105,16 @@ module Tessella
             self
         end
 
-        def to_s = frame.to_s
+        def to_s
+            text = frame.to_s
+            return text unless @ascii
+
+            text.each_line.with_index(1) do |line, n|
+                Check.ascii!(line.chomp, "chart line #{n}")
+            end
+            text
+        end
+
         def render(io = $stdout) = io.print(to_s)
 
         private

@@ -64,6 +64,7 @@ Decisions:
 - 2026-11-05 — table: multi-line cells, width:/min_width: fitting (widest column only, ArgumentError below min), ANSI kept across wraps, bold header under color:, align: symbols — asked by climat (CCIface) on the user's behalf, design mine, confirmed by CCIface
 - 2026-11-05 — images: img2art ported (Tessella.image, `tessella image`); PNM and a built-in pure-Ruby PNG decoder always; every other format through rmagick as a soft dependency, never declared, loaded lazily in rmagick_reader.rb (the one file outside the entries that may require); without it, refused naming the gem and the magick pipe — by user (soft rmagick, PNM+PNG built in)
 - 2026-11-05 — the command line is its own entry, lib/tessella/cli.rb (optparse + lib/tessella/cli/*); require "tessella" loads the library alone; the bundle carries both — by user
+- 2026-11-05 — ASCII rule enforced where it leaked: table cells/title, wave names/labels, chart text (checked on the finished figure; a non-ASCII data row is exit 1, a flag exit 2), bitfield names always (a bit-field is ASCII) — found by Tessella:doc, fix mine
 
 Pieces:
 - P0 [kept: interface judgment, verified] — scaffold the repo (git init, gemspec, Makefile per make, minitest harness, oracle harness) and write the internal interfaces the other pieces share: Canvas (pixel grid → rows), Stats (bins, percentiles, density, scales), Layout (frame, axes, title, legend, colour) — evidence: DESIGN.md; make check 23 files no offences; make tests 3/3; make bundle parses and loads

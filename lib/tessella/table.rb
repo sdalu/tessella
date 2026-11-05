@@ -235,6 +235,7 @@ module Tessella
         # rubocop:disable-next Metrics/ParameterLists
         def self.build(rows, header:, style:, ascii:, align:, title:, **fit)
             head, body = split(rows, header)
+            check_ascii!(rows, title) if ascii
             ncols = (head || body.first).size
             check_align_length!(align, ncols)
             aligns = Detect.resolve_aligns(body, align, ncols)
@@ -452,6 +453,19 @@ module Tessella
         # input (an unterminated quote, a stray quote outside one).
         def self.parse(text, tsv: false)
             CSVReader.parse(text, tsv ? "\t" : ",")
+        end
+    end
+
+    # Under ascii: true, the check that every cell and the title are
+    # ASCII.
+    module Table
+        def self.check_ascii!(rows, title)
+            Check.ascii!(title, "title")
+            rows.each_with_index do |row, r|
+                row.each_with_index do |cell, c|
+                    Check.ascii!(cell, "row #{r + 1}, column #{c + 1}")
+                end
+            end
         end
     end
 

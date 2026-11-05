@@ -289,12 +289,21 @@ module Tessella
                 @period = period
                 @ascii = ascii
                 @ruler = ruler
+                Diagram.check_ascii!(entries) if ascii
                 widths = entries.grep(Wave::WaveSignal).map { Width.of(it.name) }
                 @name_width = widths.max || 0
             end
 
             def rows
                 @rows ||= build_rows
+            end
+
+            def self.check_ascii!(entries)
+                entries.grep(Wave::WaveSignal).each do |s|
+                    [s.name, *s.labels].each do |text|
+                        Check.ascii!(text, "line #{s.lineno}")
+                    end
+                end
             end
 
             private

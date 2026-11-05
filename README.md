@@ -155,7 +155,8 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   RFC 2360 draws them, always in ASCII: a bit ruler, `+-+` ticks, each
   name centred in its cell, a field longer than its row continued on
   the next. `word:` is 8, 16, 32 or 64; `octets:` ticks per byte; a
-  name too wide for its cell is refused unless `abbrev:` truncates it.
+  name too wide for its cell is refused unless `abbrev:` truncates it,
+  and a non-ASCII name is refused.
 - **wave**: WaveDrom-like signals, `name: wave` per line in `0 1 p n
   x z = .`, bus labels after `|`, a lone `---` for a blank row; each
   step is `period:` columns (2 at least), `ruler:` numbers the steps.

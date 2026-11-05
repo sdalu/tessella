@@ -44,7 +44,9 @@ module Tessella
         def self.draw(argv, stdin, stdout)
             opts, path = Options.parse(argv.dup)
             KindOptions.check!(opts)
-            chart = Kinds.build(opts, Reader.rows(path, stdin))
+            rows = Reader.rows(path, stdin)
+            Reader.check_ascii!(rows) if opts[:ascii]
+            chart = Kinds.build(opts, rows)
             stdout.print(chart.to_s)
             0
         end
@@ -298,6 +300,14 @@ module Tessella
                 raise DataError, "no data" if rows.empty?
 
                 rows
+            end
+
+            # A non-ASCII label under --ascii is bad input, named by
+            # its row (a non-ASCII --title or label is usage).
+            def self.check_ascii!(rows)
+                i = rows.index { |row| !row.join.ascii_only? } or return
+
+                raise DataError, "row #{i + 1} is non-ASCII under --ascii"
             end
 
             def self.text(path, stdin)

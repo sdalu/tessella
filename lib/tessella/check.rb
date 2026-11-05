@@ -32,6 +32,15 @@ module Tessella
             value.is_a?(Numeric) && (!value.is_a?(Float) || value.finite?)
         end
 
+        # Under ascii: true every text drawn into a figure is ASCII
+        # too: one that is not is refused, naming where it came from.
+        def self.ascii!(text, where)
+            return text if text.nil? || text.to_s.ascii_only?
+
+            raise ArgumentError, "#{where} is non-ASCII under ascii: " \
+                                 "true: #{text.to_s.inspect}"
+        end
+
         def self.same_size!(a, b, names)
             return if a.size == b.size
 

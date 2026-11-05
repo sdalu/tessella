@@ -21,7 +21,7 @@ module Tessella
 
         def self.block(fields, word:, octets:, ruler:, abbrev:)
             word!(word)
-            rows = layout_rows(fields_for(fields), word, abbrev)
+            rows = layout_rows(ascii_names!(fields_for(fields)), word, abbrev)
             show_ruler = ruler && !octets
             Block.new(render(rows, word, show_ruler, octets))
         end
@@ -34,6 +34,17 @@ module Tessella
         end
 
         # The script's own text format, or the fields already given.
+        # A bit-field is drawn in ASCII only, so its names must be.
+        def self.ascii_names!(fields)
+            fields.each_with_index do |f, i|
+                next if f.name.ascii_only?
+
+                where = f.line ? "line #{f.line}" : "field #{i + 1}"
+                raise ArgumentError, "#{where}: name #{f.name.inspect} is " \
+                                     "non-ASCII (a bit-field is ASCII)"
+            end
+        end
+
         def self.fields_for(fields)
             return parse(fields) if fields.is_a?(String)
 
