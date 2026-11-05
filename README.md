@@ -80,7 +80,8 @@ e to y + e, or `[lows, highs]` for asymmetric ones; each point gets a
 segment along the value axis (across, sideways), drawn after the line
 or marks, and the axis limits take the bars in. Errors are in data
 units and go through `yscale:` with y. On the command line `--yerr`
-reads three columns, x, y and the error.
+reads three columns, x, y and the error; a negative error in the
+input is bad input (exit 1), naming its row.
 
 `mark:` (on `add`, and on `Tessella.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
@@ -577,7 +578,7 @@ line|scatter|stairs|density|bar|histogram|box|stem|heatmap` (default
 `--canvas braille|block|quadrant|half|dot|ascii|density`,
 `--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` and
 `--xdate [FMT]` for line, scatter, stairs and density, and `--yerr`
-for line, scatter and density).
+for line and scatter).
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
 `--style post|pre` (stairs only); `--stacked` (bar only); `--blocks

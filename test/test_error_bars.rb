@@ -41,6 +41,25 @@ class TestErrorBars < Minitest::Test
         end
     end
 
+    def chart(argv, input)
+        err = StringIO.new
+        status = Tessella::CLI.run(["chart", *argv],
+                                   stdin: StringIO.new(input),
+                                   stdout: StringIO.new, stderr: err)
+        [status, err.string]
+    end
+
+    # A negative error in the input is bad input (exit 1, its row
+    # named); density takes no --yerr (usage, exit 2).
+    def test_the_command_refusals
+        status, err = chart(%w[--yerr], "1 2 1\n2 4 -1\n")
+        assert_equal(1, status)
+        assert_match(/row 2: the error is negative: -1/, err)
+        status, err = chart(%w[--kind density --yerr], "1 2 1\n")
+        assert_equal(2, status)
+        assert_match(/--yerr is not valid with --kind density/, err)
+    end
+
     def test_the_command
         out = StringIO.new
         status = Tessella::CLI.run(%w[chart --kind scatter --yerr],

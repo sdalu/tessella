@@ -306,7 +306,7 @@ module Tessella
             EXTRA = {
                 line: %i[area gradient orientation yscale xdate yerr],
                 scatter: %i[orientation yscale xdate yerr],
-                density: %i[orientation yscale xdate yerr],
+                density: %i[orientation yscale xdate],
                 stairs: %i[style area gradient orientation yscale xdate],
                 bar: %i[fill eighths track orientation blocks stacked],
                 histogram: %i[fill eighths track bins closed orientation
@@ -464,7 +464,16 @@ module Tessella
                     raise DataError, "--yerr reads x, y and the error: " \
                                      "#{columns.size} columns"
                 end
-                { yerr: columns.pop }
+                { yerr: errors!(columns.pop) }
+            end
+
+            # A negative error is a bad value in the input: its row named.
+            def self.errors!(errors)
+                i = errors.index(&:negative?)
+                return errors unless i
+
+                raise DataError, "row #{i + 1}: the error is negative: " \
+                                 "#{Axis.label(errors[i])}"
             end
 
             def self.add_rest(chart, columns, header)
