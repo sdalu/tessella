@@ -66,9 +66,8 @@ module Tessella
         NOTES = {
             meter: { blade: "patchy font coverage",
                      button: "patchy font coverage",
-                     block: "house style: █ on a · track" },
-            head: { full: "▴ ▾ for ▲ ▼ under cjk",
-                    emoji: "U+FE0E after it on the web" }
+                     block: "house style" },
+            head: { full: "▴▾ under cjk", emoji: "+U+FE0E on web" }
         }.freeze
 
         def self.all
