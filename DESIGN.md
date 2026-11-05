@@ -397,6 +397,9 @@ Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
 Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
                                             #   stairs: filled, btop-style
+    # threshold: N, above:, below: (line, scatter, stairs): a dashed
+    #   rule at N, cells beyond it coloured above: (kinds/threshold.rb;
+    #   a canvas colour may be a callable of the cell's row and column)
     # yerr: (line, scatter): error bars along the value axis
     #   (kinds/error_bars.rb), kept apart from Series as bounds
     # x values that are times: a date axis in UTC (kinds/date_axis.rb),

@@ -83,6 +83,13 @@ units and go through `yscale:` with y. On the command line `--yerr`
 reads three columns, x, y and the error; a negative error in the
 input is bad input (exit 1), naming its row.
 
+A threshold: `threshold: N` on line, scatter and stairs draws a
+dashed rule at N across the plot (down it, sideways), visible without
+colour, and the value axis takes N in; under `color: true` the cells
+beyond it take `above:` (`:red` by default) and the rest `below:`
+(the series' own colour unless given). On the command line,
+`--threshold N`, `--above C`, `--below C`.
+
 `mark:` (on `add`, and on `Tessella.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
 the cell of each point, over whatever the cell holds, instead of the

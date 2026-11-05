@@ -126,10 +126,19 @@ module Tessella
             end
         end
 
+        # color: a name, or a callable of the cell's row and column.
         def draw_pixel(px, py, color)
             return unless px.between?(0, pixel_width) &&
                           py.between?(0, pixel_height)
-            set_sub_pixel(clip(px, pixel_width), clip(py, pixel_height), color)
+            x = clip(px, pixel_width)
+            y = clip(py, pixel_height)
+            set_sub_pixel(x, y, cell_color(color, x, y))
+        end
+
+        def cell_color(color, px, py)
+            return color unless color.respond_to?(:call) && color.arity == 2
+
+            color.call(py / y_pixel_per_char, px / x_pixel_per_char)
         end
 
         def clip(v, max) = v == max ? v - 1 : v

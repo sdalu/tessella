@@ -10,9 +10,11 @@ module Tessella
         include Sideways
         include DateAxis
         include ErrorBars
+        include Threshold
 
         OPTIONS = (Chart::OPTIONS +
-                   %i[area gradient orientation yscale xdate]).freeze
+                   %i[area gradient orientation yscale xdate threshold
+                      above below]).freeze
         GRADIENT = %i[green yellow red].freeze
 
         def initialize(**opts)
@@ -63,8 +65,10 @@ module Tessella
         include Sideways
         include DateAxis
         include ErrorBars
+        include Threshold
 
-        OPTIONS = (Chart::OPTIONS + %i[orientation yscale xdate]).freeze
+        OPTIONS = (Chart::OPTIONS + %i[orientation yscale xdate threshold
+                                       above below]).freeze
 
         private
 

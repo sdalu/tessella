@@ -24,6 +24,31 @@ module Tessella
                 end
             end
 
+            # The value at the middle of a cell row (0 the top) or column.
+            def cell_row_value(row)
+                @yhi - ((row + 0.5) * (@yhi - @ylo) / height)
+            end
+
+            def cell_column_value(col)
+                @xlo + ((col + 0.5) * (@xhi - @xlo) / width)
+            end
+
+            # A dashed line in data coordinates: every other pixel set.
+            def dashed(x0, y0, x1, y1, color: nil)
+                from = to_pixel(x0, y0).map(&:floor)
+                to = to_pixel(x1, y1).map(&:floor)
+                steps = from.zip(to).map { |a, b| (b - a).abs }.max
+                (0..steps).step(2) do |i|
+                    t = steps.zero? ? 0 : i.fdiv(steps)
+                    draw_pixel(*between(from, to, t), color)
+                end
+            end
+
+            # The pixel t (0..1) of the way from one pixel to another.
+            def between(from, to, t)
+                from.zip(to).map { |a, b| (a + ((b - a) * t)).round }
+            end
+
             # A bar along pixel row py (0 the top), length pixels from
             # the left edge: a horizontal bar chart's bar on a canvas.
             def row_bar(py, length, color: nil)

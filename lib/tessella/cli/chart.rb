@@ -91,6 +91,13 @@ module Tessella
                 @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
                 @parser.on("--xdate [FMT]") { |v| @opts[:xdate] = v || true }
                 @parser.on("--yerr") { @opts[:yerr] = true }
+                add_threshold
+            end
+
+            def add_threshold
+                @parser.on("--threshold N") { @opts[:threshold] = num(it) }
+                @parser.on("--above C") { @opts[:above] = Color.parse(it) }
+                @parser.on("--below C") { @opts[:below] = Color.parse(it) }
             end
 
             def add_histogram_specific
@@ -304,10 +311,13 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                line: %i[area gradient orientation yscale xdate yerr],
-                scatter: %i[orientation yscale xdate yerr],
+                line: %i[area gradient orientation yscale xdate yerr
+                         threshold above below],
+                scatter: %i[orientation yscale xdate yerr threshold above
+                            below],
                 density: %i[orientation yscale xdate],
-                stairs: %i[style area gradient orientation yscale xdate],
+                stairs: %i[style area gradient orientation yscale xdate
+                           threshold above below],
                 bar: %i[fill eighths track orientation blocks stacked],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
@@ -335,6 +345,8 @@ module Tessella
                      blocks: "--blocks", yscale: "--yscale",
                      stacked: "--stacked", cell_width: "--cell-width",
                      xdate: "--xdate", yerr: "--yerr",
+                     threshold: "--threshold", above: "--above",
+                     below: "--below",
                      colormap: "--colormap", min: "--min", max: "--max",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
