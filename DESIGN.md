@@ -112,6 +112,8 @@ Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
 Tessella.indent(fig, prefix:, ascii: false)
 Tessella.caption(fig, text:, above: false, ascii: false)
 Tessella.shadow(fig, glyph: nil, ascii: false)  # ░ right and below
+Tessella.fill(fig, pattern: nil, ascii: false)  # enclosed blanks: the
+    # cells a flood from the figure's edge through blanks cannot reach
 block.lines; block.width; block.height; block.to_s
 block.check_width!(max)     # ArgumentError naming the line and width
 ```

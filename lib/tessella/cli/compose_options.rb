@@ -28,13 +28,97 @@ module Tessella
         end
     end
 
+    # The flags of `tessella compose`'s subcommands, one definer per
+    # flag (ComposeOptions::FLAGS names which a subcommand takes).
+    # Kept apart so ComposeOptions stays under budget.
+    module ComposeFlags
+        private
+
+        def add_title
+            @parser.on("--title T", "a title in the top edge") do |t|
+                @opts[:title] = t
+            end
+        end
+
+        def add_style
+            @parser.on("--style S", "a border style, or six glyphs") do |s|
+                @opts[:style] = Borders.custom?(s) ? s : Borders.name(s)
+            end
+        end
+
+        def add_pad = add_count("--pad", :pad, "blank columns inside each side")
+        def add_gap = add_count("--gap", :gap, "blank columns (rows) between")
+
+        def add_center
+            @parser.on("--center", "centre narrower blocks") do
+                @opts[:center] = true
+            end
+        end
+
+        def add_prefix
+            @parser.on("--prefix STR", "the text before every line") do |p|
+                @opts[:prefix] = p
+            end
+        end
+
+        def add_text = @parser.on("--text T", "caption") { @opts[:text] = it }
+
+        def add_glyph
+            @parser.on("--glyph G", "shadow glyph (░; # with --ascii)") do |g|
+                @opts[:glyph] = g
+            end
+        end
+
+        def add_fill
+            @parser.on("--fill P", "fill the inside: a pattern name or " \
+                                   "glyphs") { @opts[:fill] = it }
+        end
+
+        def add_pattern
+            @parser.on("--pattern P", "pattern name or glyphs (light)") do |p|
+                @opts[:pattern] = p
+            end
+        end
+
+        def add_above
+            @parser.on("--above", "caption above, not below") do
+                @opts[:above] = true
+            end
+        end
+
+        def add_count(flag, key, text)
+            @parser.on("#{flag} N", Integer, text) do |n|
+                usage!("#{flag} must be >= 0") if n.negative?
+                @opts[key] = n
+            end
+        end
+
+        def add_align
+            @parser.on("--align A", "top, middle or bottom") do |a|
+                usage!("unknown --align #{a}") unless
+                    Compose::ALIGNS.include?(a.to_sym)
+                @opts[:align] = a.to_sym
+            end
+        end
+
+        def add_rule
+            @parser.on("--rule C", "a rule of C between blocks") do |c|
+                usage!("--rule must be exactly one character") unless
+                    c.length == 1
+                @opts[:rule] = c
+            end
+        end
+    end
+
     class ComposeOptions
         include ComposeStyleCheck
+        include ComposeFlags
 
         FLAGS = {
-            "frame" => %i[title style pad], "beside" => %i[gap align],
+            "frame" => %i[title style pad fill], "beside" => %i[gap align],
             "stack" => %i[gap rule center], "indent" => %i[prefix],
-            "caption" => %i[text above], "shadow" => %i[glyph]
+            "caption" => %i[text above], "shadow" => %i[glyph],
+            "fill" => %i[pattern]
         }.freeze
         REQUIRED = { "indent" => :prefix, "caption" => :text }.freeze
 
@@ -77,70 +161,6 @@ module Tessella
         def add_help
             @parser.on("--help", "print this help") do
                 raise ComposeCLI::Help, @parser.to_s
-            end
-        end
-
-        def add_title
-            @parser.on("--title T", "a title in the top edge") do |t|
-                @opts[:title] = t
-            end
-        end
-
-        def add_style
-            @parser.on("--style S", "a border style, or six glyphs") do |s|
-                @opts[:style] = Borders.custom?(s) ? s : Borders.name(s)
-            end
-        end
-
-        def add_pad = add_count("--pad", :pad, "blank columns inside each side")
-        def add_gap = add_count("--gap", :gap, "blank columns (rows) between")
-
-        def add_center
-            @parser.on("--center", "centre narrower blocks") do
-                @opts[:center] = true
-            end
-        end
-
-        def add_prefix
-            @parser.on("--prefix STR", "the text before every line") do |p|
-                @opts[:prefix] = p
-            end
-        end
-
-        def add_text = @parser.on("--text T", "caption") { @opts[:text] = it }
-
-        def add_glyph
-            @parser.on("--glyph G", "shadow glyph (░; # with --ascii)") do |g|
-                @opts[:glyph] = g
-            end
-        end
-
-        def add_above
-            @parser.on("--above", "caption above, not below") do
-                @opts[:above] = true
-            end
-        end
-
-        def add_count(flag, key, text)
-            @parser.on("#{flag} N", Integer, text) do |n|
-                usage!("#{flag} must be >= 0") if n.negative?
-                @opts[key] = n
-            end
-        end
-
-        def add_align
-            @parser.on("--align A", "top, middle or bottom") do |a|
-                usage!("unknown --align #{a}") unless
-                    Compose::ALIGNS.include?(a.to_sym)
-                @opts[:align] = a.to_sym
-            end
-        end
-
-        def add_rule
-            @parser.on("--rule C", "a rule of C between blocks") do |c|
-                usage!("--rule must be exactly one character") unless
-                    c.length == 1
-                @opts[:rule] = c
             end
         end
 

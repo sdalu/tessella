@@ -21,13 +21,19 @@ module Tessella
         end
 
         def self.shadow_glyph!(glyph, ascii)
-            g = glyph || (ascii ? ASCII_SHADOW : SHADOW)
-            unless g.is_a?(String) && g.length == 1 && Width.of(g) == 1 &&
-                   g.match?(/\A[[:graph:]]\z/)
-                raise ArgumentError, "shadow glyph must be one visible " \
-                                     "column: #{g.inspect}"
+            glyph!(glyph || (ascii ? ASCII_SHADOW : SHADOW), "shadow glyph",
+                   ascii)
+        end
+
+        # A glyph drawn into a figure: one visible column, ASCII under
+        # ascii: true.
+        def self.glyph!(glyph, what, ascii)
+            unless glyph.is_a?(String) && glyph.length == 1 &&
+                   Width.of(glyph) == 1 && glyph.match?(/\A[[:graph:]]\z/)
+                raise ArgumentError, "#{what} must be one visible column: " \
+                                     "#{glyph.inspect}"
             end
-            text!("shadow glyph", g, ascii)
+            text!(what, glyph, ascii)
         end
     end
 

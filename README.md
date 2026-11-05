@@ -179,7 +179,14 @@ gets the prefix without its trailing blank); `caption(fig, text:,
 above:)` adds a centred line; `shadow(fig, glyph:)` adds a drop
 shadow, `░` (`#` under `ascii: true`) one column right of every row
 but the first and a bottom bar one row down reaching that column --
-the geometry `tessella lint` checks. Each takes `ascii: true`, which draws
+the geometry `tessella lint` checks; `fill(fig, pattern:)` puts a
+pattern in every enclosed blank cell -- inside a frame, a box, any
+closed region -- leaving text, lines and the outside alone: a name
+from the registry (`light`, `medium`, `dark`, `solid`, `hatch`,
+`backhatch`, `cross`, `grid`, `stipple`, `sparse`, `dotted`, `dots`,
+`colons`, `hash`, `at`) or glyphs of one's own, tiled diagonally, all
+of one width class (`colons` by default under `ascii: true`).
+`frame(fig, fill:)` frames and fills in one call. Each takes `ascii: true`, which draws
 ASCII glyphs and refuses non-ASCII content, and returns a `Block`
 (`lines`, `width`, `height`, `to_s`).
 
@@ -452,6 +459,7 @@ tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
+tessella compose fill    [--pattern P] BLOCK     (frame also takes --fill P)
 ```
 
 Each BLOCK is a file, or `-` for stdin (once). `--style` takes a

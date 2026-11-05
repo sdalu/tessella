@@ -267,3 +267,34 @@ class TestShadow < Minitest::Test
         end
     end
 end
+
+# fill: a pattern in every enclosed blank cell -- inside a frame or any
+# closed region -- tiled diagonally; text, lines and the outside stay.
+class TestFill < Minitest::Test
+    def test_a_frame_fills_its_blank_interior_around_the_text
+        assert_equal(["┌───┐", "│░x░│", "└───┘"],
+                     Tessella.frame("x", fill: :light).lines)
+    end
+
+    def test_only_enclosed_regions_fill
+        fig = Tessella.beside(Tessella.frame("a", pad: 1), "b c")
+        assert_equal("┌───┐ b c\n│:a:│\n└───┘\n",
+                     Tessella.fill(fig, pattern: ":").to_s)
+    end
+
+    def test_a_pattern_tiles_diagonally
+        assert_equal(["+---+", "|∴∵∴|", "|∵∴∵|", "+---+"],
+                     Tessella.fill("+---+\n|   |\n|   |\n+---+",
+                                   pattern: :stipple).lines)
+    end
+
+    def test_refusals
+        assert_raises(ArgumentError) { Tessella.fill("+\n", pattern: "░▒") }
+        assert_raises(ArgumentError) do
+            Tessella.frame("x", fill: :light, ascii: true)
+        end
+        framed = Tessella.frame("x", ascii: true)
+        assert_equal("+---+\n|:x:|\n+---+\n",
+                     Tessella.fill(framed, ascii: true).to_s)
+    end
+end

@@ -46,14 +46,18 @@ module Tessella
     # frame: a box around one block, title centred in the top edge;
     # pad: is horizontal only, the frame hugs its content vertically.
     module Compose
-        def self.frame(figure, title: nil, style: nil, pad: 1, ascii: false)
+        # fill: a pattern for the blank interior (Compose.fill).
+        # rubocop:disable-next Metrics/ParameterLists
+        def self.frame(figure, title: nil, style: nil, pad: 1, ascii: false,
+                       fill: nil)
             block, = blocks([figure], ascii)
             text!("title", title, ascii)
             g = Borders.fetch(style, ascii: ascii)
             field = frame_field(block, title, count!("pad", pad))
-            Block.new([frame_top(g, title, field),
-                       *frame_rows(block, g, pad, field),
-                       g.bl + (g.h * field) + g.br])
+            framed = Block.new([frame_top(g, title, field),
+                                *frame_rows(block, g, pad, field),
+                                g.bl + (g.h * field) + g.br])
+            fill ? Compose.fill(framed, pattern: fill, ascii: ascii) : framed
         end
 
         # The width inside the frame: the block and its pads, or room

@@ -12,8 +12,10 @@ module Tessella
         class Help < StandardError; end
 
         USAGE = <<~TEXT
-            Usage: tessella compose frame  [--title T] [--style S] [--pad N] BLOCK
+            Usage: tessella compose frame  [--title T] [--style S] [--pad N]
+                                          [--fill P] BLOCK
                    tessella compose shadow [--glyph G] BLOCK
+                   tessella compose fill   [--pattern P] BLOCK
                    tessella compose beside [--gap N] [--align A] BLOCK...
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
                    tessella compose indent --prefix STR BLOCK
@@ -76,6 +78,7 @@ module Tessella
     # that composes them.
     module ComposeCommands
         ARITY = { "frame" => 1, "indent" => 1, "caption" => 1, "shadow" => 1,
+                  "fill" => 1,
                   "beside" => 2.., "stack" => 2.. }.freeze
 
         def self.fetch(sub)
@@ -96,7 +99,8 @@ module Tessella
 
         def self.frame_call(blocks, o)
             Compose.frame(blocks.first, title: o[:title], style: o[:style],
-                                        pad: o.fetch(:pad, 1), ascii: o[:ascii])
+                                        pad: o.fetch(:pad, 1), ascii: o[:ascii],
+                                        fill: o[:fill])
         end
 
         def self.beside_call(blocks, o)
@@ -112,6 +116,10 @@ module Tessella
 
         def self.indent_call(blocks, o)
             Compose.indent(blocks.first, prefix: o[:prefix], ascii: o[:ascii])
+        end
+
+        def self.fill_call(blocks, o)
+            Compose.fill(blocks.first, pattern: o[:pattern], ascii: o[:ascii])
         end
 
         def self.shadow_call(blocks, o)
