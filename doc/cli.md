@@ -35,6 +35,14 @@ Every command keeps one contract:
 The message goes to stderr as `tessella COMMAND: message`, naming the
 line, row or block it is about; a usage mistake adds the usage line.
 
+A file that cannot be read is reported the same way by every
+command, naming it (`stdin` when it was stdin):
+
+```text
+$ tessella table missing.csv
+tessella table: cannot read missing.csv: No such file or directory
+```
+
 ```text
 $ tessella chart --kind pie langs.csv
 tessella chart: invalid argument: --kind pie
