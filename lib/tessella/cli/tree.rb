@@ -17,7 +17,7 @@ module Tessella
         USAGE_ERRORS = [OptionParser::ParseError, UsageError].freeze
 
         USAGE = <<~TEXT
-            Usage: tessella tree [--style S] [--ascii] [--root NAME]
+            Usage: tessella tree [--style S] [--[no-]ascii] [--root NAME]
                                  [--max-width N] [file]  (stdin if none)
         TEXT
 

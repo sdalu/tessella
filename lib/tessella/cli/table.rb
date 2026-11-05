@@ -101,7 +101,7 @@ module Tessella
 
         BANNER = <<~TEXT
             Usage: tessella table [options] [file]  (stdin if none)
-                --tsv --no-header --align SPEC --style NAME|GLYPHS --ascii
+                --tsv --no-header --align SPEC --style NAME|GLYPHS --[no-]ascii
                 --title TEXT --max-width N
         TEXT
 
