@@ -9,7 +9,8 @@ module Tessella
     class Line < Chart
         include Sideways
 
-        OPTIONS = (Chart::OPTIONS + %i[area gradient orientation]).freeze
+        OPTIONS = (Chart::OPTIONS +
+                   %i[area gradient orientation yscale]).freeze
         GRADIENT = %i[green yellow red].freeze
 
         def initialize(**opts)
@@ -59,7 +60,7 @@ module Tessella
     class Scatter < Chart
         include Sideways
 
-        OPTIONS = (Chart::OPTIONS + %i[orientation]).freeze
+        OPTIONS = (Chart::OPTIONS + %i[orientation yscale]).freeze
 
         private
 

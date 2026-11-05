@@ -149,6 +149,7 @@ module Tessella
                 @parser.on("--style C") { |v| @opts[:style] = v.to_sym }
                 @parser.on("--scale N") { |v| @opts[:scale] = num(v) }
                 @parser.on("--xscale C") { |v| @opts[:xscale] = v.to_sym }
+                @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
             end
 
             def add_area
@@ -264,10 +265,10 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                line: %i[area gradient orientation],
-                scatter: %i[orientation],
-                density: %i[orientation],
-                stairs: %i[style area gradient orientation],
+                line: %i[area gradient orientation yscale],
+                scatter: %i[orientation yscale],
+                density: %i[orientation yscale],
+                stairs: %i[style area gradient orientation yscale],
                 bar: %i[fill eighths track orientation blocks],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
@@ -290,7 +291,7 @@ module Tessella
             FLAG = { style: "--style", scale: "--scale", bins: "--bins",
                      closed: "--closed", fill: "--fill", area: "--area",
                      gradient: "--gradient", orientation: "--orientation",
-                     blocks: "--blocks",
+                     blocks: "--blocks", yscale: "--yscale",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
             def self.check!(opts)

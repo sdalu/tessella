@@ -50,11 +50,14 @@ chart.render(io = $stdout)
 ```
 
 Options common to every kind, all optional: `title xlabel ylabel
-width height xlim ylim canvas ascii color border xscale`. Defaults:
+width height xlim ylim canvas ascii color border xscale`, and for
+line, scatter, stairs and density `yscale` too. Defaults:
 width 40, height 15, canvas `:braille` (`:ascii` when `ascii: true`),
 `color: false`, border by kind. `xscale:` runs a series' x values
 through a transform (`:ln`, `:log2`, `:log10`; `nil` the identity)
-before limits and drawing. An unknown option, canvas, xscale name, or
+before limits and drawing, and `yscale:` a series' y values; the
+axis then reads in transformed units (1 to 1000 under `:log10` is 0
+to 3), as unicode_plot's does. An unknown option, canvas, xscale name, or
 (for stairs) style raises `ArgumentError` naming it, as do a width or
 height that is not a positive Integer, x and y of different lengths,
 and a value that is not a finite number (nil, a String, NaN,
@@ -372,6 +375,19 @@ tessella text --plain [TEXT ...]
 A letter or digit with no form is named on stderr; under `--strict`
 the command prints nothing and exits 1.
 
+### Sparklines
+
+```ruby
+Tessella.sparkline([1, 5, 22, 13, 53, 2, 8])   # ▁▂▄▃█▁▂
+```
+
+One cell a value, eight steps from the lowest to the highest (`▁` to
+`█`, or `_.-:=+*#` under `ascii: true`). `width:` averages the values
+into that many cells; `min:` and `max:` fix the range, so several
+lines share one scale. `tessella sparkline [--width N] [--min A]
+[--max B] [--ascii] [VALUE ...]` reads the values given, or stdin
+(split on blanks and commas).
+
 ### Glyph sets
 
 ```ruby
@@ -481,7 +497,8 @@ line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
 `--canvas braille|block|quadrant|half|dot|ascii|density`,
-`--ascii`, `--color`, `--xscale ln|log2|log10`.
+`--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` for
+line, scatter, stairs and density).
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
 `--style post|pre` (stairs only); `--blocks

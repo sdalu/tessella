@@ -53,16 +53,20 @@ module Tessella
             end
         end
 
-        # x (nil for 1..n) and y as stored: x through the xscale, both
-        # finite, and the same length.
+        # x (nil for 1..n) and y as stored: each through its scale,
+        # both finite, and the same length.
         def series_values(x, y)
             ys = Check.finite!(Array(y), "y")
             xs = Array(x || (1..ys.length))
             Check.same_size!(xs, ys, %w[x y])
-            [Check.finite!(xs.map(&@xscale), x_name), ys]
+            [Check.finite!(xs.map(&@xscale), scaled_name(:x)),
+             Check.finite!(ys.map(&@yscale), scaled_name(:y))]
         end
 
-        def x_name = @opts[:xscale] ? "x under xscale #{@opts[:xscale]}" : "x"
+        def scaled_name(axis)
+            scale = @opts[:"#{axis}scale"]
+            scale ? "#{axis} under #{axis}scale #{scale}" : axis.to_s
+        end
     end
 
     # Shared machinery behind every chart kind (DESIGN.md, "Chart and
@@ -90,6 +94,7 @@ module Tessella
             @color_on = opts.fetch(:color, false)
             @border = opts[:border] || default_border
             @xscale = Stats.transform(opts[:xscale])
+            @yscale = Stats.transform(opts[:yscale])
             @series = []
             @next_color = 0
         end

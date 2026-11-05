@@ -11,7 +11,7 @@ module Tessella
             "table" => TableCLI, "bitfield" => BitfieldCLI, "wave" => WaveCLI,
             "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI,
             "glyphs" => GlyphsCLI, "meter" => MeterCLI, "rule" => RuleCLI,
-            "text" => TextCLI
+            "text" => TextCLI, "sparkline" => SparklineCLI
         }.freeze
 
         USAGE = <<~TEXT
@@ -35,6 +35,7 @@ module Tessella
               rule      a divider line, with an optional ornament
               text      text in a Unicode style: bold, script, small
                         caps, circled, fullwidth, ...
+              sparkline one line of values, ▁ to █
 
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.
