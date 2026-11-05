@@ -41,9 +41,9 @@ break is caught before the slow oracle run.
 ## Release
 
 - [ ] Does the number move? `lib/inkchart/version.rb` is the one place
-  `VERSION` is written (`make version` prints it). A round that changes
-  behaviour moves it; one that changes only tests or documents does
-  not.
+  `VERSION` is written (`make version` prints it). The user bumps it,
+  never a session: a round that changes behaviour says so in its report
+  and leaves the number alone.
 
 No round closes by publishing: there is no deploy or publish target,
 and nothing here pushes a gem or creates a public remote.
