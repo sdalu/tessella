@@ -70,17 +70,60 @@ $ tessella --target cjk table cities.csv
 
 Read here, in a Western font, the `Zürich` row looks one column
 short: `ü` is ambiguous, and the table gave it the two columns a CJK
-terminal will. There, the row lines up. An explicit `--ascii` or
-`ascii: false` is still honoured; Unicode structure under `cjk` will
-not line up where it is read.
+terminal will. There, the row lines up.
+
+`ascii: false` still asks for Unicode structure. A frame and a table
+then round every inner width up to a whole number of border glyphs
+and count their border runs in columns, so each line has one width in
+a CJK terminal and the box closes there. Read in a Western terminal,
+as on this page, the box looks a column too wide here and there.
+Other figures (trees, waves, charts) drawn in Unicode under `cjk` do
+not line up in a CJK terminal: leave them to the ASCII default.
+
+```ruby
+# frozen_string_literal: true
+
+# examples/cjk.rb: a table and a frame asked for in Unicode under the
+# cjk target. Their inner widths are rounded up to whole border
+# glyphs, so they close in a CJK terminal; read in a Western one, as
+# here, the boxes look a column wide here and there.
+require "tessella"
+
+Tessella::Target.with(:cjk) do
+    rows = Tessella::Table.parse(File.read("cities.csv"))
+    puts Tessella.table(rows, ascii: false)
+    puts Tessella.frame(File.read("note.txt"), ascii: false)
+end
+```
+
+```text
+$ ruby cjk.rb
+┌─────┬───┐
+│ city     │  pop │
+├─────┼───┤
+│ 東京     │   14 │
+│ Paris    │    2 │
+│ Zürich  │  0.4 │
+└─────┴───┘
+┌─────────┐
+│ ruby is 12 kLOC  │
+│ c is the bulk    │
+└─────────┘
+```
 
 ## web
 
 A browser may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide colour
 emoji. Under `web` the output carries U+FE0E, the text-presentation
-selector, after each such glyph, so it stays a one-column glyph. It
-is invisible, and the one exception to tessella's rule of no
-invisible characters in its output.
+selector, after each such glyph, so it is drawn as a text glyph, not
+an emoji. It is invisible, and the one exception to tessella's rule
+of no invisible characters in its output.
+
+The selector fixes a glyph's form, not its width. A glyph the page's
+monospace font does not carry is drawn from a fallback font, at that
+font's width: in Chrome on GitHub's code fonts `▶` takes two columns
+and `↗` 1.4, with or without U+FE0E. On the web, then, only glyphs
+the monospace font carries line up: prefer `▸` to `▶`.
 
 ## Checking for a target
 

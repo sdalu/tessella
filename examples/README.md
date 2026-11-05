@@ -21,6 +21,7 @@ RUBYLIB=../lib ruby load.rb
 | `fit.rb`         | a table fitted to a width, with a multi-line cell  | [table](../doc/table.md)            |
 | `gradient.rb`    | a `Raster` built in Ruby, drawn in three styles    | [images](../doc/images.md)          |
 | `refusals.rb`    | what the library refuses, and its messages         | [library](../doc/library.md)        |
+| `cjk.rb`         | a Unicode table and frame drawn for a CJK terminal | [targets](../doc/targets.md)        |
 | `lint.rb`        | the lint's findings and rulers, from Ruby          | [lint](../doc/lint.md)              |
 
 ## Shell scripts
