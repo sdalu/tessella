@@ -100,15 +100,12 @@ class TestTarget < Minitest::Test
                                        --no-ascii -])[1].lines.first)
     end
 
-    # seq under web: bolder heads ► ◄, an async one doubled; the
-    # terminal keeps ▸ ◂ and →.
-    def test_web_sequence_arrowheads
+    # seq draws ► ◄, and ►► ◄◄ for async, in every target.
+    def test_sequence_arrowheads_are_one_set
         text = "participant A\nparticipant B\nA -> B: go\nB ->> A: back\n"
         web = T.with(:web) { Tessella.seq(text).to_s }
+        assert_equal(Tessella.seq(text).to_s, web)
         assert_includes(web, "─►│")
         assert_includes(web, "│◄◄─")
-        term = Tessella.seq(text).to_s
-        assert_includes(term, "─▸│")
-        assert_includes(term, "│←─")
     end
 end

@@ -4,7 +4,7 @@ module Tessella
     # UML-style sequence diagrams (this module matches the tessella
     # skill's scripts/seq.rb byte for byte). One statement per line:
     # "participant NAME", "A -> B: text" (call), "A --> B: text"
-    # (reply, dashed), "A ->> B: text" (async, open arrowhead), a
+    # (reply, dashed), "A ->> B: text" (async, a double arrowhead), a
     # self call "A -> A: text" (a loop right of A), and "note over
     # A[,B]: text". A name is any run of Unicode letters/digits, "_",
     # "." or "-"; under ascii: true such a name must be ASCII.
@@ -285,21 +285,16 @@ module Tessella
             [top, mid, bot]
         end
 
-        HEADS = {
-            term: { call: { right: "▸", left: "◂" },
-                    async: { right: "→", left: "←" } },
-            # Bolder heads for a browser, where ▸ reads small (not
-            # emoji-capable, though a font lacking them gives them a
-            # fallback width); async a double head, as ->> writes it.
-            web: { call: { right: "►", left: "◄" },
-                   async: { right: "►►", left: "◄◄" } }
-        }.freeze
+        # Full-size heads (not emoji-capable, though a font lacking
+        # them gives them a fallback width on the web); async a double
+        # head, as ->> writes it.
+        HEADS = { call: { right: "►", left: "◄" },
+                  async: { right: "►►", left: "◄◄" } }.freeze
 
         def self.arrowhead(kind, dir, style)
             return dir == :right ? ">" : "<" if style[:ascii]
 
-            heads = HEADS[Target.web? ? :web : :term]
-            heads[kind == :async ? :async : :call][dir]
+            HEADS[kind == :async ? :async : :call][dir]
         end
 
         def self.alt_dashes(n) = (0...n).map { |i| i.even? ? "-" : " " }.join

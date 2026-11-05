@@ -13,10 +13,10 @@ module SeqFixtures
         └─┬─┘  └─┬─┘
           │      │
           │  hi  │
-          │─────▸│
+          │─────►│
           │      │
           │  ok  │
-          │◂┄┄┄┄┄│
+          │◄┄┄┄┄┄│
           │      │
     DIAGRAM
 
@@ -27,7 +27,7 @@ module SeqFixtures
           │
           │──┐
           │  │ loop
-          │◂─┘
+          │◄─┘
           │
     DIAGRAM
 
@@ -37,10 +37,10 @@ module SeqFixtures
         └─┬─┘  └─┬─┘  └─┬─┘
           │      │      │
           │  hi  │      │
-          │─────▸│      │
+          │─────►│      │
           │      │      │
           │     go      │
-          │────────────▸│
+          │────────────►│
           │      │      │
           │      ┌──────┐
           │      │ wait │
@@ -109,10 +109,9 @@ class TestSeqRender < Minitest::Test
         refute_empty(tees)
     end
 
-    def test_async_draws_the_open_arrowhead_not_the_filled_call_head
+    def test_async_draws_a_double_head
         out = Tessella.seq("A ->> B: ping\n").to_s
-        assert_includes(out, "→")
-        refute_includes(out, "▸")
+        assert_includes(out, "──►►│")
     end
 
     def test_ascii_call_reply_and_async_all_render_ascii_only
