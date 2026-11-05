@@ -68,6 +68,20 @@ kind's own line or dots: `chart.add(xs, ys, name: "measured", mark:
 character, ASCII under `ascii: true`; the legend shows it before the
 series' name. Bar, histogram, box and stem take no `mark:`.
 
+Line and stairs take `area: true`, which fills under each series
+from the floor up, as btop draws its graphs: every pixel column is a
+bar, so a braille cell holds two bars of 0 to 4 dots (a block cell two
+of 0 to 2), and a peak narrower than a column still shows. The y axis
+then starts at 0 unless `ylim:` says otherwise. Under `color: true`
+the cells take `gradient:`'s colours by height, bottom first
+(default `[:green, :yellow, :red]`, equal bands; `false` keeps the
+series' colour); without colour they are plain glyphs. A colour, in
+`gradient:` as anywhere tessella takes one, is a name (`:red`,
+`:green`, `:yellow`, `:blue`, `:magenta`, `:cyan`, `:white`), a
+256-colour index (`0..255`) or a truecolor `"#rrggbb"`; a gradient
+whose stops are all `#rrggbb` blends smoothly from the bottom row to
+the top one instead of in bands.
+
 Bar and histogram take three more options, all optional: `fill:` the
 bar glyph (`█` by default, `#` under `ascii: true`), `eighths:` draw
 the fractional last cell with `▏▎▍▌▋▊▉` (`true` by default, always
@@ -320,7 +334,9 @@ line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--ascii`, `--color`, `--xscale ln|log2|log10`.
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
-`--style post|pre` (stairs only); `--scale N` (stem only); `--fill G`,
+`--style post|pre` (stairs only); `--area` and `--gradient C,C,...`
+(line and stairs only; each `C` a name, an index `0..255` or `#rrggbb`,
+or `none` for the series' colour); `--scale N` (stem only); `--fill G`,
 `--no-eighths` and `--track G|none` (bar and histogram only, as above).
 `--help` and `--version` print and exit. An option given to a kind
 that does not take it is a usage error (exit 2) naming both; a bad

@@ -3,12 +3,52 @@
 module Tessella
     # A connected path through (x, y) points (DESIGN.md, "Chart and
     # kinds"): the x = 0 / y = 0 axis lines draw when in range, as
-    # unicode_plot's lineplot does.
+    # unicode_plot's lineplot does. area: true fills under the path
+    # instead, from the canvas floor up, btop-style; under color: true
+    # its cells take gradient:'s colours by height, bottom band first.
     class Line < Chart
+        OPTIONS = (Chart::OPTIONS + %i[area gradient]).freeze
+        GRADIENT = %i[green yellow red].freeze
+
+        def initialize(**opts)
+            super
+            check_area!(opts)
+        end
+
         private
 
+        # An area is measured from zero: the y range takes in 0 unless
+        # ylim: says otherwise.
+        def ylim
+            return super unless @opts[:area]
+
+            Axis.limits([0, *@series.flat_map(&:y)], @opts[:ylim])
+        end
+
         def draw_series(canvas, series)
-            canvas.lines(series.x, series.y, color: series.color)
+            return canvas.lines(series.x, series.y, color: series.color) unless
+                @opts[:area]
+
+            canvas.area(series.x, series.y, color: area_color(series))
+        end
+
+        # The gradient as a cell row -> colour map (row 0 the top), or
+        # the series' own colour when gradient: false.
+        def area_color(series)
+            stops = @opts.fetch(:gradient, GRADIENT)
+            return series.color unless stops
+
+            rows = height
+            ->(row) { Color::Gradient.at(stops, rows - 1 - row, rows) }
+        end
+
+        def check_area!(opts)
+            stops = opts[:gradient]
+            return if stops.nil? || stops == false
+
+            raise ArgumentError, "gradient: needs area: true" unless opts[:area]
+
+            Color::Gradient.check!(stops)
         end
     end
 

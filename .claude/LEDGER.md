@@ -69,6 +69,7 @@ Decisions:
 - 2026-11-05 — lint geometry reads every box-drawing glyph by its arms (light/heavy/double/rounded/dashed/mixed, not light only), with borders: / --border for custom sets; custom border sets for frame and table (Set or 6 glyphs, 11 with a table's tees; never silently replaced under ascii:) — by user ("do all")
 - 2026-11-05 — stack gap: without a rule is N rows, not 2N (compose.rb's code contradicted its own help) — found by Tessella:doc, fix mine
 - 2026-11-05 — ASCII rule enforced where it leaked: table cells/title, wave names/labels, chart text (checked on the finished figure; a non-ASCII data row is exit 1, a flag exit 2), bitfield names always (a bit-field is ASCII) — found by Tessella:doc, fix mine
+- 2026-11-05 — area: true / --area on line and stairs: btop-style fill, one bar per pixel column (two per braille or block cell), y from 0, peaks kept; gradient: / --gradient by height under color: true, plain without; colours gain 0..255 and #rrggbb, an all-hex gradient blends — by user (fill, gradient, no-colour, two bars per char, specifiable gradient); named area: not fill: (bar's fill: is its glyph), mine
 
 Pieces:
 - P0 [kept: interface judgment, verified] — scaffold the repo (git init, gemspec, Makefile per make, minitest harness, oracle harness) and write the internal interfaces the other pieces share: Canvas (pixel grid → rows), Stats (bins, percentiles, density, scales), Layout (frame, axes, title, legend, colour) — evidence: DESIGN.md; make check 23 files no offences; make tests 3/3; make bundle parses and loads

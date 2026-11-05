@@ -66,7 +66,8 @@ lib/tessella/stats.rb      binning, percentiles, transforms
 lib/tessella/axis.rb       limits, nice rounding, number labels
 lib/tessella/color.rb      colour names to ANSI, and nothing else
 lib/tessella/canvas.rb     the base grid
-lib/tessella/canvas/*.rb   braille, block, dot, ascii, density
+lib/tessella/canvas/*.rb   braille, block, dot, ascii, density, and
+                           area (the fill under a curve, every type)
 lib/tessella/frame.rb      border, labels, title, legend, render
 lib/tessella/chart.rb      shared options, series, render entry
 lib/tessella/kinds/*.rb    one file per kind
@@ -280,6 +281,9 @@ canvas.point(x, y, color: nil)           # data coordinates; outside
 canvas.line(x0, y0, x1, y1, color: nil)  #   the limits: clipped
 canvas.points(xs, ys, color: nil)
 canvas.lines(xs, ys, color: nil)         # joins consecutive points
+canvas.area(xs, ys, color: nil)  # fills each pixel column the path
+    # spans from the floor to the curve (canvas/area.rb); color: a
+    # colour, or a callable cell row (0 the top) -> colour
 canvas.rows                              # => Array (top row first) of
     # Array of Tessella::Cell (Data: char, color); char " " is blank
 canvas.annotate(col, row, text, color: nil)  # writes text into cells
@@ -309,9 +313,14 @@ Tessella::Frame.new(
     bottom: nil         # [left_text, right_text] under the frame, at
                         #   its two ends (x-axis extremes)
 ).to_s                  # => String, "\n"-terminated, no trailing blank
-Tessella::Color.wrap(text, name)  # ANSI wrap; name nil => text as is
+Tessella::Color.wrap(text, color) # ANSI wrap; nil => text as is; a
+                                  #   name, a 0..255 index (38;5) or
+                                  #   "#rrggbb" (38;2)
 Tessella::Color::NAMES            # :red :green :yellow :blue :magenta
                                   #   :cyan :white, the series cycle
+Tessella::Color::Gradient.at(stops, row, rows)  # row 0 the bottom:
+                                  #   equal bands, or a smooth blend
+                                  #   when every stop is "#rrggbb"
 ```
 
 ## Chart and kinds
@@ -324,6 +333,8 @@ chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another
                                             #   series
 Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
+Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
+                                            #   stairs: filled, btop-style
 Tessella.bar(labels, values, **opts)
 Tessella.histogram(values, bins: nil, closed: :left, **opts)
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays

@@ -145,9 +145,18 @@ module Tessella
 
             def add_kind_specific
                 add_histogram_specific
+                add_area
                 @parser.on("--style C") { |v| @opts[:style] = v.to_sym }
                 @parser.on("--scale N") { |v| @opts[:scale] = num(v) }
                 @parser.on("--xscale C") { |v| @opts[:xscale] = v.to_sym }
+            end
+
+            def add_area
+                @parser.on("--area") { @opts[:area] = true }
+                @parser.on("--gradient C,C", Array) do |v|
+                    @opts[:gradient] =
+                        v == ["none"] ? false : v.map { Color.parse(it) }
+                end
             end
 
             def add_histogram_specific
@@ -244,7 +253,8 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                stairs: %i[style],
+                line: %i[area gradient],
+                stairs: %i[style area gradient],
                 bar: %i[fill eighths track],
                 histogram: %i[fill eighths track bins closed],
                 stem: %i[scale]
@@ -263,7 +273,8 @@ module Tessella
     class ChartCLI
         module KindOptions
             FLAG = { style: "--style", scale: "--scale", bins: "--bins",
-                     closed: "--closed", fill: "--fill",
+                     closed: "--closed", fill: "--fill", area: "--area",
+                     gradient: "--gradient",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
             def self.check!(opts)
