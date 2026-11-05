@@ -47,36 +47,56 @@ module Tessella
             tessella --version prints the version.
         TEXT
 
+        # A --target or TESSELLA_TARGET that names no target: usage.
+        class TargetError < ArgumentError; end
+
+        META = %w[--help -h --version].freeze
+
         def self.run(argv, stdin:, stdout:, stderr:, env: ENV)
             target, argv = target(argv, env)
             command, *rest = argv
-            return meta(command, stdout) if %w[--help -h --version]
-                                            .include?(command)
+            return meta(command, stdout) if META.include?(command)
 
             klass = COMMANDS[command] or return refuse(command, stderr)
             Target.with(target) do
                 klass.run(rest, stdin: stdin, stdout: stdout, stderr: stderr)
             end
-        rescue ArgumentError => e
+        rescue TargetError => e
             usage_error(e, stderr)
         end
 
-        # A leading --target T (or --target=T), else TESSELLA_TARGET,
-        # else term; and the arguments after it.
-        def self.target(argv, env)
-            first, second, *rest = argv
-            return [second, rest] if first == "--target" && second
-            return [first.delete_prefix("--target="), [second, *rest]] if
-                first&.start_with?("--target=")
-
-            [env.fetch("TESSELLA_TARGET", "term"), argv]
-        end
-
         def self.usage_error(error, stderr)
-            raise error unless error.message.start_with?("unknown target")
-
             stderr.puts("tessella: #{error.message}")
             2
+        end
+
+        # A leading --target T (or --target=T), else TESSELLA_TARGET
+        # (set and not empty), else term -- checked before anything
+        # runs, --help and --version included; and the arguments after.
+        def self.target(argv, env)
+            name, rest = given_target(argv)
+            name ||= env["TESSELLA_TARGET"].to_s
+            [check_target!(name.empty? ? "term" : name), rest]
+        end
+
+        def self.given_target(argv)
+            first, *rest = argv
+            if first == "--target"
+                raise TargetError, "--target needs term, cjk or web" if
+                    rest.empty?
+
+                return [rest.first, rest.drop(1)]
+            end
+            return [first.delete_prefix("--target="), rest] if
+                first&.start_with?("--target=")
+
+            [nil, argv]
+        end
+
+        def self.check_target!(name)
+            Target.check!(name)
+        rescue ArgumentError => e
+            raise TargetError, e.message
         end
 
         # The 1-based number of the first line of text that is not

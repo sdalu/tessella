@@ -108,4 +108,18 @@ class TestTarget < Minitest::Test
         assert_includes(web, "─►│")
         assert_includes(web, "│◄◄─")
     end
+
+    # An empty TESSELLA_TARGET is no target; a bad one is refused even
+    # before --help; --target needs its value.
+    def test_target_edge_cases
+        out = StringIO.new
+        Tessella::CLI.run(%w[rule --width 3], stdin: StringIO.new, stdout: out,
+                                              stderr: StringIO.new,
+                                              env: { "TESSELLA_TARGET" => "" })
+        assert_equal("───\n", out.string)
+        assert_equal(2, cli(%w[--target mars --help]).first)
+        status, _, err = cli(%w[--target])
+        assert_equal(2, status)
+        assert_includes(err, "--target needs")
+    end
 end
