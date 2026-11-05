@@ -17,15 +17,15 @@ module Tessella
 
             usage!("unknown --style #{style}") unless
                 Borders::STYLES.key?(style)
-            usage!("--style #{style} conflicts with #{ascii_source}") if
-                @opts[:ascii] && style != :ascii
+            usage!(ascii_conflict(style)) if @opts[:ascii] && style != :ascii
         end
 
-        # Where ASCII came from: the flag, or the cjk target's default.
-        def ascii_source
-            return "--ascii" if @ascii_flag
+        # Named for where ASCII came from: the flag, or the cjk
+        # target's default, which --no-ascii lifts.
+        def ascii_conflict(style)
+            return "--style #{style} conflicts with --ascii" if @ascii_flag
 
-            "the cjk target's ASCII default (--no-ascii for Unicode)"
+            "--style #{style} needs --no-ascii under target cjk"
         end
 
         def check_custom_style!(style)

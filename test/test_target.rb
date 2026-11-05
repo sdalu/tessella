@@ -95,7 +95,7 @@ class TestTarget < Minitest::Test
         assert_includes(io[:stdout].string, "┌")
         status, _, err = cli(%w[--target cjk compose frame --style light -])
         assert_equal(2, status)
-        assert_includes(err, "the cjk target's ASCII default (--no-ascii")
+        assert_includes(err, "--style light needs --no-ascii under target cjk")
         assert_equal("┌───┐\n", cli(%w[--target cjk compose frame
                                        --no-ascii -])[1].lines.first)
     end
