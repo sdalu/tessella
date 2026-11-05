@@ -551,3 +551,21 @@ class TestTableFitConverges < Minitest::Test
                      error.message)
     end
 end
+
+# Cells from Ruby: a number is drawn as its text, right-aligned as a
+# number column; anything else that is not a String is refused.
+class TestTableCellValues < Minitest::Test
+    def test_numbers_are_cells
+        out = Tessella.table([%w[stat ms], ["max", 30], ["min", 2.5]]).to_s
+        assert_includes(out, "│ max  │  30 │")
+        assert_includes(out, "│ min  │ 2.5 │")
+    end
+
+    def test_another_kind_of_cell_is_refused_by_position
+        error = assert_raises(ArgumentError) do
+            Tessella.table([%w[a b], ["x", nil]])
+        end
+        assert_match(/row 2, column 2: a cell must be a String or a number/,
+                     error.message)
+    end
+end

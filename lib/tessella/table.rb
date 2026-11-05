@@ -480,6 +480,22 @@ module Tessella
     # of a frame and the five tees; and, under ascii: true, the check
     # that every cell and the title are ASCII.
     module Table
+        # Cells as text: a String as it is, a number as its digits (so a
+        # numeric column still right-aligns); anything else refused,
+        # naming its row and column.
+        def self.cell_text(rows)
+            Array(rows).each_with_index.map do |row, r|
+                Array(row).each_with_index.map do |cell, c|
+                    next cell if cell.is_a?(String)
+                    next cell.to_s if cell.is_a?(Numeric)
+
+                    raise ArgumentError, "row #{r + 1}, column #{c + 1}: a " \
+                                         "cell must be a String or a number: " \
+                                         "#{cell.inspect}"
+                end
+            end
+        end
+
         def self.check_ascii!(rows, title)
             Check.ascii!(title, "title")
             rows.each_with_index do |row, r|
@@ -512,8 +528,9 @@ module Tessella
     def self.table(rows, header: true, style: nil, ascii: false, align: nil,
                    title: nil, width: nil, min_width: Table::MIN_WIDTH,
                    color: false)
-        Table.build(rows, header: header, style: style, ascii: ascii,
-                          align: align, title: title, width: width,
-                          min_width: min_width, color: color)
+        Table.build(Table.cell_text(rows),
+                    header: header, style: style, ascii: ascii,
+                    align: align, title: title, width: width,
+                    min_width: min_width, color: color)
     end
 end
