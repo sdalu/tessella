@@ -6,13 +6,14 @@ module Tessella
     # grouped, a bar per series under each label with a blank row
     # between labels, or stacked: true, the series end to end in one bar
     # labelled with its total. Series are told apart by fill glyph
-    # (█ ▓ ▒, ASCII # = +) and, under color: true, by colour; the legend
-    # sits right of the frame, named by series: (1..n otherwise). Values
+    # (Legend::FILLS, █ ▓ ▒ ░ ... ASCII # = + @ ..., so at most 12) and,
+    # under color: true, by colour; the legend sits right of the frame,
+    # or wrapped under it, named by series: (1..n otherwise). Values
     # must be 0 or more; the braille, block and half layouts refuse
     # several series. Kept apart so Bar stays under budget.
     module MultiBars
-        FILLS = %w[█ ▓ ▒].freeze
-        ASCII_FILLS = %w[# = +].freeze
+        FILLS = Legend::FILLS
+        ASCII_FILLS = Legend::ASCII_FILLS
 
         private
 
@@ -23,6 +24,7 @@ module Tessella
             rows.each_with_index do |values, i|
                 vals = Check.finite!(Array(values), "value")
                 check_series_size!(vals)
+                Legend.fills!(vals.size, "series")
                 @groups << [labels[i], vals]
             end
             self
@@ -38,7 +40,7 @@ module Tessella
 
         def series_count = @groups.first.last.size
 
-        def series_fill(i) = (@ascii ? ASCII_FILLS : FILLS)[i % FILLS.size]
+        def series_fill(i) = (@ascii ? ASCII_FILLS : FILLS)[i]
 
         # Eighths (▏..▉, ▁..▇) are solid: they end only a █ series, so a
         # ▓ or ▒ bar is never closed by what looks like another series.
@@ -58,15 +60,16 @@ module Tessella
             end
         end
 
-        # The legend beside the frame, an entry a row, or on one line
-        # under it when there are more series than rows.
+        # The legend beside the frame, an entry a row, or under it,
+        # wrapped to the frame's width, when there are more series
+        # than rows.
         def legend_options(rows)
             entries = legend_entries
             if entries.size <= rows
                 return { right: entries.each_with_index.to_h { |e, i| [i, e] } }
             end
 
-            { under: entries.join("  ") }
+            { under: Legend.wrap(entries, width) }
         end
 
         def multi_values!

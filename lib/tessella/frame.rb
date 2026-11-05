@@ -13,12 +13,13 @@ module Tessella
     module FrameBelow
         private
 
-        # A row of text under the body, column for column (a column
-        # chart's names).
+        # Rows of text under the body, column for column (a column
+        # chart's names, a legend wrapped by Legend).
         def under_line
             return nil if @under.to_s.empty?
 
-            lead + (" " * Width.of(border_part(:l))) + @under
+            indent = lead + (" " * Width.of(border_part(:l)))
+            @under.lines(chomp: true).map { indent + it }.join("\n")
         end
 
         def bottom_extremes_line

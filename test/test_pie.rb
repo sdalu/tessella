@@ -22,7 +22,7 @@ class TestPie < Minitest::Test
     def test_ascii_and_colour
         out = Tessella.pie(%w[a b c], [1, 1, 2], height: 4, ascii: true).to_s
         assert(out.ascii_only?)
-        assert_includes(out, "= c 50 %")
+        assert_includes(out, "+ c 50 %")
         colored = Tessella.pie(%w[a b], [1, 3], height: 4, color: true).to_s
         assert_includes(colored, "\e[31m")
         assert_includes(colored, "\e[32m")
@@ -35,7 +35,19 @@ class TestPie < Minitest::Test
 
     def test_more_slices_than_rows_go_under
         out = Tessella.pie(%w[a b c d e], [1, 2, 3, 4, 5], height: 4).to_s
-        assert_includes(out.lines.last, "█ a 7 %  ▓ b 13 %")
+        assert_equal("    █ a 7 %  ▓ b 13 %  ▒ c 20 %  ░ d 27 %\n",
+                     out.lines[-2])
+        assert_equal("    ╳ e 33 %\n", out.lines.last)
+    end
+
+    # Twelve fills, no two alike: a thirteenth slice is refused.
+    def test_every_slice_its_own_fill
+        out = Tessella.pie((1..12).map(&:to_s), [1] * 12, height: 4).to_s
+        fills = out.scan(/(\S) \d+ \d+ %/).flatten
+        assert_equal(12, fills.uniq.size)
+        assert_raises(ArgumentError) do
+            Tessella.pie((1..13).map(&:to_s), [1] * 13)
+        end
     end
 
     def test_refusals

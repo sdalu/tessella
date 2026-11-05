@@ -178,9 +178,10 @@ value a series, and name the series with `series:`. They are grouped
 -- a bar a series under each label, a blank row between labels -- or,
 with `stacked: true`, end to end in one bar labelled with its total;
 both work upright too (`orientation: :vertical`). Series are told
-apart by fill (`█ ▓ ▒`, `# = +` in ASCII) and, under `color: true`,
-by colour; the legend sits right of the frame, or on one line under
-it when there are more series than rows. Eighths end only the
+apart by fill (`█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆ ·`, `# = + @ * : . o % & ~ x`
+in ASCII, so at most 12 series) and, under `color: true`, by colour;
+the legend sits right of the frame, or wrapped to the frame's width
+under it when there are more series than rows. Eighths end only the
 `█` series, since they are solid. Values must be 0 or more, and the
 braille, block and half layouts draw one series only.
 
@@ -236,10 +237,10 @@ close` rows, `--xdate` for ISO 8601 dates.
 
 `Tessella.pie(labels, values)` draws the slices clockwise from the
 top on a disc twice as wide as tall, so it reads round in a terminal,
-each slice its own fill (`█ ▓ ▒ ╳ ╱ ╲ ∴ ·`, ASCII `# @ = + * : . o`)
+each slice its own fill (the bars' twelve, so at most 12 slices)
 and, under `color: true`, its own colour; the legend beside the disc
-gives the shares in whole percents summing to 100 (on one line under
-it when the slices outnumber the rows). `donut: true` hollows the
+gives the shares in whole percents summing to 100 (under it, wrapped
+to 40 columns, when the slices outnumber the rows). `donut: true` hollows the
 middle into a ring. `height:` (12 by default) sizes the disc;
 `width:`, the limits, `canvas:` and `xscale:` are refused. Values
 must be 0 or more, not all 0. On the command line `--kind pie` reads

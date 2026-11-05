@@ -4,34 +4,39 @@ module Tessella
     # A pie, or with donut: true a ring (DESIGN.md, "Chart and kinds"):
     # labels and values as slices clockwise from the top, drawn on
     # character cells twice as wide as tall, so the disc reads round in
-    # a terminal. Slices are told apart by fill -- █ ▓ ▒ ╳ ╱ ╲ ∴ ·, one
-    # width class, or # @ = + * : . o in ASCII -- and, under color:
-    # true, by colour; the legend right of the disc gives each slice's
-    # share, or under it when the slices outnumber the rows. height:
-    # (12 by default) sets the size, so width: is refused. Values must
-    # be 0 or more, and not all 0.
+    # a terminal. Slices are told apart by fill -- █ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆
+    # ·, one width class, or # = + @ * : . o % & ~ x in ASCII, so at
+    # most 12 slices -- and, under color: true, by colour. The legend
+    # right of the disc gives each slice's share, or under it, wrapped
+    # to 40 columns or the disc's width, when the slices outnumber the
+    # rows. height: (12 by default) sets the size, so width: is
+    # refused. Values must be 0 or more, and not all 0.
     class Pie < Chart
         OPTIONS = (Chart::OPTIONS - %i[width xlim ylim canvas xscale] +
                    %i[donut]).freeze
-        FILLS = %w[█ ▓ ▒ ╳ ╱ ╲ ∴ ·].freeze
-        ASCII_FILLS = %w[# @ = + * : . o].freeze
         HOLE = 0.5
+        LEGEND = 40
 
         def add(labels, values)
             @labels = Array(labels).map(&:to_s)
             @values = Check.finite!(Array(values), "value")
             Check.same_size!(@labels, @values, %w[labels values])
-            unless @values.all? { it >= 0 } && @values.sum.positive?
-                raise ArgumentError, "pie values must be 0 or more, not all 0"
-            end
+            values!
             self
         end
 
         private
 
+        def values!
+            unless @values.all? { it >= 0 } && @values.sum.positive?
+                raise ArgumentError, "pie values must be 0 or more, not all 0"
+            end
+            Legend.fills!(@values.size, "slices")
+        end
+
         def default_border = :none
         def height = @opts.fetch(:height, 12)
-        def fill(i) = (@ascii ? ASCII_FILLS : FILLS)[i % FILLS.size]
+        def fill(i) = (@ascii ? Legend::ASCII_FILLS : Legend::FILLS)[i]
         def slice_color(i) = Color::NAMES[i % Color::NAMES.size]
 
         # Where each slice ends, as a share of the turn.
@@ -75,11 +80,12 @@ module Tessella
                       **legend)
         end
 
-        # The legend beside the disc, centred, or on one line under it
+        # The legend beside the disc, centred, or under it, wrapped,
         # when there are more slices than rows.
         def legend
             rows = legend_entries
-            return { under: rows.join("  ") } if rows.size > height
+            return { under: Legend.wrap(rows, [height * 2, LEGEND].max) } if
+                rows.size > height
 
             first = (height - rows.size) / 2
             { right: rows.each_with_index.to_h { |text, i| [first + i, text] } }
