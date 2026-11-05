@@ -9,7 +9,8 @@ module Tessella
         COMMANDS = {
             "chart" => ChartCLI, "compose" => ComposeCLI, "tree" => TreeCLI,
             "table" => TableCLI, "bitfield" => BitfieldCLI, "wave" => WaveCLI,
-            "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI
+            "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI,
+            "glyphs" => GlyphsCLI
         }.freeze
 
         USAGE = <<~TEXT
@@ -28,6 +29,7 @@ module Tessella
               image     a picture as text: tones, blocks, braille, edges
               lint      check text figures: tabs, widths, invisible
                         glyphs, mixed or misaligned structure
+              glyphs    the named glyph sets and their width classes
 
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.

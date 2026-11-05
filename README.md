@@ -297,6 +297,29 @@ junctions) and ASCII `+-|` boxes; `borders:` adds custom sets (names,
 `Tessella.alphabet` measures a file before a figure goes into it: a
 file that is pure ASCII should get ASCII art.
 
+### Glyph sets
+
+```ruby
+Tessella::Width.class_of("▒")              # => :A
+Tessella::Glyphs.fetch(:meter, :arrow)     # => a GlyphSet: glyphs "▸▹"
+Tessella::Glyphs.fetch(:ramp, :blocks).mixed?  # => true (░ N, ▒▓█ A)
+```
+
+Every glyph has a width class, as the ascii-art skill's palette names
+them: N, narrow everywhere; A, East Asian Ambiguous (one column in
+Western terminals, two in CJK-configured ones); W, always two.
+`Tessella::Glyphs` names the sets the library draws with -- border
+styles, fill patterns, meter fill/track pairs, rule lines, tone ramps
+-- and computes each set's classes from Unicode 15.1, never by hand.
+A set spanning two classes is *mixed*: fine in Western terminals, but
+it changes length in CJK ones.
+
+```text
+tessella glyphs [KIND [NAME]]    # every set, a kind, or one set's glyphs
+tessella glyphs --check GLYPHS   # the classes of a set of one's own;
+                                 #   exit 1 when they are mixed
+```
+
 ### The command line from Ruby
 
 `require "tessella"` loads the library alone. The command classes

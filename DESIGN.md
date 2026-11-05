@@ -58,6 +58,8 @@ lib/tessella/version.rb    VERSION, the one place it is written
 lib/tessella/error.rb      Tessella::Error < StandardError
 lib/tessella/check.rb      the argument checks every kind shares
 lib/tessella/width.rb      display width: columns a terminal gives text
+lib/tessella/width_class.rb width classes N, A, W (Unicode 15.1)
+lib/tessella/glyphs.rb     the named glyph sets and their classes
 lib/tessella/borders.rb    border glyph sets: light heavy double rounded ascii
 lib/tessella/block.rb      Tessella::Block: a finished figure as lines
 lib/tessella/compose.rb    frame, beside, stack, indent, caption
@@ -240,6 +242,19 @@ Two departures, each an addition rather than a change:
 `--paranoid`, an older name for `--ascii`, was dropped. The display
 width tables are `Width`'s, so the lint and the figures it checks
 count the same columns.
+
+## Glyphs
+
+`Width.class_of` gives a glyph's width class -- `:N`, `:A` (East
+Asian Ambiguous) or `:W` -- from Unicode 15.1's EastAsianWidth.txt,
+the ambiguous ranges generated into `width_class.rb` beside Width's
+own tables. `Glyphs` (`glyphs.rb`) is the registry of named sets: the
+border styles (read from `Borders`), fill patterns, meter pairs, rule
+lines and ramps, from the ascii-art skill's palette and ui.md. Each
+set's classes are computed, so the skill's references can query them
+(`tessella glyphs`) instead of keeping a hand-typed copy, and a set
+that mixes classes says so. Drawing modules take their glyphs from
+here, so a new named set is one entry, not a constant per module.
 
 ## Stats and Axis
 
