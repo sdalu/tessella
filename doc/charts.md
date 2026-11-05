@@ -2,7 +2,7 @@
 
 A chart turns numbers into a framed figure: a plot area of character
 cells, the y extremes on its left, the x extremes under it, a title
-above and a legend on the right. There are ten kinds:
+above and a legend on the right. There are eleven kinds:
 
 | Kind        | Draws                                      | Input           |
 |-------------|--------------------------------------------|-----------------|
@@ -16,6 +16,7 @@ above and a legend on the right. There are ten kinds:
 | `stem`      | a stem-and-leaf plot, as text              | values          |
 | `heatmap`   | a matrix as a grid of shaded cells         | rows of values  |
 | `candlestick` | open, high, low, close per x, as candles | x, four prices  |
+| `pie`       | shares of a whole, as a disc or a ring     | labels, values  |
 
 Every example on this page is the command's output, byte for byte;
 the input files are in [examples/](../examples/), and every command
@@ -68,6 +69,7 @@ What each kind reads:
 | `stem`                                | one column; two for the back-to-back form                       |
 | `heatmap`                             | a label, then the row's values; a header names the columns      |
 | `candlestick`                         | x, open, high, low, close                                       |
+| `pie`                                 | label, value                                                    |
 
 ## The kinds
 
@@ -562,6 +564,79 @@ In Ruby:
 Tessella.candlestick(x, open:, high:, low:, close:, **opts)
 ```
 
+### pie
+
+A pie draws each value as a slice of a disc, clockwise from the top,
+with a legend giving each label's share in whole percents that add
+up to 100. It has no frame and no axes.
+
+```text
+$ tessella chart --kind pie langs.csv
+           ▒▒▒▒▒█████
+        ▒▒▒▒▒▒▒▒████████
+      ▒▒▒▒▒▒▒▒▒▒██████████
+     ▓▓▓▓▒▒▒▒▒▒▒███████████
+    ▓▓▓▓▓▓▓▓▒▒▒▒████████████ █ ruby 24 %
+    ▓▓▓▓▓▓▓▓▓▓▓▒████████████ ▓ c 61 %
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ ▒ rust 15 %
+    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+           ▓▓▓▓▓▓▓▓▓▓
+```
+
+`--donut` (`donut: true`) cuts out the middle:
+
+```text
+$ tessella chart --kind pie --donut langs.csv
+           ▒▒▒▒▒█████
+        ▒▒▒▒▒▒▒▒████████
+      ▒▒▒▒▒▒▒▒▒▒██████████
+     ▓▓▓▓▒▒▒▒      ████████
+    ▓▓▓▓▓▓▓          ███████ █ ruby 24 %
+    ▓▓▓▓▓▓            ██████ ▓ c 61 %
+    ▓▓▓▓▓▓            ▓▓▓▓▓▓ ▒ rust 15 %
+    ▓▓▓▓▓▓▓          ▓▓▓▓▓▓▓
+     ▓▓▓▓▓▓▓▓      ▓▓▓▓▓▓▓▓
+      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+           ▓▓▓▓▓▓▓▓▓▓
+```
+
+The slices are filled `█ ▓ ▒ ╳ ╱ ╲ ∴ ·` in turn (`# @ = + * : . o`
+under `--ascii`), and coloured under `--color`. `--height` sizes the
+disc, 12 rows by default; its width follows, a cell being about
+twice as tall as wide. With more slices than the disc has rows, the
+legend goes on one line under it.
+
+```text
+$ tessella chart --kind pie --ascii --height 8 langs.csv
+        ====####
+      ======######
+     @@@====#######  # ruby 24 %
+    @@@@@@@=######## @ c 61 %
+    @@@@@@@@@@@@@@@@ = rust 15 %
+     @@@@@@@@@@@@@@
+      @@@@@@@@@@@@
+        @@@@@@@@
+```
+
+A pie takes no `--width`, `--xlim`, `--ylim`, `--canvas` or
+`--xscale` (usage errors, exit 2), and reads exactly a label and a
+value a row:
+
+```text
+$ tessella chart --kind pie hosts.csv
+tessella chart: row 1 has 4 columns: pie reads label value
+```
+
+In Ruby:
+
+```ruby
+Tessella.pie(labels, values, donut: false, **opts)
+```
+
 ## Orientation
 
 `--orientation horizontal|vertical` (`orientation:`) is the direction
@@ -859,6 +934,7 @@ corner-and-tick frame bar charts use, or `:none`.
 | `--cell-width N`            | `cell_width: N`    | heatmap              |
 | `--colormap C,C,...`        | `colormap: [...]`  | heatmap              |
 | `--min A`, `--max B`        | `min:`, `max:`     | heatmap              |
+| `--donut`                   | `donut: true`      | pie                  |
 
 The bar defaults are `fill: "█"`, `eighths: true`, `track: "·"`;
 under `ascii: true`, `#`, no eighths, and `.`.

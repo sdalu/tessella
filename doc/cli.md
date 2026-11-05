@@ -12,7 +12,7 @@ figure on stdout. Each has its own `--help`.
 
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|
-| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem, heatmap, candlestick | [charts](charts.md) |
+| `chart`    | line, scatter, stairs, density, bar, histogram, box, stem, heatmap, candlestick, pie | [charts](charts.md) |
 | `compose`  | frame, beside, stack, grid, indent, caption, shadow, fill | [composition](composition.md)  |
 | `tree`     | an indented outline as a tree              | [tree](tree.md)                |
 | `table`    | CSV or TSV rows as a table                 | [table](table.md)              |
@@ -49,8 +49,8 @@ tessella table: cannot read missing.csv: No such file or directory
 ```
 
 ```text
-$ tessella chart --kind pie langs.csv
-tessella chart: invalid argument: --kind pie
+$ tessella chart --kind radar langs.csv
+tessella chart: invalid argument: --kind radar
 Usage: tessella chart [options] [file]
 ```
 
@@ -87,12 +87,13 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
                [--cell-width N] [--colormap C,C,...] [--min A] [--max B]
+               [--donut]
                [file]
 ```
 
 | Option                 | Takes                                  | Default         |
 |------------------------|----------------------------------------|-----------------|
-| `--kind K`             | `line scatter stairs density bar histogram box stem heatmap candlestick` | `line` |
+| `--kind K`             | `line scatter stairs density bar histogram box stem heatmap candlestick pie` | `line` |
 | `--width N`            | plot area width, cells                 | 40              |
 | `--height N`           | plot area height, cells                | 15              |
 | `--title S`            | a title above the frame                |                 |
@@ -114,6 +115,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--cell-width N`       | heatmap: columns a cell                | 2               |
 | `--colormap C,...`     | heatmap, with --color: colour stops    | viridis-like    |
 | `--min A`, `--max B`   | heatmap: fix the range                 | the data's      |
+| `--donut`              | pie: a ring, not a disc                | off             |
 | `--stacked`            | bar: series end to end, not grouped    | grouped         |
 | `--blocks B`           | bar, histogram: `eighths half block quadrant braille` | `eighths` |
 | `--area`               | line, stairs: fill under each series   | off             |
