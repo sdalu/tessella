@@ -143,12 +143,49 @@ groups:
 |--------------------|-------------------------------------------------------|
 | `▸ ◂ ▴ ▾`          | text glyphs most monospace fonts carry: they line up  |
 | `→ ← ↑ ↓`          | text glyphs most monospace fonts carry: they line up  |
+| `► ◄`              | not emoji-capable, bolder; some fonts lack them       |
 | `▶ ◀ ↔ ↕ ↗ ↘ ↙ ↖`  | emoji-capable: may become a wide colour emoji         |
 
-So on the web, end a drawn line with a small head, `────▸`, and keep
-`→ ← ↑ ↓` for arrows standing alone. tessella's own figures do: a
-sequence diagram's arrows end in `▸` and `◂`, and an asynchronous
-message in `→`.
+So on the web, end a drawn line with a small head, `────▸`, or a
+bolder `────►`, and keep `→ ← ↑ ↓` for arrows standing alone. `► ◄`
+never turn into emoji, but a font without them still draws them at a
+fallback width: they trade a little of `▸`'s safety for a head that
+reads at a glance.
+
+A sequence diagram drawn for the web takes the bolder heads: `►` and
+`◄` end calls and replies, and a double `►►` marks an asynchronous
+message, where the terminal draws `▸`, `◂` and `→`:
+
+```text
+$ tessella --target web seq login.txt
+┌─────────┐    ┌─────────┐        ┌─────┐
+│ Browser │    │ Server  │        │ DB  │
+└────┬────┘    └────┬────┘        └──┬──┘
+     │              │                │
+     │ POST /login  │                │
+     │─────────────►│                │
+     │              │                │
+     │              │  SELECT user   │
+     │              │───────────────►│
+     │              │                │
+     │              │      row       │
+     │              │◄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
+     │              │                │
+     │              │──┐             │
+     │              │  │ check hash  │
+     │              │◄─┘             │
+     │              │                │
+     │              ┌────────────────┐
+     │              │bcrypt, cost 12 │
+     │              └────────────────┘
+     │              │                │
+     │              │  log attempt   │
+     │              │──────────────►►│
+     │              │                │
+     │ 200 + cookie │                │
+     │◄┄┄┄┄┄┄┄┄┄┄┄┄┄│                │
+     │              │                │
+```
 
 When a figure does carry an emoji-capable glyph, `--target web` puts
 U+FE0E, the text-presentation selector, right after it. The selector

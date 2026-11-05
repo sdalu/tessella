@@ -75,6 +75,12 @@ $ tessella seq login.txt
      │              │                │
 ```
 
+## On the web
+
+Under `--target web` the arrow heads are bolder: `►` and `◄` for calls
+and replies, `►►` for an asynchronous message. See
+[width targets](targets.md#web) for why, and what it costs.
+
 ## Options
 
 `--numbered` numbers the messages; `--footer` repeats the participant
