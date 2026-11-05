@@ -711,7 +711,12 @@ or `none` for the series' colour); `--scale N` (stem only); `--fill G`,
 that does not take it is a usage error (exit 2) naming both; a bad
 value for one a kind does take surfaces as the chart's own
 `ArgumentError`, also exit 2. Bad input (a non-number where a number
-is due, a missing field) exits 1, naming the row and the field.
+is due, a missing field) exits 1, naming the row and the field; so
+does a value the chart cannot draw (one past Float's range, a negative
+pie slice, a candle whose low and high do not hold it, an x of 0 or
+below under a log `--xscale`), raised as `Tessella::ValueError`, an
+`ArgumentError`. Input that is not valid UTF-8 is bad input in every
+command, naming its line.
 
 ### Colour
 

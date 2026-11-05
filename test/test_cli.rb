@@ -225,9 +225,10 @@ class TestCLIFields < Minitest::Test
         assert_includes(out, "New York ┤")
     end
 
-    def test_a_log_xscale_over_a_zero_x_is_a_usage_error
+    # The x of 0 is in the data: bad input, not a usage mistake.
+    def test_a_log_xscale_over_a_zero_x_is_bad_input
         status, _, err = run_cli(["--xscale", "log10"], "0 1\n1 2\n10 3\n")
-        assert_equal(2, status)
+        assert_equal(1, status)
         assert_includes(err, "finite")
     end
 

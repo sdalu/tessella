@@ -24,7 +24,7 @@ module Tessella
             i = values.index { !finite_number?(it) }
             return values unless i
 
-            raise ArgumentError,
+            raise ValueError,
                   "#{name} must be a finite number: #{values[i].inspect}"
         end
 

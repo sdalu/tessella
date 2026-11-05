@@ -28,6 +28,7 @@ module Tessella
         def self.draw(argv, stdin)
             opts, words = parse(argv.dup)
             source = words.empty? ? stdin.read : words.join(" ")
+            CLI.utf8!(source, DataError)
             Tessella.sparkline(numbers(source), **opts).to_s
         end
 
@@ -41,8 +42,11 @@ module Tessella
             raise DataError, "no value" if fields.empty?
 
             fields.map do |f|
-                Float(f, exception: false) or
-                    raise DataError, "not a number: #{f.inspect}"
+                value = Float(f, exception: false)
+                raise DataError, "not a number: #{f.inspect}" unless
+                    value&.finite?
+
+                value
             end
         end
 

@@ -240,7 +240,8 @@ module Tessella
         end
 
         def self.read(path, stdin)
-            path == "-" ? stdin.read : File.read(path)
+            CLI.utf8!(path == "-" ? stdin.read : File.read(path),
+                      ComposeCLI::DataError, "#{path}:")
         rescue SystemCallError => e
             raise ComposeCLI::DataError, CLI.cannot_read(path, e)
         end

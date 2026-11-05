@@ -29,10 +29,17 @@ module Tessella
 
             private
 
+            # Fences are found on a scrubbed copy (a pattern cannot read
+            # an invalid byte), each section keeping its raw lines, so
+            # the bad byte is a finding there, not an abort.
             def sections(lines)
-                return Fences.sections(lines) if @opts[:fences]
+                whole = Section.new(lines: lines, first: 1, exempt: false)
+                return [whole] unless @opts[:fences]
 
-                [Section.new(lines: lines, first: 1, exempt: false)]
+                scrubbed = lines.map { it.valid_encoding? ? it : it.scrub("?") }
+                Fences.sections(scrubbed).map do |sec|
+                    sec.with(lines: lines[sec.first - 1, sec.lines.size])
+                end
             end
 
             def check(sec)

@@ -69,8 +69,8 @@ module Tessella
             end
             return unless bad
 
-            raise ArgumentError, "candle #{bad + 1}: low and high must hold " \
-                                 "open and close"
+            raise ValueError, "candle #{bad + 1}: low and high must hold " \
+                              "open and close"
         end
 
         def same_length!(values)

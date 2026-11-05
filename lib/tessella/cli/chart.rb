@@ -35,10 +35,10 @@ module Tessella
             draw(argv, stdin, stdout)
         rescue Halt => e
             halt(e, stdout, stderr)
+        rescue DataError, Tessella::ValueError => e
+            data_error(e, stderr)
         rescue OptionParser::ParseError, UsageError, ArgumentError => e
             usage_error(e, stderr)
-        rescue DataError => e
-            data_error(e, stderr)
         end
 
         def self.draw(argv, stdin, stdout)
@@ -425,7 +425,7 @@ module Tessella
             end
 
             def self.text(path, stdin)
-                path ? File.read(path) : stdin.read
+                CLI.utf8!(path ? File.read(path) : stdin.read, DataError)
             rescue SystemCallError => e
                 raise DataError, CLI.cannot_read(path, e)
             end

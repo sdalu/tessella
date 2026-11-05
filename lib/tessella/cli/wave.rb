@@ -139,7 +139,8 @@ module Tessella
     class WaveCLI
         module Reader
             def self.text(path, stdin)
-                path ? File.read(path) : stdin.read
+                CLI.utf8!(path ? File.read(path) : stdin.read,
+                          WaveCLI::DataError)
             rescue SystemCallError => e
                 raise WaveCLI::DataError, CLI.cannot_read(path, e)
             end

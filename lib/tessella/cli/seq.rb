@@ -126,7 +126,8 @@ module Tessella
     class SeqCLI
         module Reader
             def self.text(path, stdin)
-                path ? File.read(path) : stdin.read
+                CLI.utf8!(path ? File.read(path) : stdin.read,
+                          SeqCLI::DataError)
             rescue SystemCallError => e
                 raise SeqCLI::DataError, CLI.cannot_read(path, e)
             end

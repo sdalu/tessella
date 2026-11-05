@@ -49,7 +49,7 @@ module Tessella
         end
 
         def self.read(path, stdin)
-            path ? File.read(path) : stdin.read
+            CLI.utf8!(path ? File.read(path) : stdin.read, ArgumentError)
         rescue SystemCallError => e
             raise ArgumentError, CLI.cannot_read(path, e)
         end

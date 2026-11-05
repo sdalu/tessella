@@ -120,7 +120,14 @@ module Tessella
                 Image::RAMPS.fetch(@opts[:style], Image::RAMPS[:ramp])
             end
 
+            # Glyphs of one's own: a String. A Symbol is a ramp's name,
+            # and one the registry lacks is refused, not drawn with.
             def check_custom_ramp!(ramp)
+                unless ramp.is_a?(String)
+                    names = Tessella::Glyphs::RAMPS.keys.join(", ")
+                    raise ArgumentError, "unknown ramp: #{ramp.inspect} " \
+                                         "(#{names}, or glyphs)"
+                end
                 raise ArgumentError, "ramp must not be empty" if ramp.empty?
 
                 ramp

@@ -122,7 +122,8 @@ module Tessella
     # The script's own input: one file argument, or stdin.
     module BitfieldReader
         def self.read(path, stdin)
-            path ? File.read(path) : stdin.read
+            CLI.utf8!(path ? File.read(path) : stdin.read,
+                      BitfieldCLI::DataError)
         rescue SystemCallError => e
             raise BitfieldCLI::DataError, CLI.cannot_read(path, e)
         end

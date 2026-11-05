@@ -54,12 +54,24 @@ module Tessella
 
         def self.samples(magic, maxval, raster)
             ints = if %w[P2 P3].include?(magic)
-                       raster.split.map(&:to_i)
+                       plain_samples(raster)
                    else
                        raster.unpack(maxval < 256 ? "C*" : "n*")
                    end
             check_samples(ints, maxval)
             ints.map { it.fdiv(maxval) }
+        end
+
+        # A plain (P2/P3) raster's samples: decimal digits only, so a
+        # "-128" or an "x" is refused rather than read as a number.
+        def self.plain_samples(raster)
+            raster.split.map do |token|
+                unless token.match?(/\A\d+\z/)
+                    raise ArgumentError, "PNM sample is not a number: " \
+                                         "#{token.inspect}"
+                end
+                token.to_i
+            end
         end
 
         def self.check_maxval(maxval)

@@ -9,6 +9,7 @@ module Tessella
     # unknown style, --ascii).
     class TextCLI
         class UsageError < StandardError; end
+        class DataError < StandardError; end
         # Raised by --help, carrying its text.
         class Help < StandardError; end
 
@@ -17,14 +18,20 @@ module Tessella
 
         def self.run(argv, stdin:, stdout:, stderr:)
             opts, words = parse(argv.dup)
-            text = words.empty? ? stdin.read : "#{words.join(" ")}\n"
-            convert(text, opts, stdout, stderr)
+            convert(input(words, stdin), opts, stdout, stderr)
         rescue Help => e
             stdout.print(e.message)
             0
-        rescue OptionParser::ParseError, UsageError, ArgumentError => e
+        rescue DataError, OptionParser::ParseError, UsageError,
+               ArgumentError => e
             stderr.puts("tessella text: #{e.message}")
-            2
+            e.is_a?(DataError) ? 1 : 2
+        end
+
+        # The words given, or stdin; UTF-8 either way.
+        def self.input(words, stdin)
+            text = words.empty? ? stdin.read : "#{words.join(" ")}\n"
+            CLI.utf8!(text, DataError)
         end
 
         def self.convert(text, opts, stdout, stderr)

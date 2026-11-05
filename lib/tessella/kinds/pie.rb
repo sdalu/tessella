@@ -32,7 +32,7 @@ module Tessella
 
         def values!
             unless @values.all? { it >= 0 } && @values.sum.positive?
-                raise ArgumentError, "pie values must be 0 or more, not all 0"
+                raise ValueError, "pie values must be 0 or more, not all 0"
             end
             Legend.fills!(@values.size, "slices")
         end

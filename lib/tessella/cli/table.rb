@@ -147,7 +147,8 @@ module Tessella
         end
 
         def self.read(path, stdin)
-            path && path != "-" ? File.read(path) : stdin.read
+            CLI.utf8!(path && path != "-" ? File.read(path) : stdin.read,
+                      DataError)
         rescue SystemCallError => e
             raise DataError, CLI.cannot_read(path, e)
         end
