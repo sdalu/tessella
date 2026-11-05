@@ -10,7 +10,7 @@ module Tessella
             "chart" => ChartCLI, "compose" => ComposeCLI, "tree" => TreeCLI,
             "table" => TableCLI, "bitfield" => BitfieldCLI, "wave" => WaveCLI,
             "seq" => SeqCLI, "image" => ImageCLI, "lint" => LintCLI,
-            "glyphs" => GlyphsCLI
+            "glyphs" => GlyphsCLI, "meter" => MeterCLI
         }.freeze
 
         USAGE = <<~TEXT
@@ -30,6 +30,7 @@ module Tessella
               lint      check text figures: tabs, widths, invisible
                         glyphs, mixed or misaligned structure
               glyphs    the named glyph sets and their width classes
+              meter     a one-line progress bar or gauge
 
             tessella COMMAND --help shows a command's options;
             tessella --version prints the version.

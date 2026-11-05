@@ -186,8 +186,9 @@ from the registry (`light`, `medium`, `dark`, `solid`, `hatch`,
 `backhatch`, `cross`, `grid`, `stipple`, `sparse`, `dotted`, `dots`,
 `colons`, `hash`, `at`) or glyphs of one's own, tiled diagonally, all
 of one width class (`colons` by default under `ascii: true`).
-`frame(fig, fill:)` frames and fills in one call. Each takes `ascii: true`, which draws
-ASCII glyphs and refuses non-ASCII content, and returns a `Block`
+`frame(fig, fill:)` frames and fills in one call. Each takes `ascii:
+true`, which draws ASCII glyphs and refuses non-ASCII content, and
+returns a `Block`
 (`lines`, `width`, `height`, `to_s`).
 
 ### Diagrams
@@ -306,6 +307,26 @@ junctions) and ASCII `+-|` boxes; `borders:` adds custom sets (names,
 `Borders::Set`s or six-glyph Strings, as `style:` takes them).
 `Tessella.alphabet` measures a file before a figure goes into it: a
 file that is pure ASCII should get ASCII art.
+
+### Meters
+
+```ruby
+Tessella.meter(0.5)                     # [██████████··········] 50 %
+Tessella.meter("73%", style: :star, title: "cpu", width: 8)
+                                        # cpu [★★★★★★☆☆] 73 %
+```
+
+A one-line progress bar or gauge, as the ascii-art skill's ui.md
+writes one. `fraction` is 0..1 or a percentage String; `style:` a
+meter pair from the registry (`arrow ▸▹`, `chevron`, `classic =`,
+`rectangle ▮▯`, `wave ~_`, `blade ▰▱`, `button ⦿⦾`, `block █·`, the
+default, which fills its last cell by eighths, `box ■□`, `circle ●○`,
+`star ★☆`) or a fill and a track glyph of one's own, refused when the
+two differ in width class (the bar would change length as it fills
+in a CJK terminal). `width:` (20), `title:`, `label: false` (no
+percentage), `brackets: false`; `ascii: true` draws `[=====     ]`.
+On the command line: `tessella meter [--style S] [--width N] [--title
+T] [--no-label] [--no-brackets] [--ascii] FRACTION`.
 
 ### Glyph sets
 
@@ -459,7 +480,7 @@ tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
 tessella compose indent  --prefix STR BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
-tessella compose fill    [--pattern P] BLOCK     (frame also takes --fill P)
+tessella compose fill    [--pattern P] BLOCK  (frame takes --fill P)
 ```
 
 Each BLOCK is a file, or `-` for stdin (once). `--style` takes a

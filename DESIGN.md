@@ -60,6 +60,7 @@ lib/tessella/check.rb      the argument checks every kind shares
 lib/tessella/width.rb      display width: columns a terminal gives text
 lib/tessella/width_class.rb width classes N, A, W (Unicode 15.1)
 lib/tessella/glyphs.rb     the named glyph sets and their classes
+lib/tessella/meter.rb      a one-line meter (progress bar, gauge)
 lib/tessella/borders.rb    border glyph sets: light heavy double rounded ascii
 lib/tessella/block.rb      Tessella::Block: a finished figure as lines
 lib/tessella/compose.rb    frame, beside, stack, indent, caption
@@ -258,6 +259,16 @@ set's classes are computed, so the skill's references can query them
 (`tessella glyphs`) instead of keeping a hand-typed copy, and a set
 that mixes classes says so. Drawing modules take their glyphs from
 here, so a new named set is one entry, not a constant per module.
+
+## Meters and rules
+
+`Tessella.meter` (`meter.rb`) draws one line: an optional title, the
+bar in brackets, the percentage. Its fill/track pairs are the
+registry's meter sets, so a style is one entry in `Glyphs::METERS`;
+a pair of one's own is refused when its two glyphs differ in width
+class, because such a bar changes length as it fills in a CJK
+terminal and the label after it drifts. It doubles as the gauge
+other libraries have: a gauge is a meter with a title.
 
 ## Stats and Axis
 
