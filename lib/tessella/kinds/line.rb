@@ -7,7 +7,9 @@ module Tessella
     # instead, from the canvas floor up, btop-style; under color: true
     # its cells take gradient:'s colours by height, bottom band first.
     class Line < Chart
-        OPTIONS = (Chart::OPTIONS + %i[area gradient]).freeze
+        include Sideways
+
+        OPTIONS = (Chart::OPTIONS + %i[area gradient orientation]).freeze
         GRADIENT = %i[green yellow red].freeze
 
         def initialize(**opts)
@@ -17,19 +19,16 @@ module Tessella
 
         private
 
-        # An area is measured from zero: the y range takes in 0 unless
-        # ylim: says otherwise.
-        def ylim
-            return super unless @opts[:area]
-
-            Axis.limits([0, *@series.flat_map(&:y)], @opts[:ylim])
-        end
+        # An area is measured from zero: the value axis takes in 0
+        # unless its limits are given.
+        def zero_floor? = @opts[:area]
 
         def draw_series(canvas, series)
             return canvas.lines(series.x, series.y, color: series.color) unless
                 @opts[:area]
 
-            canvas.area(series.x, series.y, color: area_color(series))
+            canvas.area(series.x, series.y, color: area_color(series),
+                                            across: @sideways)
         end
 
         # The gradient as a cell row -> colour map (row 0 the top), or
@@ -37,6 +36,9 @@ module Tessella
         def area_color(series)
             stops = @opts.fetch(:gradient, GRADIENT)
             return series.color unless stops
+
+            return ->(col) { Color::Gradient.at(stops, col, width) } if
+                @sideways
 
             rows = height
             ->(row) { Color::Gradient.at(stops, rows - 1 - row, rows) }
@@ -55,6 +57,10 @@ module Tessella
     # Unconnected points (DESIGN.md): the same axis lines as Line, with
     # no path drawn between points.
     class Scatter < Chart
+        include Sideways
+
+        OPTIONS = (Chart::OPTIONS + %i[orientation]).freeze
+
         private
 
         def draw_series(canvas, series)

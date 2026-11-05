@@ -135,6 +135,14 @@ $ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
        ruby   c  rust  go
 ```
 
+Line, scatter, stairs and density take `orientation:` as well, the
+direction their value axis runs: `:vertical` (the default) puts the
+values up the vertical axis; `:horizontal` swaps the axes, values
+along the horizontal one and x running up, so a horizontal chart of
+`(x, y)` is the vertical chart of `(y, x)`. `xlim:`, `ylim:`,
+`xlabel:` and `ylabel:` keep their meaning and follow their axis; an
+`area:` fills from the left edge, its gradient running left to right.
+
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
 each box stands three columns wide, whiskers running up and down
 (`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
@@ -373,7 +381,10 @@ line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 `--ascii`, `--color`, `--xscale ln|log2|log10`.
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
-`--style post|pre` (stairs only); `--area` and `--gradient C,C,...`
+`--style post|pre` (stairs only); `--orientation horizontal|vertical`
+(every kind but stem: the direction the value axis runs, bars and
+boxes horizontal by default, the plotted kinds vertical); `--area`
+and `--gradient C,C,...`
 (line and stairs only; each `C` a name, an index `0..255` or `#rrggbb`,
 or `none` for the series' colour); `--scale N` (stem only); `--fill G`,
 `--no-eighths` and `--track G|none` (bar and histogram only, as above).

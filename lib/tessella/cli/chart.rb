@@ -264,8 +264,10 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                line: %i[area gradient],
-                stairs: %i[style area gradient],
+                line: %i[area gradient orientation],
+                scatter: %i[orientation],
+                density: %i[orientation],
+                stairs: %i[style area gradient orientation],
                 bar: %i[fill eighths track orientation blocks],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],

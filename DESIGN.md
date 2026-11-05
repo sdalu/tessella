@@ -282,9 +282,12 @@ canvas.point(x, y, color: nil)           # data coordinates; outside
 canvas.line(x0, y0, x1, y1, color: nil)  #   the limits: clipped
 canvas.points(xs, ys, color: nil)
 canvas.lines(xs, ys, color: nil)         # joins consecutive points
-canvas.area(xs, ys, color: nil)  # fills each pixel column the path
-    # spans from the floor to the curve (canvas/area.rb); color: a
-    # colour, or a callable cell row (0 the top) -> colour
+canvas.area(xs, ys, color: nil, across: false)  # fills each pixel
+    # column the path spans from the floor to the curve (canvas/area.rb),
+    # or with across: each pixel row from the left edge; color: a
+    # colour, or a callable cell row (0 the top) / column -> colour
+canvas.row_bar(py, length, color: nil)   # pixel-level bars, for the
+canvas.column_bar(px, height, color: nil) #   bar layouts
 canvas.rows                              # => Array (top row first) of
     # Array of Tessella::Cell (Data: char, color); char " " is blank
 canvas.annotate(col, row, text, color: nil)  # writes text into cells
@@ -336,6 +339,10 @@ Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
 Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
                                             #   stairs: filled, btop-style
+    # orientation: the direction the value axis runs, every kind but
+    #   stem: plotted kinds :vertical by default, :horizontal swaps the
+    #   axes (kinds/sideways.rb, each series stored swapped); bar,
+    #   histogram, box :horizontal by default, :vertical for columns
 Tessella.bar(labels, values, **opts)
 Tessella.histogram(values, bins: nil, closed: :left, **opts)
     # bar, histogram: orientation: :horizontal | :vertical (columns),

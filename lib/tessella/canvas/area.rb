@@ -12,7 +12,12 @@ module Tessella
         module Area
             # color: one colour name for every cell, or a callable
             # taking a cell row (0 at the top) and returning one.
-            def area(xs, ys, color: nil)
+            # across: true fills each pixel row instead, from the left
+            # edge out to the curve (x the value, y the position), the
+            # callable then taking a cell column.
+            def area(xs, ys, color: nil, across: false)
+                return area_across(xs, ys, color) if across
+
                 (0...pixel_width).each do |px|
                     value = column_value(xs, ys, px)
                     fill_column(px, column_top(value), color) if value
@@ -35,6 +40,39 @@ module Tessella
             end
 
             private
+
+            def area_across(xs, ys, color)
+                (0...pixel_height).each do |py|
+                    value = row_value(xs, ys, py)
+                    next unless value
+
+                    share = (value - @xlo).fdiv(@xhi - @xlo).clamp(0.0, 1.0)
+                    (share * pixel_width).round.times do |px|
+                        set_sub_pixel(px, py, shade_across(color, px))
+                    end
+                end
+            end
+
+            # The value at a pixel row: the curve at its centre (x as a
+            # function of y), or the highest x of a point inside it.
+            def row_value(xs, ys, py)
+                lo, hi = row_span(py)
+                inside = ys.each_index.select { ys[it] > lo && ys[it] <= hi }
+                [*inside.map { xs[it] }, curve_at(ys, xs, (lo + hi) / 2.0)]
+                    .compact.max
+            end
+
+            def row_span(py)
+                step = (@yhi - @ylo).fdiv(pixel_height)
+                hi = @yhi - (py * step)
+                [hi - step, hi]
+            end
+
+            def shade_across(color, px)
+                return color unless color.respond_to?(:call)
+
+                color.call(px / x_pixel_per_char)
+            end
 
             def column_value(xs, ys, px)
                 lo, hi = column_span(px)
