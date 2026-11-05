@@ -12,7 +12,10 @@ Gem::Specification.new do |s|
     s.authors = ["Stephane D'Alu"]
     s.license = "MIT"
     s.required_ruby_version = ">= 3.4"
-    s.files = Dir["lib/**/*.rb", "exe/*", "LICENSE", "README.md"]
+    # doc/ and examples/ ship too: doc/library.md is the API reference
+    # a caller (or a skill driving the library) is pointed at.
+    s.files = Dir["lib/**/*.rb", "exe/*", "LICENSE", "README.md",
+                  "doc/**/*", "examples/**/*"]
     s.bindir = "exe"
     s.executables = ["tessella"]
     s.metadata["rubygems_mfa_required"] = "true"
