@@ -328,6 +328,13 @@ percentage), `brackets: false`; `ascii: true` draws `[=====     ]`.
 On the command line: `tessella meter [--style S] [--width N] [--title
 T] [--no-label] [--no-brackets] [--ascii] FRACTION`.
 
+`Tessella.rule(width: 78, ornament: nil, style: :light)` is a
+divider: a line in a rule style (`light ─`, `heavy ━`, `double ═`,
+`dashed ┄`, `ascii -`), an ornament centred in it by display width:
+`Tessella.rule(width: 24, ornament: "✦")` is `────────── ✦
+───────────`. On the command line: `tessella rule [--width N]
+[--ornament T] [--style S] [--ascii]`.
+
 ### Glyph sets
 
 ```ruby

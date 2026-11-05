@@ -269,6 +269,8 @@ a pair of one's own is refused when its two glyphs differ in width
 class, because such a bar changes length as it fills in a CJK
 terminal and the label after it drifts. It doubles as the gauge
 other libraries have: a gauge is a meter with a title.
+`Tessella.rule` (`rule.rb`) is a divider in a registry rule style,
+an ornament centred by display width.
 
 ## Stats and Axis
 
