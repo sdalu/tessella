@@ -52,10 +52,21 @@ module Tessella
             (1..series_count).map(&:to_s)
         end
 
-        def legend
-            series_names.each_with_index.to_h do |name, i|
-                [i, "#{series_fill(i)} #{name}"]
+        def legend_entries
+            series_names.each_with_index.map do |name, i|
+                "#{series_fill(i)} #{name}"
             end
+        end
+
+        # The legend beside the frame, an entry a row, or on one line
+        # under it when there are more series than rows.
+        def legend_options(rows)
+            entries = legend_entries
+            if entries.size <= rows
+                return { right: entries.each_with_index.to_h { |e, i| [i, e] } }
+            end
+
+            { under: entries.join("  ") }
         end
 
         def multi_values!

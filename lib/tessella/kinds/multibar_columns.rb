@@ -10,10 +10,21 @@ module Tessella
         def multi_column_options
             body, slot, top = multi_columns
             { body: body, border: :box, ascii: @ascii, color: @color_on,
-              title: @opts[:title], xlabel: @opts[:xlabel],
+              title: @opts[:title],
               ylabel: @opts[:ylabel] || column_value_label,
               left: { (body.size - 1) => "0", 0 => Axis.label(top) },
-              right: legend, **group_names(slot) }
+              **column_captions(body.size, slot) }
+        end
+
+        # The names under the columns and the legend: beside the frame,
+        # or, when it has more entries than rows and the names already
+        # hold the line under it, on the x label's line.
+        def column_captions(rows, slot)
+            names = group_names(slot)
+            legend = legend_options(rows)
+            xlabel = @opts[:xlabel]
+            xlabel ||= legend.delete(:under) if legend[:under] && names[:under]
+            { xlabel: xlabel, **legend, **names }
         end
 
         def multi_columns

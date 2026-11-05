@@ -152,7 +152,8 @@ value a series, and name the series with `series:`. They are grouped
 with `stacked: true`, end to end in one bar labelled with its total;
 both work upright too (`orientation: :vertical`). Series are told
 apart by fill (`█ ▓ ▒`, `# = +` in ASCII) and, under `color: true`,
-by colour; the legend sits right of the frame. Eighths end only the
+by colour; the legend sits right of the frame, or on one line under
+it when there are more series than rows. Eighths end only the
 `█` series, since they are solid. Values must be 0 or more, and the
 braille, block and half layouts draw one series only.
 
@@ -160,9 +161,10 @@ braille, block and half layouts draw one series only.
 $ printf 'q cpu io net\nq1 3 5 2\nq2 4 2 6\n' |
   tessella chart --kind bar --stacked --width 24
       ┌                        ┐
-   q1 ┤█████▓▓▓▓▓▓▓▓▒▒▒▒··· 10  █ cpu
-   q2 ┤███████▓▓▓▒▒▒▒▒▒▒▒▒▒ 12  ▓ io
+   q1 ┤█████▓▓▓▓▓▓▓▓▒▒▒▒··· 10
+   q2 ┤███████▓▓▓▒▒▒▒▒▒▒▒▒▒ 12
       └                        ┘
+       █ cpu  ▓ io  ▒ net
 ```
 
 On the command line, a bar row with more than two columns is a label

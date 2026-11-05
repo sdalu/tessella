@@ -33,6 +33,15 @@ class TestMultiBar < Minitest::Test
         assert_match(/^\s+8 │/, stacked)
     end
 
+    # More series than rows: the legend goes on one line under the
+    # frame, never cut short.
+    def test_a_legend_with_more_series_than_rows_stays_whole
+        out = Tessella.bar(%w[q1 q2], [[3, 5, 2], [4, 2, 6]],
+                           series: %w[cpu io net], stacked: true,
+                           width: 24).to_s
+        assert_includes(out, "█ cpu  ▓ io  ▒ net")
+    end
+
     def test_eighths_end_only_a_solid_series
         out = Tessella.bar(%w[a], [[7, 7]], width: 16).to_s
         refute_match(/▓[▏▎▍▌▋▊▉]/, out)

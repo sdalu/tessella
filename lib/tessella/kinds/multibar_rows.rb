@@ -12,7 +12,7 @@ module Tessella
             rows, left = multi_rows(area, ew)
             { body: rows, border: @border, ascii: @ascii, color: @color_on,
               title: @opts[:title], xlabel: xlabel, ylabel: @opts[:ylabel],
-              left: left, right: legend }
+              left: left, **legend_options(rows.size) }
         end
 
         def multi_rows(area, ew)
