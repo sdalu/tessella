@@ -29,6 +29,18 @@ class TestHelp < Minitest::Test
         end
     end
 
+    # The chart's help names every kind and describes every option,
+    # so a later option cannot land without a description.
+    def test_chart_lists_its_kinds_and_describes_every_option
+        status, out = help(%w[chart --help])
+        assert_equal(0, status)
+        Tessella::ChartCLI::Options::KINDS.each do |kind|
+            assert_match(/^  .*\b#{kind}\b/, out, kind)
+        end
+        assert(described?(out), out)
+        assert(out.lines.all? { it.chomp.length <= 80 }, out)
+    end
+
     def test_image_describes_every_option
         status, out = help(%w[image --help])
         assert_equal(0, status)

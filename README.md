@@ -226,8 +226,9 @@ candles over `width:`, each as wide as its share allows with a blank
 column between (a column each, no gap, when they do not fit): the
 wick `│` from low to high in the candle's middle column, the body
 from open to close across the candle, `█` for an up candle (close at
-or above open), `▒` for a down one, `─` when they share a row; under `color: true` up is green and down
-red. The value axis is on the left, the first and last x under the
+or above open), `▒` for a down one, `─` when they share a row; under
+`color: true` up is green and down red. The value axis is on the
+left, the first and last x under the
 frame -- dates when x holds times, formatted as a date axis's
 (`xdate:`). A low above open or close, or a high below, is refused.
 On the command line `--kind candlestick` reads `x open high low

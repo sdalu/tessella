@@ -146,8 +146,9 @@ module Tessella
             def initialize
                 @opts = { kind: :line }
                 @parser = OptionParser.new
-                @parser.banner = ChartCLI::BANNER
+                @parser.banner = Help::BANNER
                 build
+                Help.describe!(@parser)
             end
 
             def parse(argv)
