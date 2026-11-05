@@ -82,6 +82,8 @@ module Tessella
         DEFAULT_WIDTH = 40
         DEFAULT_HEIGHT = 15
 
+        # Canvases a chart reaches only through another's name.
+        WIDE = %i[half_wide eighths_wide].freeze
         OPTIONS = %i[title xlabel ylabel width height xlim ylim canvas
                      ascii color border xscale].freeze
 
@@ -136,10 +138,25 @@ module Tessella
 
         def canvas_type
             type = @opts[:canvas] || default_canvas_type
-            return type if Canvas.types.key?(type)
+            return eighths_type if type == :eighths
+            return type if Canvas.types.key?(type) && !WIDE.include?(type)
 
             raise ArgumentError, "unknown canvas: #{type.inspect}"
         end
+
+        # The eighths canvas only fills (Canvas::Eighths): an area, up
+        # its columns or, sideways, along its rows -- not a threshold's
+        # dashes, which would read as bars.
+        def eighths_type
+            raise ArgumentError, "canvas: :eighths needs area: true" unless
+                fills?
+            raise ArgumentError, "canvas: :eighths takes no threshold:" if
+                @opts[:threshold]
+
+            @sideways ? :eighths_wide : :eighths
+        end
+
+        def fills? = false
 
         def width  = @opts.fetch(:width, DEFAULT_WIDTH)
         def height = @opts.fetch(:height, DEFAULT_HEIGHT)

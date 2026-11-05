@@ -110,7 +110,11 @@ series' colour); without colour they are plain glyphs. A colour, in
 `:green`, `:yellow`, `:blue`, `:magenta`, `:cyan`, `:white`), a
 256-colour index (`0..255`) or a truecolor `"#rrggbb"`; a gradient
 whose stops are all `#rrggbb` blends smoothly from the bottom row to
-the top one instead of in bands.
+the top one instead of in bands. `canvas: :eighths` (`--canvas
+eighths`) fills by eighth blocks instead: one bar per character, but
+8 steps a cell (`▁▂▃▄▅▆▇█`; sideways `▏▎▍▌▋▊▉█`), btop's other look.
+It only fills, so it needs `area: true` and refuses `threshold:`,
+whose dashes would read as bars.
 
 Bar and histogram take three more options, all optional: `fill:` the
 bar glyph (`█` by default, `#` under `ascii: true`), `eighths:` draw
@@ -623,7 +627,7 @@ line|scatter|stairs|density|bar|histogram|box|stem|heatmap|candlestick|pie`
 (default `line`),
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
-`--canvas braille|block|quadrant|half|dot|ascii|density`,
+`--canvas braille|block|quadrant|half|dot|ascii|density|eighths`,
 `--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` and
 `--xdate [FMT]` for line, scatter, stairs and density, and `--yerr`
 for line and scatter).

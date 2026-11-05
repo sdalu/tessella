@@ -27,6 +27,7 @@ module Tessella
         # An area is measured from zero: the value axis takes in 0
         # unless its limits are given.
         def zero_floor? = @opts[:area]
+        def fills? = @opts[:area]
 
         def draw_series(canvas, series)
             return canvas.lines(series.x, series.y, color: series.color) unless

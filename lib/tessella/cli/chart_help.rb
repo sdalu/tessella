@@ -32,7 +32,7 @@ module Tessella
                 "--xlim" => ["the x range, A,B"],
                 "--ylim" => ["the y range, A,B"],
                 "--canvas" => ["braille, block (quadrant), half, dot,",
-                               "ascii or density"],
+                               "ascii, density, or eighths (--area)"],
                 "--ascii" => ["ASCII only, from the first byte"],
                 "--color" => ["ANSI colours (off by default)"],
                 "--xscale" => ["ln, log2 or log10 on x"],

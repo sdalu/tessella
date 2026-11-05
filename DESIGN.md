@@ -71,8 +71,9 @@ lib/tessella/stats.rb      binning, percentiles, transforms
 lib/tessella/axis.rb       limits, nice rounding, number labels
 lib/tessella/color.rb      colour names to ANSI, and nothing else
 lib/tessella/canvas.rb     the base grid
-lib/tessella/canvas/*.rb   braille, block, dot, ascii, density, and
-                           area (the fill under a curve, every type)
+lib/tessella/canvas/*.rb   braille, block, half, eighths (fills
+                           only), dot, ascii, density, and area (the
+                           fill under a curve, every type)
 lib/tessella/frame.rb      border, labels, title, legend, render
 lib/tessella/chart.rb      shared options, series, render entry
 lib/tessella/kinds/*.rb    one file per kind
@@ -401,7 +402,8 @@ chart.add(x = nil, y, name: nil, color: nil, mark: nil) # another
 Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
 Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
-                                            #   stairs: filled, btop-style
+                                            #   stairs: filled, btop-style;
+                                            #   canvas: :eighths, by eighths
     # threshold: N, above:, below: (line, scatter, stairs): a dashed
     #   rule at N, cells beyond it coloured above: (kinds/threshold.rb;
     #   a canvas colour may be a callable of the cell's row and column)
