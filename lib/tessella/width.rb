@@ -58,8 +58,27 @@ module Tessella
         # no column.
         ANSI = /\e\[[0-9;]*m/
 
+        # What makes a cluster one emoji: a zero-width joiner, or a
+        # skin-tone modifier.
+        EMOJI_JOIN = /[\u200D\u{1F3FB}-\u{1F3FF}]/
+
+        # Summed over grapheme clusters, so an emoji sequence counts
+        # once (Width.cluster).
         def self.of(text)
-            text.to_s.gsub(ANSI, "").each_char.sum { char(it.ord) }
+            plain = text.to_s.gsub(ANSI, "")
+            return plain.length if plain.ascii_only?
+
+            plain.each_grapheme_cluster.sum { cluster(it) }
+        end
+
+        # One grapheme cluster's columns: its characters' sum, except an
+        # emoji sequence -- joined by ZWJ (👨‍👩‍👧) or skin-toned (👍🏽)
+        # -- which terminals draw as the one wide glyph it is: 2.
+        def self.cluster(text)
+            widths = text.each_char.map { char(it.ord) }
+            return 2 if widths.include?(2) && text.match?(EMOJI_JOIN)
+
+            widths.sum
         end
 
         def self.pad(count) = " " * [count, 0].max

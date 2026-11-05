@@ -66,12 +66,13 @@ module Tessella
             name.to_s
         end
 
-        # The block as rows of one-column cells, a wide glyph and an
+        # The block as rows of one-column cells, a wide glyph (a grapheme
+        # cluster, an emoji sequence or an accented letter whole) and an
         # empty tail cell after it, every row the block's width.
         def self.cell_grid(block)
             block.lines.map do |line|
-                cells = line.each_char.flat_map do |ch|
-                    Width.char(ch.ord) == 2 ? [ch, ""] : [ch]
+                cells = line.each_grapheme_cluster.flat_map do |g|
+                    [g, *Array.new([Width.cluster(g) - 1, 0].max, "")]
                 end
                 cells + Array.new(block.width - cells.size, " ")
             end
