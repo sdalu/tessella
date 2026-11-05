@@ -116,11 +116,14 @@ module Tessella
         def title_line = label_line(@title, width)
         def xlabel_line = label_line(@xlabel, width)
 
+        # Each line of text centred under the body.
         def label_line(text, width)
             return nil if text.to_s.empty?
 
-            offset = [((width / 2.0) - (Width.of(text) / 2.0)).round, 0].max
-            lead + (" " * offset) + text
+            text.to_s.lines(chomp: true).map do |line|
+                offset = [((width / 2.0) - (Width.of(line) / 2.0)).round, 0].max
+                lead + (" " * offset) + line
+            end.join("\n")
         end
 
         def top_line

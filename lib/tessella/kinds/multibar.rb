@@ -22,6 +22,9 @@ module Tessella
         def multi? = !@groups.nil?
 
         def add_multi(labels, rows)
+            raise ArgumentError, "xscale: takes one series" if @opts[:xscale]
+
+            Check.same_size!(labels, rows, %w[labels groups])
             @groups ||= []
             rows.each_with_index do |values, i|
                 vals = Check.finite!(Array(values), "value")

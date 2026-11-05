@@ -114,6 +114,8 @@ module Tessella
             Check.same_size!(names, Array(samples), %w[names samples])
             names.zip(samples).each do |name, sample|
                 values = Array(sample).map(&@xscale)
+                raise ArgumentError, "sample #{name} is empty" if values.empty?
+
                 @boxes << [name.to_s, Check.finite!(values, "sample"),
                            box_color]
             end

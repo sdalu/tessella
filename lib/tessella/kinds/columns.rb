@@ -62,6 +62,8 @@ module Tessella
         end
 
         def layout_frame_options
+            raise ArgumentError, "no bars to draw" if @bars.empty?
+
             values = layout_values
             max = values.max.to_f
             common = { ascii: @ascii, color: @color_on, title: @opts[:title] }

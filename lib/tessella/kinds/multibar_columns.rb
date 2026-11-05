@@ -18,12 +18,14 @@ module Tessella
 
         # The names under the columns and the legend: beside the frame,
         # or, when it has more entries than rows and the names already
-        # hold the line under it, on the x label's line.
+        # hold the line under it, on the lines after the x label.
         def column_captions(rows, slot)
             names = group_names(slot)
             legend = legend_options(rows)
             xlabel = @opts[:xlabel]
-            xlabel ||= legend.delete(:under) if legend[:under] && names[:under]
+            if legend[:under] && names[:under]
+                xlabel = [xlabel, legend.delete(:under)].compact.join("\n")
+            end
             { xlabel: xlabel, **legend, **names }
         end
 
