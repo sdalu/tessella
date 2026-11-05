@@ -146,6 +146,29 @@ along the horizontal one and x running up, so a horizontal chart of
 `xlabel:` and `ylabel:` keep their meaning and follow their axis; an
 `area:` fills from the left edge, its gradient running left to right.
 
+Bars of several series: give `Tessella.bar` an Array per label, one
+value a series, and name the series with `series:`. They are grouped
+-- a bar a series under each label, a blank row between labels -- or,
+with `stacked: true`, end to end in one bar labelled with its total;
+both work upright too (`orientation: :vertical`). Series are told
+apart by fill (`█ ▓ ▒`, `# = +` in ASCII) and, under `color: true`,
+by colour; the legend sits right of the frame. Eighths end only the
+`█` series, since they are solid. Values must be 0 or more, and the
+braille, block and half layouts draw one series only.
+
+```text
+$ printf 'q cpu io net\nq1 3 5 2\nq2 4 2 6\n' |
+  tessella chart --kind bar --stacked --width 24
+      ┌                        ┐
+   q1 ┤█████▓▓▓▓▓▓▓▓▒▒▒▒··· 10  █ cpu
+   q2 ┤███████▓▓▓▒▒▒▒▒▒▒▒▒▒ 12  ▓ io
+      └                        ┘
+```
+
+On the command line, a bar row with more than two columns is a label
+and a value a series, named by the header; `--stacked` stacks them,
+and a row of another width is bad input (exit 1).
+
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
 each box stands three columns wide, whiskers running up and down
 (`╶┬╴` at the maximum, `┌┴┐` at Q3, `├─┤` the median, `└┬┘` at Q1,
@@ -508,7 +531,7 @@ line|scatter|stairs|density|bar|histogram|box|stem` (default `line`),
 line, scatter, stairs and density).
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
-`--style post|pre` (stairs only); `--blocks
+`--style post|pre` (stairs only); `--stacked` (bar only); `--blocks
 eighths|braille|block|quadrant|half` (bar and histogram only);
 `--orientation horizontal|vertical`
 (every kind but stem: the direction the value axis runs, bars and

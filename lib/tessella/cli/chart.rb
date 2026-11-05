@@ -177,6 +177,7 @@ module Tessella
 
             def add_bar_specific
                 add_layout
+                @parser.on("--stacked") { @opts[:stacked] = true }
                 @parser.on("--fill G") { |v| @opts[:fill] = v }
                 @parser.on("--no-eighths") { @opts[:eighths] = false }
                 @parser.on("--track G") do |v|
@@ -269,7 +270,7 @@ module Tessella
                 scatter: %i[orientation yscale],
                 density: %i[orientation yscale],
                 stairs: %i[style area gradient orientation yscale],
-                bar: %i[fill eighths track orientation blocks],
+                bar: %i[fill eighths track orientation blocks stacked],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
                 box: %i[orientation],
@@ -292,6 +293,7 @@ module Tessella
                      closed: "--closed", fill: "--fill", area: "--area",
                      gradient: "--gradient", orientation: "--orientation",
                      blocks: "--blocks", yscale: "--yscale",
+                     stacked: "--stacked",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
             def self.check!(opts)
@@ -420,23 +422,42 @@ module Tessella
     class ChartCLI
         class BarKind
             def self.build(kind, opts, rows)
-                _header, data = Header.split(rows, bar_like: kind == :bar)
-                kind == :bar ? bar(opts, data) : histogram(opts, data)
+                header, data = Header.split(rows, bar_like: kind == :bar)
+                return histogram(opts, data) unless kind == :bar
+
+                bar(opts, data, header)
             end
 
-            def self.bar(opts, data)
-                check_two_columns!(data)
+            # label value, or label and a value a series (named by the
+            # header), grouped or --stacked.
+            def self.bar(opts, data, header)
                 labels = data.map { it[0] }
-                values = Columns.numeric(data, 1, "value")
-                Tessella.bar(labels, values, **ChartOpts.for(opts))
+                ncols = same_width!(data)
+                if ncols == 2
+                    return Tessella.bar(labels,
+                                        Columns.numeric(data, 1, "value"),
+                                        **ChartOpts.for(opts))
+                end
+                Tessella.bar(labels, series_values(data, ncols),
+                             series: header&.drop(1), **ChartOpts.for(opts))
             end
 
-            # A column past the value would be dropped unseen: refused.
-            def self.check_two_columns!(data)
-                i = data.index { it.size > 2 } or return
+            def self.series_values(data, ncols)
+                columns = (1...ncols).map do |i|
+                    Columns.numeric(data, i, "value #{i}")
+                end
+                columns.transpose
+            end
 
-                raise DataError, "row #{i + 1} has #{data[i].size} columns: " \
-                                 "bar takes label and value"
+            # Every row as wide as the first: a short or long one is
+            # refused rather than read in part.
+            def self.same_width!(data)
+                ncols = data.first.size
+                i = data.index { it.size != ncols }
+                return ncols unless i
+
+                raise DataError, "row #{i + 1} has #{data[i].size} columns, " \
+                                 "row 1 has #{ncols}"
             end
 
             def self.histogram(opts, data)

@@ -142,15 +142,17 @@ module Tessella
             steps(fraction * column_height * 8, value)
         end
 
-        def append_column(rows, units, bw, color)
+        def append_column(rows, units, bw, color, fill = @fill)
             rows.each_with_index do |row, r|
                 level = (column_height - 1 - r) * 8
-                row.concat(Array.new(bw) { rise_cell(units - level, color) })
+                row.concat(Array.new(bw) do
+                    rise_cell(units - level, color, fill)
+                end)
             end
         end
 
-        def rise_cell(eighths, color)
-            return Cell.new(char: @fill, color: color) if eighths >= 8
+        def rise_cell(eighths, color, fill = @fill)
+            return Cell.new(char: fill, color: color) if eighths >= 8
             return Cell.blank unless eighths.positive?
 
             Cell.new(char: RISE[eighths], color: color)

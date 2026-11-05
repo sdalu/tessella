@@ -401,7 +401,9 @@ Tessella.histogram(values, bins: nil, closed: :left, **opts)
     # bar, histogram: orientation: :horizontal | :vertical (columns),
     #   blocks: :eighths | :braille | :block (:quadrant) | :half
     #   (kinds/columns.rb); only
-    #   horizontal :eighths is unicode_plot's layout, the oracle's
+    #   horizontal :eighths is unicode_plot's layout, the oracle's;
+    #   values an Array per label: several series, grouped or
+    #   stacked: true, series: their names (kinds/multibar*.rb)
 Tessella.box(names, samples, **opts)        # samples: Array of Arrays;
     # orientation: :vertical stands the boxes (kinds/box_upright.rb)
 Tessella.stem(values, scale: nil, **opts)   # stem-and-leaf

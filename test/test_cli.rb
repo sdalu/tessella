@@ -150,10 +150,16 @@ class TestCLIErrors < Minitest::Test
         assert_match(/value/, err)
     end
 
-    def test_bar_refuses_a_row_past_label_and_value
-        status, _out, err = run_cli(["--kind", "bar"], "x sin cos\n1 2 3\n")
+    # Columns past the value are series, never dropped; a row of
+    # another width is refused.
+    def test_bar_reads_extra_columns_as_series
+        status, out, = run_cli(["--kind", "bar"], "x sin cos\n1 2 3\n")
+        assert_equal(0, status)
+        assert_includes(out, "█ sin")
+        assert_includes(out, "▓ cos")
+        status, _out, err = run_cli(["--kind", "bar"], "a 1 2\nb 3\n")
         assert_equal(1, status)
-        assert_match(/row 1 has 3 columns: bar takes label and value/, err)
+        assert_match(/row 2 has 2 columns, row 1 has 3/, err)
     end
 
     def test_help_exits_0_and_prints_usage

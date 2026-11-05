@@ -135,9 +135,13 @@ module Tessella
         include BarLayouts
         include ColumnBars
         include DotRowBars
+        include MultiBars
+        include MultiBarRows
+        include MultiBarColumns
 
         OPTIONS = (Chart::OPTIONS +
-                   %i[fill eighths track orientation blocks]).freeze
+                   %i[fill eighths track orientation blocks stacked
+                      series]).freeze
         MIN_WIDTH = 10
         DEFAULT_FILL = "█"
         ASCII_FILL = "#"
@@ -153,9 +157,14 @@ module Tessella
             @bars = []
         end
 
+        # values: a number per label, or an Array per label, one value a
+        # series (MultiBars).
         def add(labels, values, color: nil)
-            bar_color = color || auto_color
             labels = Array(labels)
+            return add_multi(labels, Array(values)) if
+                Array(values).first.is_a?(Array)
+
+            bar_color = color || auto_color
             values = Check.finite!(Array(values), "value")
             Check.same_size!(labels, values, %w[labels values])
             labels.zip(values).each do |label, value|
@@ -185,6 +194,8 @@ module Tessella
         end
 
         def frame
+            return Frame.new(**multi_frame_options) if multi?
+
             Frame.new(**(classic? ? frame_options : layout_frame_options))
         end
 
