@@ -155,6 +155,7 @@ $ tessella compose frame --ascii --style '****=!' note.txt
 *=================*
 ```
 
+<!-- tessella: allow-mixed -->
 ```text
 $ tessella compose frame --ascii --style '╓╖╙╜─║' note.txt
 tessella compose: border glyph ╓ conflicts with ascii: true
@@ -168,7 +169,7 @@ Usage: tessella compose frame  [--title T] [--style S] [--pad N]
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK
        tessella compose caption --text T [--above] BLOCK
-Every subcommand also takes --ascii and --max-width N.
+Every subcommand also takes --[no-]ascii and --max-width N.
 ```
 
 A figure framed in a custom set can still be checked by
@@ -580,5 +581,5 @@ Usage: tessella compose frame  [--title T] [--style S] [--pad N]
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
        tessella compose indent --prefix STR BLOCK
        tessella compose caption --text T [--above] BLOCK
-Every subcommand also takes --ascii and --max-width N.
+Every subcommand also takes --[no-]ascii and --max-width N.
 ```

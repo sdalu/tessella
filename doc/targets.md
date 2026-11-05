@@ -80,6 +80,28 @@ as on this page, the box looks a column too wide here and there.
 Other figures (trees, waves, charts) drawn in Unicode under `cjk` do
 not line up in a CJK terminal: leave them to the ASCII default.
 
+On the command line, `--no-ascii` asks for Unicode under `cjk`;
+without it, a Unicode `--style` is refused rather than quietly drawn
+in ASCII:
+
+```text
+$ tessella --target cjk table --no-ascii --style light cities.csv
+┌─────┬───┐
+│ city     │  pop │
+├─────┼───┤
+│ 東京     │   14 │
+│ Paris    │    2 │
+│ Zürich  │  0.4 │
+└─────┴───┘
+```
+
+```text
+$ tessella --target cjk compose frame --style light note.txt 2>&1 | head -1
+tessella compose: --style light conflicts with the cjk target's ASCII default (--no-ascii for Unicode)
+```
+
+From Ruby, `ascii: false`:
+
 ```ruby
 # frozen_string_literal: true
 

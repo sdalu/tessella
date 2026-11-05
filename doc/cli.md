@@ -10,7 +10,9 @@ The first argument names the command. Each command reads one file,
 or stdin when none is given (`compose` reads several), and prints one
 figure on stdout. Each has its own `--help`. `--target term|cjk|web`,
 before the command, or `TESSELLA_TARGET` in the environment, draws
-for a [width target](targets.md).
+for a [width target](targets.md). Every drawing command takes
+`--ascii` and `--no-ascii`; the second matters only under `cjk`,
+where ASCII is the default.
 
 | Command    | Draws                                      | Page                           |
 |------------|--------------------------------------------|--------------------------------|

@@ -1220,7 +1220,8 @@ the same three forms, comma-separated: `--gradient
 ## ASCII
 
 `--ascii` (`ascii: true`) makes the whole chart ASCII from the first
-byte: the frame is `+ - |`, the canvas is the ASCII one, bars are `#`
+byte (`--no-ascii` asks for Unicode, which matters only under the
+[cjk target](targets.md#cjk), where ASCII is the default): the frame is `+ - |`, the canvas is the ASCII one, bars are `#`
 on a `.` track. No part draws Unicode and lets a later pass rewrite
 it, so the output is safe in a man page, an RFC-style text or a
 source file kept to ASCII. A non-ASCII title, label, bar or series
