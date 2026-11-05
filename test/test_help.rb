@@ -20,7 +20,7 @@ class TestHelp < Minitest::Test
     end
 
     def test_each_compose_subcommand_has_its_own_help
-        %w[frame beside stack indent caption shadow fill].each do |sub|
+        %w[frame beside stack indent caption shadow fill grid].each do |sub|
             status, out = help(["compose", sub, "--help"])
             assert_equal(0, status, sub)
             assert(out.start_with?("Usage: tessella compose #{sub} "), out)

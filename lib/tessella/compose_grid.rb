@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+module Tessella
+    # grid: figures in rows of columns: (DESIGN.md, "Blocks and
+    # composition") -- the dashboard layout other libraries have, built
+    # from beside and stack: each row's figures side by side, gap:
+    # columns apart and aligned by align:, the rows stacked row_gap:
+    # rows apart. A short last row stays short.
+    module Compose
+        GRID = { columns: 2, gap: 2, row_gap: 1, align: :top }.freeze
+
+        # (*figures, columns: 2, gap: 2, row_gap: 1, align: :top,
+        # ascii: false)
+        def self.grid(*figures, ascii: false, **layout)
+            raise ArgumentError, "grid takes one figure or more" if
+                figures.empty?
+
+            o = GRID.merge(layout)
+            Check.positive_integer!(o[:columns], "columns")
+            rows = blocks(figures, ascii).each_slice(o[:columns]).map do |row|
+                grid_row(row, o)
+            end
+            rows.size == 1 ? rows.first : stack(*rows, gap: o[:row_gap])
+        end
+
+        def self.grid_row(row, o)
+            return row.first if row.size == 1
+
+            beside(*row, gap: o[:gap], align: o[:align])
+        end
+    end
+
+    def self.grid(...) = Compose.grid(...)
+end

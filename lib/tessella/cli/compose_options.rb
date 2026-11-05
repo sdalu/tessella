@@ -88,6 +88,15 @@ module Tessella
             HALO.fetch(mode) { usage!("--halo must be sides, around or none") }
         end
 
+        def add_columns
+            @parser.on("--columns N", Integer, "figures a row (2)") do |n|
+                usage!("--columns must be >= 1") if n < 1
+                @opts[:columns] = n
+            end
+        end
+
+        def add_row_gap = add_count("--row-gap", :row_gap, "blank rows apart")
+
         def add_pattern
             @parser.on("--pattern P", "pattern name or glyphs (light)") do |p|
                 @opts[:pattern] = p
@@ -133,7 +142,8 @@ module Tessella
             "beside" => %i[gap align],
             "stack" => %i[gap rule center], "indent" => %i[prefix],
             "caption" => %i[text above], "shadow" => %i[glyph],
-            "fill" => %i[pattern halo]
+            "fill" => %i[pattern halo],
+            "grid" => %i[columns gap row_gap align]
         }.freeze
         REQUIRED = { "indent" => :prefix, "caption" => :text }.freeze
 

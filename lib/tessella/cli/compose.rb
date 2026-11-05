@@ -16,6 +16,8 @@ module Tessella
                                           [--fill P] [--halo H] BLOCK
                    tessella compose shadow [--glyph G] BLOCK
                    tessella compose fill   [--pattern P] [--halo H] BLOCK
+                   tessella compose grid   [--columns N] [--gap N] [--row-gap N]
+                                          [--align A] BLOCK...
                    tessella compose beside [--gap N] [--align A] BLOCK...
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
                    tessella compose indent --prefix STR BLOCK
@@ -37,10 +39,16 @@ module Tessella
             fail_with(stderr, e.message, 1)
         end
 
-        # A subcommand's own line out of USAGE.
+        # A subcommand's own lines out of USAGE: its line and the
+        # continuation lines under it.
         def self.usage_line(sub)
-            line = USAGE.lines.find { it.include?("compose #{sub} ") }
-            "Usage: #{line.strip.delete_prefix("Usage: ")}"
+            lines = USAGE.lines
+            i = lines.index { it.include?("compose #{sub} ") }
+            more = lines[(i + 1)..].take_while do |line|
+                !line.include?("tessella") && line.start_with?("  ")
+            end
+            ["Usage: #{lines[i].strip.delete_prefix("Usage: ")}\n",
+             *more].join
         end
 
         def self.help(stdout)
@@ -78,7 +86,7 @@ module Tessella
     # that composes them.
     module ComposeCommands
         ARITY = { "frame" => 1, "indent" => 1, "caption" => 1, "shadow" => 1,
-                  "fill" => 1,
+                  "fill" => 1, "grid" => 1..,
                   "beside" => 2.., "stack" => 2.. }.freeze
 
         def self.fetch(sub)
@@ -92,8 +100,11 @@ module Tessella
             arity = ARITY.fetch(sub)
             return if arity === paths.size # rubocop:disable Style/CaseEquality
 
-            want = arity.is_a?(Integer) ? "exactly one" : "at least two"
-            want += arity.is_a?(Integer) ? " BLOCK" : " BLOCKs"
+            want = if arity.is_a?(Integer)
+                       "exactly one BLOCK"
+                   else
+                       "at least #{arity.begin} BLOCK#{"s" if arity.begin > 1}"
+                   end
             raise ComposeCLI::UsageError, "#{sub} takes #{want}"
         end
 
@@ -117,6 +128,14 @@ module Tessella
 
         def self.indent_call(blocks, o)
             Compose.indent(blocks.first, prefix: o[:prefix], ascii: o[:ascii])
+        end
+
+        def self.grid_call(blocks, o)
+            Compose.grid(*blocks, columns: o.fetch(:columns, 2),
+                                  gap: o.fetch(:gap, 2),
+                                  row_gap: o.fetch(:row_gap, 1),
+                                  align: o.fetch(:align, :top),
+                                  ascii: o[:ascii])
         end
 
         def self.fill_call(blocks, o)

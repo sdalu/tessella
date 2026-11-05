@@ -431,6 +431,12 @@ T] [--title-width N] [--no-label] [--no-brackets] [--ascii]
 FRACTION`; `title_width:` (`--title-width`) pads the title, so a
 column of meters with titles of different lengths lines up.
 
+`Tessella.grid(*figures, columns: 2, gap: 2, row_gap: 1, align:
+:top)` sets figures out in rows of `columns`, a dashboard of charts,
+meters and sparklines: each row side by side, the rows stacked; a
+short last row stays short. `tessella compose grid [--columns N]
+[--gap N] [--row-gap N] [--align A] BLOCK...`.
+
 `Tessella.rule(width: 78, ornament: nil, style: :light)` is a
 divider: a line in a rule style (`light ─`, `heavy ━`, `double ═`,
 `dashed ┄`, `ascii -`), an ornament centred in it by display width:

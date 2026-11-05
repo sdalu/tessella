@@ -323,3 +323,20 @@ class TestFillHalo < Minitest::Test
         assert_raises(ArgumentError) { Tessella.fill(BOX, halo: :wide) }
     end
 end
+
+# grid: figures in rows of columns:, gap: columns apart, rows row_gap:
+# apart; a short last row stays short.
+class TestGrid < Minitest::Test
+    def test_rows_of_columns
+        assert_equal("a  b\n\nc\n", Tessella.grid("a", "b", "c").to_s)
+        assert_equal("a b c\n",
+                     Tessella.grid("a", "b", "c", columns: 3, gap: 1).to_s)
+        assert_equal("a\nb\n", Tessella.grid("a", "b", columns: 1,
+                                                       row_gap: 0).to_s)
+    end
+
+    def test_refusals
+        assert_raises(ArgumentError) { Tessella.grid }
+        assert_raises(ArgumentError) { Tessella.grid("a", columns: 0) }
+    end
+end
