@@ -18,7 +18,9 @@ module Tessella
         GAP = 2
         LOOP_WIDTH = 3
 
-        NAME = '[\p{L}\p{N}_.-]+'
+        # A name may hold "-" but not end with one, so "A-->B" is A
+        # replying to B, and "A-->>B", no arrow, is refused.
+        NAME = '[\p{L}\p{N}_.](?:[\p{L}\p{N}_.-]*[\p{L}\p{N}_.])?'
         KIND = { "->" => :call, "-->" => :reply, "->>" => :async }.freeze
         PART_RE = /\Aparticipant\s+(#{NAME})\s*\z/
         ARROW_RE = /\A(#{NAME})\s*(->>|-->|->)\s*(#{NAME})\s*:\s*(.*)\z/
@@ -63,7 +65,8 @@ module Tessella
                 { type: :message, kind: KIND[m[2]], from: m[1], to: m[3],
                   text: m[4].rstrip }
             elsif (m = NOTE_RE.match(line))
-                { type: :note, names: [m[1], m[2]].compact, text: m[3].rstrip }
+                { type: :note, names: [m[1], m[2]].compact.uniq,
+                  text: m[3].rstrip }
             end
         end
 
@@ -110,15 +113,21 @@ module Tessella
 
         def self.ascii_name?(name) = name.each_char.all? { it.ord < 128 }
 
+        # Under ascii: true names, labels and notes are ASCII -- but
+        # under :cjk, where ascii: only means the structure.
         def self.check_ascii_names!(statements, ascii)
-            return unless ascii
+            return unless ascii && !Target.text_free?
 
-            statements.each do |s|
-                bad_name = names_in(s).find { !ascii_name?(it) }
-                next unless bad_name
+            statements.each { check_ascii_statement!(it) }
+        end
 
-                bad!(s[:line], "participant #{bad_name.inspect} is not ASCII")
-            end
+        def self.check_ascii_statement!(stmt)
+            name = names_in(stmt).find { !ascii_name?(it) }
+            line = stmt[:line]
+            bad!(line, "participant #{name.inspect} is not ASCII") if name
+            text = stmt[:text]
+            bad!(line, "text #{text.inspect} is not ASCII") if
+                text && !ascii_name?(text)
         end
 
         def self.gather_participants(stmts)
