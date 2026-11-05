@@ -22,7 +22,7 @@ module Tessella
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
                    tessella compose indent --prefix STR BLOCK
                    tessella compose caption --text T [--above] BLOCK
-            Every subcommand also takes --ascii and --max-width N.
+            Every subcommand also takes --[no-]ascii and --max-width N.
         TEXT
 
         def self.run(argv, stdin:, stdout:, stderr:)

@@ -50,7 +50,7 @@ module Tessella
         end
 
         def self.flags(parser, opts)
-            parser.on("--ascii", "a line of -") { opts[:ascii] = true }
+            parser.on("--[no-]ascii", "a line of -") { opts[:ascii] = it }
             parser.on("--help", "print this help") { raise Help, parser.to_s }
         end
     end

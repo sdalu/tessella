@@ -84,4 +84,19 @@ class TestTarget < Minitest::Test
             assert_equal(1, widths.uniq.size, figure.to_s)
         end
     end
+
+    # The command line's way to Unicode under cjk: --no-ascii, on
+    # every drawing command; a --style alone names the default it
+    # conflicts with.
+    def test_no_ascii_asks_for_unicode_under_cjk
+        io = { stdin: StringIO.new("a,b\n1,2\n"), stdout: StringIO.new,
+               stderr: StringIO.new }
+        Tessella::CLI.run(%w[--target cjk table --no-ascii], env: {}, **io)
+        assert_includes(io[:stdout].string, "┌")
+        status, _, err = cli(%w[--target cjk compose frame --style light -])
+        assert_equal(2, status)
+        assert_includes(err, "the cjk target's ASCII default (--no-ascii")
+        assert_equal("┌───┐\n", cli(%w[--target cjk compose frame
+                                       --no-ascii -])[1].lines.first)
+    end
 end

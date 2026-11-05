@@ -71,8 +71,8 @@ module Tessella
         def self.flags(parser, opts)
             parser.on("--no-label", "no percentage") { opts[:label] = false }
             parser.on("--no-brackets", "no [ ]") { opts[:brackets] = false }
-            parser.on("--ascii", "the classic style: [=====     ]") do
-                opts[:ascii] = true
+            parser.on("--[no-]ascii", "the classic style: [=====     ]") do |v|
+                opts[:ascii] = v
             end
             parser.on("--help", "print this help") { raise Help, parser.to_s }
         end

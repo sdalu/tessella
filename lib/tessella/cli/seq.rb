@@ -101,7 +101,7 @@ module Tessella
             private
 
             def build
-                @parser.on("--ascii") { @opts[:ascii] = true }
+                @parser.on("--[no-]ascii") { @opts[:ascii] = it }
                 @parser.on("--numbered") { @opts[:numbered] = true }
                 @parser.on("--footer") { @opts[:footer] = true }
                 add_max_width

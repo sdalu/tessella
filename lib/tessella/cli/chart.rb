@@ -191,7 +191,7 @@ module Tessella
 
             def add_render
                 @parser.on("--canvas C") { |v| @opts[:canvas] = v.to_sym }
-                @parser.on("--ascii") { @opts[:ascii] = true }
+                @parser.on("--[no-]ascii") { @opts[:ascii] = it }
                 @parser.on("--color") { @opts[:color] = true }
             end
 

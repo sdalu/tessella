@@ -701,7 +701,10 @@ is garbage.
 ASCII from the first byte: `+ - |` for the frame, `#` for bars, and an
 ASCII glyph set for the plotted canvas instead of Unicode braille,
 block or dot cells — no part draws Unicode and lets a later pass
-rewrite it.
+rewrite it. Every drawing command takes `--no-ascii` too: under
+`--target cjk`, whose default is ASCII, it asks for Unicode
+structure (a frame or table then closes in a CJK terminal; see
+"Width targets").
 
 ### `tessella compose`
 
@@ -718,7 +721,7 @@ tessella compose fill    [--pattern P] [--halo sides|around|none] BLOCK
 
 Each BLOCK is a file, or `-` for stdin (once). `--style` takes a
 style's name or six glyphs, as `style:` does. Every subcommand also
-takes `--ascii` and `--max-width N`. Bad input -- a missing file, an
+takes `--[no-]ascii` and `--max-width N`. Bad input -- a missing file, an
 empty block, a tab, a non-ASCII byte under `--ascii`, output wider
 than `--max-width` -- exits 1 naming the block and line; a usage
 mistake (an unknown style or align, `--style` other than ascii with

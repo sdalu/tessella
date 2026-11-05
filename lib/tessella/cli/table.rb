@@ -75,7 +75,7 @@ module Tessella
                   "sep_l sep_t sep_r") do |s|
                 @opts[:style] = style!(s, names)
             end
-            op.on("--ascii") { @opts[:ascii] = true }
+            op.on("--[no-]ascii") { @opts[:ascii] = it }
             op.on("--title TEXT") { |t| @opts[:title] = t }
         end
 

@@ -107,8 +107,8 @@ module Tessella
             end
 
             def add_ascii
-                @parser.on("--ascii", "pure ASCII output") do
-                    @opts[:ascii] = true
+                @parser.on("--[no-]ascii", "pure ASCII output") do |v|
+                    @opts[:ascii] = v
                 end
             end
 

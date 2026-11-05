@@ -201,8 +201,9 @@ module Tessella
             end
 
             def add_ascii
-                @parser.on("--ascii", "ASCII only (ramp style, ASCII ramp)") do
-                    @opts[:ascii] = true
+                @parser.on("--[no-]ascii",
+                           "ASCII only (ramp style, ASCII ramp)") do |v|
+                    @opts[:ascii] = v
                 end
             end
 

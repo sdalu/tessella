@@ -59,8 +59,8 @@ module Tessella
             end
             parser.on("--min A", Float, "range bottom") { opts[:min] = it }
             parser.on("--max B", Float, "range top") { opts[:max] = it }
-            parser.on("--ascii", "eight ASCII levels: _.-:=+*#") do
-                opts[:ascii] = true
+            parser.on("--[no-]ascii", "eight ASCII levels: _.-:=+*#") do |v|
+                opts[:ascii] = v
             end
             parser.on("--help", "print this help") { raise Help, parser.to_s }
         end

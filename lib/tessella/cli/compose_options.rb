@@ -17,8 +17,15 @@ module Tessella
 
             usage!("unknown --style #{style}") unless
                 Borders::STYLES.key?(style)
-            usage!("--style #{style} conflicts with --ascii") if
+            usage!("--style #{style} conflicts with #{ascii_source}") if
                 @opts[:ascii] && style != :ascii
+        end
+
+        # Where ASCII came from: the flag, or the cjk target's default.
+        def ascii_source
+            return "--ascii" if @ascii_flag
+
+            "the cjk target's ASCII default (--no-ascii for Unicode)"
         end
 
         def check_custom_style!(style)
@@ -172,15 +179,21 @@ module Tessella
         def usage!(message) = raise(ComposeCLI::UsageError, message)
 
         def add_common
-            @parser.on("--ascii", "ASCII glyphs; refuse non-ASCII text") do
-                @opts[:ascii] = true
-            end
+            add_ascii
             @parser.on("--max-width N", Integer,
                        "refuse a figure wider than N columns") do |n|
                 usage!("--max-width must be >= 1") if n < 1
                 @opts[:max_width] = n
             end
             add_help
+        end
+
+        def add_ascii
+            @parser.on("--[no-]ascii",
+                       "ASCII glyphs; refuse non-ASCII text") do |v|
+                @opts[:ascii] = v
+                @ascii_flag = v
+            end
         end
 
         def add_help

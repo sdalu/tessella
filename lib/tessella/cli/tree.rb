@@ -93,7 +93,7 @@ module Tessella
 
         def self.add_options(op, opts)
             op.on("--style S", STYLE_NAMES) { |s| opts[:style] = s.to_sym }
-            op.on("--ascii") { opts[:ascii] = true }
+            op.on("--[no-]ascii") { opts[:ascii] = it }
             op.on("--root NAME") { |n| opts[:root] = n }
             op.on("--max-width N", Integer) { |n| opts[:max_width] = n }
             op.on("-h", "--help") { raise TreeCLI::Help }
