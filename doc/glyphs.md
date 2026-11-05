@@ -94,6 +94,24 @@ meter    blade              N    term cjk web  ▰▱  (patchy font coverage)
 meter    button             N    term cjk web  ⦿⦾  (patchy font coverage)
 ```
 
+### Arrow heads
+
+The registry also holds the arrow heads, as kind `head`, with the rule
+for choosing one in their targets and notes:
+
+```text
+$ tessella glyphs head
+head     full               N+A  term web      ►◄▲▼  mixed  (▴ ▾ for ▲ ▼ under cjk)
+head     small              N    term cjk web  ▸◂▴▾
+head     emoji              A    term          ▶◀  (U+FE0E after it on the web)
+```
+
+`full` (`►◄▲▼`) is mixed: `► ◄` are narrow, `▲ ▼` ambiguous, so in a
+CJK terminal use `▴ ▾` for up and down; `tessella lint --target cjk`
+says so when it finds `▲` or `▼` on a row that must line up. `small`
+(`▸◂▴▾`) suits every target. `emoji` (`▶◀`) suits the terminal only,
+and needs U+FE0E after it on the web ([width targets](targets.md#web)).
+
 ## Checking a set of one's own
 
 `--check GLYPHS` classifies any glyphs: it prints their class and the

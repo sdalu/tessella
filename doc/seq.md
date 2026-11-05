@@ -81,8 +81,8 @@ Calls and replies end in `►` or `◄`, asynchronous messages in a
 double head, `►►` or `◄◄`, in every [width target](targets.md). These
 heads read at a glance and never turn into emoji in a browser, but a
 font that lacks them draws them at a fallback width
-([on the web](targets.md#web)). Under `--ascii` every head is `>` or
-`<`, so there an asynchronous message looks like a call.
+([on the web](targets.md#web)). Under `--ascii` they are `>` and `<`,
+and `>>` and `<<` for an asynchronous message.
 
 ## Options
 
@@ -149,7 +149,7 @@ $ tessella seq --ascii login.txt
      |              +----------------+
      |              |                |
      |              |  log attempt   |
-     |              |--------------->|
+     |              |-------------->>|
      |              |                |
      | 200 + cookie |                |
      |<- - - - - - -|                |

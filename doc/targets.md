@@ -155,6 +155,8 @@ reads at a glance.
 tessella's sequence diagrams use the bolder heads in every target,
 terminal included: `►` and `◄` for calls and replies, `►►` and `◄◄`
 for asynchronous messages ([sequence diagrams](seq.md#arrow-heads)).
+`tessella glyphs head` lists the heads with the targets each suits
+([glyph sets](glyphs.md#arrow-heads)).
 
 When a figure does carry an emoji-capable glyph, `--target web` puts
 U+FE0E, the text-presentation selector, right after it. The selector
