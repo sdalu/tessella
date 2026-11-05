@@ -16,6 +16,12 @@ class TestLintTarget < Minitest::Test
         assert_empty(findings("│ é │\n│ a │\n"))
     end
 
+    def test_cjk_names_the_small_head_for_a_full_one
+        assert_equal(["1: ambiguous U+25B2 ▲ on aligned row (cjk target: " \
+                      "2 columns; ▴ lines up)"],
+                     findings("│ ▲ │\n", target: :cjk))
+    end
+
     def test_cjk_measures_ambiguous_glyphs_as_two
         assert_equal(["1: 3 columns rendered (budget 2)"],
                      findings("éa\n", target: :cjk, width: 2))

@@ -15,7 +15,7 @@ module Tessella
 
         BANNER = "Usage: tessella glyphs [--target T] [KIND [NAME]] | " \
                  "--check GLYPHS\n"
-        KINDS = %w[border pattern meter rule ramp].freeze
+        KINDS = %w[border pattern meter rule ramp head].freeze
 
         def self.run(argv, stdout:, stderr:, **)
             opts = parse(argv.dup)

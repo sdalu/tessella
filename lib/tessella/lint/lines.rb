@@ -111,8 +111,14 @@ module Tessella
                     next unless Width.class_of(ch) == :A
 
                     report(sec, i, "#{glyph("ambiguous", ch)} on aligned row " \
-                                   "(cjk target: 2 columns)")
+                                   "(cjk target: 2 columns#{stand_in(ch)})")
                 end
+            end
+
+            # The small head that lines up in place of a full-size one.
+            def stand_in(ch)
+                small = { "▲" => "▴", "▼" => "▾" }[ch]
+                small ? "; #{small} lines up" : ""
             end
 
             def check_budget(sec, i, line)

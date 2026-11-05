@@ -69,4 +69,13 @@ class TestGlyphs < Minitest::Test
         assert(listed.all? { it.include?("cjk") })
         assert_equal(2, glyphs("--target", "mars").first)
     end
+
+    # The arrow heads by the ascii-art skill's rule: full-size, small
+    # (lining up everywhere), and emoji-capable (term only).
+    def test_arrow_heads_say_where_they_line_up
+        g = Tessella::Glyphs
+        assert_equal(%i[term web], g.fetch(:head, :full).targets)
+        assert_equal(%i[term cjk web], g.fetch(:head, :small).targets)
+        assert_equal(%i[term], g.fetch(:head, :emoji).targets)
+    end
 end

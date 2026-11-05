@@ -555,7 +555,8 @@ Every glyph has a width class, as the ascii-art skill's palette names
 them: N, narrow everywhere; A, East Asian Ambiguous (one column in
 Western terminals, two in CJK-configured ones); W, always two.
 `Tessella::Glyphs` names the sets the library draws with -- border
-styles, fill patterns, meter fill/track pairs, rule lines, tone ramps
+styles, fill patterns, meter fill/track pairs, rule lines, tone ramps,
+arrow heads (`full` `►◄▲▼`, `small` `▸◂▴▾`, `emoji` `▶◀`)
 -- and computes each set's classes from Unicode 15.1, never by hand.
 A set spanning two classes is *mixed*: fine in Western terminals, but
 it changes length in CJK ones. Each set also lists the width targets

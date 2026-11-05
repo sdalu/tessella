@@ -287,7 +287,8 @@ artlint did, where `Width.of` takes an emoji sequence as one glyph.
 Asian Ambiguous) or `:W` -- from Unicode 15.1's EastAsianWidth.txt,
 the ambiguous ranges generated into `width_class.rb` beside Width's
 own tables. `Glyphs` (`glyphs.rb`) is the registry of named sets: the
-border styles (read from `Borders`), fill patterns, meter pairs, rule
+border styles (read from `Borders`), fill patterns, meter pairs,
+arrow heads (the ascii-art skill's full, small and emoji sets), rule
 lines and ramps, from the ascii-art skill's palette and ui.md. Each
 set's classes are computed, so the skill's references can query them
 (`tessella glyphs`) instead of keeping a hand-typed copy, and a set

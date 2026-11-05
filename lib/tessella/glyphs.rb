@@ -56,15 +56,25 @@ module Tessella
             hatch: " ·∘╱╳"
         }.freeze
 
+        # Arrow heads, right left up down (the ascii-art skill's rule):
+        # full-size for any target, though ▲ ▼ are ambiguous, two
+        # columns in a CJK terminal; small ones line up everywhere,
+        # ▴ ▾ standing in for ▲ ▼ there; ▶ ◀ may turn into wide emoji
+        # on the web.
+        HEADS = { full: "►◄▲▼", small: "▸◂▴▾", emoji: "▶◀" }.freeze
+
         NOTES = {
-            blade: "patchy font coverage", button: "patchy font coverage",
-            block: "house style: █ on a · track"
+            meter: { blade: "patchy font coverage",
+                     button: "patchy font coverage",
+                     block: "house style: █ on a · track" },
+            head: { full: "▴ ▾ for ▲ ▼ under cjk",
+                    emoji: "U+FE0E after it on the web" }
         }.freeze
 
         def self.all
             @all ||= [*borders, *table(:pattern, PATTERNS),
                       *table(:meter, METERS), *table(:rule, RULES),
-                      *table(:ramp, RAMPS)].freeze
+                      *table(:ramp, RAMPS), *table(:head, HEADS)].freeze
         end
 
         def self.borders
@@ -76,7 +86,7 @@ module Tessella
 
         def self.table(kind, sets)
             sets.map do |name, glyphs|
-                note = kind == :meter ? NOTES[name] : nil
+                note = NOTES.dig(kind, name)
                 GlyphSet.new(kind: kind, name: name, glyphs: glyphs, note: note)
             end
         end
