@@ -3,7 +3,9 @@
 module Inkchart
     # Turns a ready-made body of cells into text: border, title, axis
     # labels and legend (DESIGN.md, "Frame and Color"). Frame knows
-    # nothing of data; the body and every label arrive as given.
+    # nothing of data; the body and every label arrive as given. Labels
+    # are measured in display columns (Width), not characters, so a
+    # wide-character label keeps the frame aligned.
     class Frame
         MARGIN = 3
         GUTTER = 1
@@ -57,8 +59,8 @@ module Inkchart
         end
 
         def left_column_width
-            base = @left.values.map(&:length).max || 0
-            ylabel ? base + ylabel.length + 1 : base
+            base = @left.values.map { Width.of(it) }.max || 0
+            ylabel ? base + Width.of(ylabel) + 1 : base
         end
 
         def lead
@@ -71,7 +73,7 @@ module Inkchart
         def label_line(text, width)
             return nil if text.to_s.empty?
 
-            offset = [((width / 2.0) - (text.length / 2.0)).round, 0].max
+            offset = [((width / 2.0) - (Width.of(text) / 2.0)).round, 0].max
             lead + (" " * offset) + text
         end
 
@@ -98,7 +100,7 @@ module Inkchart
 
         def left_part(row, left_str)
             prefix = ylabel_row?(row) ? ylabel : ""
-            fill = max_left - prefix.length - left_str.length
+            fill = max_left - Width.of(prefix) - Width.of(left_str)
             (" " * MARGIN) + prefix + (" " * fill) + left_str
         end
 
@@ -129,8 +131,9 @@ module Inkchart
         end
 
         def extremes_gap(left_text, right_text)
-            cnt1 = ((width / 2.0) - left_text.length).round
-            cnt2 = width - right_text.length - left_text.length + 2 - cnt1
+            lw = Width.of(left_text)
+            cnt1 = ((width / 2.0) - lw).round
+            cnt2 = width - Width.of(right_text) - lw + 2 - cnt1
             pad(cnt1) + pad(cnt2)
         end
 

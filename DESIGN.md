@@ -37,6 +37,8 @@ written here about another, so they can be built and tested apart.
 lib/inkchart.rb            the public entry: requires, Inkchart.<kind>
 lib/inkchart/version.rb    VERSION, the one place it is written
 lib/inkchart/error.rb      Inkchart::Error < StandardError
+lib/inkchart/check.rb      the argument checks every kind shares
+lib/inkchart/width.rb      display width: columns a terminal gives text
 lib/inkchart/cell.rb       Inkchart::Cell (Data: char, color), Cell.blank
 lib/inkchart/stats.rb      binning, percentiles, transforms
 lib/inkchart/axis.rb       limits, nice rounding, number labels
@@ -255,6 +257,23 @@ Where inkchart departs from unicode_plot, it does so on purpose:
   so formatting them as values printed `10.0` on every axis;
   `Axis.tick` drops a whole Float's `.0` as unicode_plot does, while
   `Axis.label` keeps a plotted value's own form.
+- **Exact stem leaves.** unicode_plot truncates `value / (scale / 10)`
+  as a Float, so 0.3 at scale 1 (2.9999999999999996 tenths) lands on
+  leaf 2; inkchart rounds to 9 decimals before truncating.
+- **Constant data of 1e16 and more.** unicode_plot widens a constant
+  by ±1, which a Float that large cannot hold: its axis crashes and
+  its histogram bins come out empty. inkchart grows the step by tens
+  until it changes the value; below 1e16 the result is unicode_plot's.
+- **Negative bars.** unicode_plot refuses them. inkchart splits the
+  bar area at a zero column so both signs draw to one scale; with no
+  negative value the layout is unicode_plot's, byte for byte.
+- **Refusals before drawing.** A value that is not a finite number, a
+  width or height that is not a positive Integer, x and y of
+  different lengths, a stem scale that is not positive, or a stem plot
+  past 1000 stems raise `ArgumentError` naming them, where unicode_plot
+  crashes, hangs, or draws a mistake.
+- **Display width.** Labels are measured in the columns a terminal
+  gives them (`Width`), so CJK labels keep the frame aligned.
 
 The name: `inkplot` was the first choice and is taken on rubygems.org
 by an unrelated gem.

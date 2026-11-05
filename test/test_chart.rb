@@ -128,3 +128,57 @@ class TestChart < Minitest::Test
         assert_equal(chart.to_s, io.string)
     end
 end
+
+# What add and the common options refuse before anything is drawn.
+class TestChartRefusals < Minitest::Test
+    def test_width_and_height_must_be_positive_integers
+        [{ width: 0 }, { width: -3 }, { height: 0 }, { width: 2.5 }]
+            .each do |opts|
+                error = assert_raises(ArgumentError) do
+                    Inkchart.line([1, 2], **opts).to_s
+                end
+                assert_includes(error.message, opts.keys.first.to_s)
+            end
+    end
+
+    def test_x_and_y_must_have_the_same_length
+        error = assert_raises(ArgumentError) do
+            Inkchart.line([1, 2, 3], [1, 2])
+        end
+        assert_includes(error.message, "3")
+        assert_includes(error.message, "2")
+    end
+
+    def test_xscale_of_a_nonpositive_x_is_refused
+        %i[ln log2 log10].each do |xscale|
+            error = assert_raises(ArgumentError) do
+                Inkchart.line([0, 1, 2], [1, 2, 3], xscale: xscale)
+            end
+            assert_includes(error.message, "finite")
+        end
+    end
+
+    def test_a_non_finite_value_is_refused_by_every_kind
+        bad = [1, Float::INFINITY]
+        [-> { Inkchart.line(bad) }, -> { Inkchart.scatter(bad, [1, 2]) },
+         -> { Inkchart.density([1, Float::NAN]) },
+         -> { Inkchart.bar(%w[a b], bad) }, -> { Inkchart.histogram(bad) },
+         -> { Inkchart.box(["a"], [bad]) }].each do |build|
+            assert_raises(ArgumentError) { build.call.to_s }
+        end
+    end
+
+    def test_a_nil_or_string_value_is_refused_naming_it
+        [[1, nil], [1, "x"]].each do |values|
+            error = assert_raises(ArgumentError) do
+                Inkchart.bar(%w[a b], values)
+            end
+            assert_includes(error.message, values.last.inspect)
+        end
+    end
+
+    def test_bar_and_box_names_must_match_their_values
+        assert_raises(ArgumentError) { Inkchart.bar(%w[a b], [1]) }
+        assert_raises(ArgumentError) { Inkchart.box(%w[a b], [[1]]) }
+    end
+end

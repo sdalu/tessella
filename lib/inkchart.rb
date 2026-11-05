@@ -11,6 +11,8 @@ require "optparse"
 
 require_relative "inkchart/version"
 require_relative "inkchart/error"
+require_relative "inkchart/check"
+require_relative "inkchart/width"
 require_relative "inkchart/cell"
 require_relative "inkchart/stats"
 require_relative "inkchart/axis"

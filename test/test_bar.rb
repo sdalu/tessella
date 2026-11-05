@@ -219,3 +219,60 @@ class TestHistogramOracle < Minitest::Test
         Oracle.render(UnicodePlot.histogram(values, width: WIDTH, **))
     end
 end
+
+# Negative values: a zero column splits the bar area, negative bars
+# grow left from it and positive ones right, each in proportion.
+class TestBarNegative < Minitest::Test
+    def rows(labels, values, **)
+        Inkchart.bar(labels, values, width: 30, **).to_s.lines
+                .select { it.include?("┤") || it.include?("|") }
+                .map { it.chomp.sub(/\A.*?[┤|]/, "") }
+    end
+
+    def span(row, glyphs = "█▐#")
+        idx = row.chars.each_index.select { glyphs.include?(row[it]) }
+        idx.empty? ? nil : [idx.first, idx.last]
+    end
+
+    def test_negative_bars_end_where_positive_bars_start
+        neg, pos, = rows(%w[a b c], [-6, 3, 0])
+        assert_equal(span(neg).last + 1, span(pos).first)
+    end
+
+    def test_bar_lengths_are_in_proportion_across_zero
+        neg, pos, = rows(%w[a b], [-6, 3])
+        n = span(neg).last - span(neg).first + 1
+        p = span(pos).last - span(pos).first + 1
+        assert_in_delta(2.0, n.fdiv(p), 0.25)
+    end
+
+    def test_a_zero_value_draws_no_bar_and_keeps_its_label
+        _, _, zero = rows(%w[a b c], [-6, 3, 0])
+        assert_nil(span(zero))
+        assert(zero.rstrip.end_with?(" 0"))
+    end
+
+    def test_every_row_is_as_wide_as_the_frame
+        lines = Inkchart.bar(%w[a b], [-12.5, 3], width: 30).to_s.lines
+        bars = lines.select { it.include?("┤") }
+        frame = lines.first.rstrip.length
+        bars.each { assert_operator(it.index(" ", it.index("┤")), :<, frame) }
+    end
+
+    def test_all_negative_bars_grow_left_from_the_right_edge
+        a, b = rows(%w[a b], [-6, -3])
+        assert_equal(span(a).last, span(b).last)
+        assert_operator(span(a).first, :<, span(b).first)
+    end
+
+    def test_negative_bars_under_ascii_are_ascii
+        out = Inkchart.bar(%w[a b], [-6, 3], ascii: true).to_s
+        assert(out.ascii_only?)
+        assert_includes(out, "#")
+    end
+
+    def test_values_all_nonnegative_keep_the_layout
+        plain = Inkchart.bar(%w[a b], [6, 3], width: 30).to_s
+        assert_includes(plain, "a ┤#{"█" * 25}")
+    end
+end

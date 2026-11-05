@@ -118,13 +118,22 @@ module Inkchart
             end
 
             def self.state_for(lo, hi, nbins)
-                return State.new(hi, 1.0, 1.0, 1) if lo == hi
+                return State.new(hi, unit_step(hi), 1.0, 1) if lo == hi
 
                 bw = (hi - lo) / nbins
                 lbw = Math.log10(bw)
                 return wide(lo, hi, bw, lbw) if lbw >= 0
 
                 narrow(lo, hi, bw, lbw)
+            end
+
+            # A constant's one bin is [v, v + 1), as unicode_plot's; from
+            # about 1e16 up v + 1 == v, so the width grows by tens until
+            # the bin holds v.
+            def self.unit_step(v)
+                step = 1.0
+                step *= 10 while v + step == v
+                step
             end
 
             def self.wide(lo, hi, bw, lbw)

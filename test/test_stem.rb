@@ -169,3 +169,40 @@ class TestStemOracle < Minitest::Test
         $stdout = original
     end
 end
+
+# Leaves and stems computed without float truncation error, and the
+# scale and stem count kept to what can be drawn.
+class TestStemNumbers < Minitest::Test
+    def lines(*, **) = Inkchart.stem(*, **).to_s.lines.map(&:rstrip)
+
+    def test_decimal_leaves_are_not_truncated_by_float_error
+        assert_equal(["0 | 37", "1 | 1", "2 | 3"],
+                     lines([0.3, 0.7, 1.1, 2.3], scale: 1).first(3))
+    end
+
+    def test_a_negative_decimal_keeps_its_leaf
+        assert_equal("-0 | 3", lines([-0.3], scale: 1).first)
+    end
+
+    def test_scale_must_be_positive
+        [0, -10].each do |scale|
+            error = assert_raises(ArgumentError) do
+                Inkchart.stem([1, 2], scale: scale)
+            end
+            assert_includes(error.message, "scale")
+        end
+    end
+
+    def test_too_many_stems_is_refused
+        error = assert_raises(ArgumentError) { Inkchart.stem([1, 100_000]) }
+        assert_includes(error.message, "scale")
+    end
+
+    def test_an_empty_sample_still_draws_its_key
+        assert_equal("Key: 1|0 = 10", lines([]).first)
+    end
+
+    def test_a_non_finite_value_is_refused
+        assert_raises(ArgumentError) { Inkchart.stem([1, Float::NAN]) }
+    end
+end

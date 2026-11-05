@@ -31,6 +31,40 @@ module Inkchart
         def legend(series) = [series.mark, series.name].compact.join(" ")
     end
 
+    # What a chart refuses before it draws (DESIGN.md, "Chart and
+    # kinds"): unknown options, a width or height that is not a
+    # positive Integer, and a series whose x and y differ in length or
+    # hold a value an axis cannot place. Kept apart from Chart so
+    # Chart's own class body stays under budget.
+    module ChartChecks
+        private
+
+        def check_options!(opts)
+            unknown = opts.keys - self.class::OPTIONS
+            return check_sizes!(opts) if unknown.empty?
+
+            raise ArgumentError,
+                  "unknown option: #{unknown.map(&:inspect).join(", ")}"
+        end
+
+        def check_sizes!(opts)
+            %i[width height].each do |key|
+                Check.positive_integer!(opts[key], key.to_s) if opts.key?(key)
+            end
+        end
+
+        # x (nil for 1..n) and y as stored: x through the xscale, both
+        # finite, and the same length.
+        def series_values(x, y)
+            ys = Check.finite!(Array(y), "y")
+            xs = Array(x || (1..ys.length))
+            Check.same_size!(xs, ys, %w[x y])
+            [Check.finite!(xs.map(&@xscale), x_name), ys]
+        end
+
+        def x_name = @opts[:xscale] ? "x under xscale #{@opts[:xscale]}" : "x"
+    end
+
     # Shared machinery behind every chart kind (DESIGN.md, "Chart and
     # kinds"): option handling and defaults, series bookkeeping, colour
     # cycling over Color::NAMES, canvas and frame assembly, and
@@ -38,6 +72,7 @@ module Inkchart
     # and may override default_canvas_type, canvas_type, default_border,
     # draw_grid? or add itself (Stairs reshapes its points there).
     class Chart
+        include ChartChecks
         include Marks
 
         DEFAULT_WIDTH = 40
@@ -64,8 +99,8 @@ module Inkchart
         def add(*args, name: nil, color: nil, mark: nil)
             check_mark!(mark)
             x, y = args.length == 1 ? [nil, *args] : args
-            xs = Array(x || (1..y.length)).map(&@xscale)
-            @series << Series.new(x: xs, y: Array(y), name: name,
+            xs, ys = series_values(x, y)
+            @series << Series.new(x: xs, y: ys, name: name,
                                   color: color || auto_color, mark: mark)
             self
         end
@@ -83,14 +118,6 @@ module Inkchart
             name = Color::NAMES[@next_color % Color::NAMES.size]
             @next_color += 1
             name
-        end
-
-        def check_options!(opts)
-            unknown = opts.keys - OPTIONS
-            return if unknown.empty?
-
-            raise ArgumentError,
-                  "unknown option: #{unknown.map(&:inspect).join(", ")}"
         end
 
         def canvas_type

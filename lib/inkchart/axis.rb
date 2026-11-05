@@ -31,7 +31,14 @@ module Inkchart
             label(number)
         end
 
-        def self.widen(mi) = [mi - 1, mi + 1]
+        # +-1, as unicode_plot widens a constant; from about 1e16 up a
+        # Float cannot hold mi +- 1, so the step grows by tens until it
+        # changes mi (unicode_plot crashes there instead).
+        def self.widen(mi)
+            d = 1.0
+            d *= 10 while mi + d == mi || mi - d == mi
+            [mi - d, mi + d]
+        end
 
         def self.narrow(mi, ma)
             diff = ma - mi
@@ -57,6 +64,8 @@ module Inkchart
             roundable?(v) ? v.ceil + 1 : v.floor + 1
         end
 
-        def self.roundable?(x) = x.to_i == x && INT64_RANGE.cover?(x)
+        def self.roundable?(x)
+            x.finite? && INT64_RANGE.cover?(x) && x.to_i == x
+        end
     end
 end

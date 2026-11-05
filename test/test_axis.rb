@@ -100,3 +100,24 @@ class TestAxis < Minitest::Test
         [toks.first, toks.last]
     end
 end
+
+# Constant data too large for a +-1 widening to change it.
+class TestAxisHugeConstant < Minitest::Test
+    def test_constant_values_at_1e16_widen_to_a_nonzero_range
+        [1e16, 10**17, -2e18].each do |v|
+            lo, hi = Inkchart::Axis.limits([v, v])
+            assert_operator(lo, :<, hi)
+        end
+    end
+
+    def test_constant_values_at_1e16_draw_in_every_grid_kind
+        %i[line scatter stairs density].each do |kind|
+            assert_includes(Inkchart.public_send(kind, [1e16, 1e16]).to_s, "┐")
+        end
+        assert_includes(Inkchart.box(["a"], [[1e16, 1e16]]).to_s, "┐")
+    end
+
+    def test_widening_below_1e16_is_unchanged
+        assert_equal([2.0, 4.0], Inkchart::Axis.limits([3, 3]))
+    end
+end

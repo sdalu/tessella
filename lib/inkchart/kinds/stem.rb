@@ -9,13 +9,15 @@ module Inkchart
     # frame and draw_series go unused.
     class Stem < Chart
         DEFAULT_SCALE = 10
+        MAX_STEMS = 1000
         DIVIDER = "|"
 
         def initialize(values, other = nil, scale: nil, **)
             super(**)
-            @scale = numeric!(scale || DEFAULT_SCALE, "scale")
+            @scale = Check.positive!(scale || DEFAULT_SCALE, "scale")
             @left = leaves_by_stem(values)
             @right = other && leaves_by_stem(other)
+            check_stem_count!([@left, @right].compact.flat_map(&:keys).uniq)
             @left_color = @color_on ? auto_color : nil
             @right_color = @color_on && @right ? auto_color : nil
         end
@@ -34,7 +36,7 @@ module Inkchart
         end
 
         def leaves_by_stem(values)
-            Array(values).each_with_object({}) do |v, h|
+            Check.finite!(Array(values), "value").each_with_object({}) do |v, h|
                 stem, leaf = stem_and_leaf(v)
                 (h[stem] ||= []) << leaf
             end
@@ -42,7 +44,9 @@ module Inkchart
 
         def stem_and_leaf(value)
             value = numeric!(value, "value")
-            scaled = value.to_f.fdiv(@scale / 10.0)
+            # Rounded first: 0.3 / 0.1 is 2.9999999999999996, and
+            # truncating that would file 0.3 under leaf 2.
+            scaled = value.to_f.fdiv(@scale / 10.0).round(9)
             whole = (scaled / 10).to_i
             frac = (scaled - (whole * 10)).to_i
             sign = value.negative? ? "-" : ""
@@ -53,6 +57,20 @@ module Inkchart
             keys = hashes.compact.flat_map(&:keys).uniq
             neg, pos = keys.partition { it.start_with?("-") }
             negative_range(neg) + positive_range(pos)
+        end
+
+        # One line per stem from the lowest to the highest, empty ones
+        # included: past MAX_STEMS that is a wall of text, not a chart.
+        def check_stem_count!(keys)
+            return if keys.empty?
+
+            lo, hi = keys.map { it.start_with?("-") ? -it.to_i.abs : it.to_i }
+                         .minmax
+            count = hi - lo + 1 + (keys.any? { it.start_with?("-") } ? 1 : 0)
+            return if count <= MAX_STEMS
+
+            raise ArgumentError, "#{count} stems at scale " \
+                                 "#{Axis.label(@scale)}: raise the scale"
         end
 
         def negative_range(keys)

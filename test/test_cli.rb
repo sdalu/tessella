@@ -183,3 +183,43 @@ class TestCLIHeaderNames < Minitest::Test
         assert_includes out.string, "cos"
     end
 end
+
+# Reader's field splitting: a CSV line splits on commas only, so a
+# label may hold spaces; a tab line on tabs; only a line with neither
+# splits on runs of spaces.
+class TestCLIFields < Minitest::Test
+    include CLIHelper
+
+    def test_a_csv_label_with_a_space_is_one_field
+        status, out, = run_cli(["--kind", "bar"],
+                               "New York,8\nParis,2\nRome,3\n")
+        assert_equal(0, status)
+        assert_includes(out, "New York ┤")
+        assert_equal(3, out.lines.count { it.include?("┤") })
+    end
+
+    def test_a_csv_header_then_spaced_labels_draws_every_row
+        status, out, = run_cli(["--kind", "bar"],
+                               "city,pop\nNew York,8\nLos Angeles,4\n")
+        assert_equal(0, status)
+        assert_includes(out, "Los Angeles ┤")
+    end
+
+    def test_a_tab_separated_label_with_a_space_is_one_field
+        status, out, = run_cli(["--kind", "bar"], "New York\t8\nParis\t2\n")
+        assert_equal(0, status)
+        assert_includes(out, "New York ┤")
+    end
+
+    def test_a_log_xscale_over_a_zero_x_is_a_usage_error
+        status, _, err = run_cli(["--xscale", "log10"], "0 1\n1 2\n10 3\n")
+        assert_equal(2, status)
+        assert_includes(err, "finite")
+    end
+
+    def test_a_zero_width_is_a_usage_error
+        status, _, err = run_cli(["--width", "0"], "1\n2\n")
+        assert_equal(2, status)
+        assert_includes(err, "width")
+    end
+end

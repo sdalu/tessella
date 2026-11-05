@@ -105,8 +105,12 @@ module Inkchart
 
         def add(names, samples, color: nil)
             box_color = color || auto_color
-            Array(names).zip(samples).each do |name, sample|
-                @boxes << [name.to_s, Array(sample).map(&@xscale), box_color]
+            names = Array(names)
+            Check.same_size!(names, Array(samples), %w[names samples])
+            names.zip(samples).each do |name, sample|
+                values = Array(sample).map(&@xscale)
+                @boxes << [name.to_s, Check.finite!(values, "sample"),
+                           box_color]
             end
             self
         end

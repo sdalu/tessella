@@ -165,3 +165,25 @@ class TestFrameOracle < Minitest::Test
         text.gsub("⠀", " ").split("\n", -1).map(&:rstrip)
     end
 end
+
+# Labels in East Asian wide characters take two columns each, as a
+# terminal draws them, so the frame stays aligned.
+class TestFrameWideLabels < Minitest::Test
+    def test_a_wide_character_label_keeps_the_frame_aligned
+        lines = Inkchart.bar(%w[日本 b], [1, 2]).to_s.lines
+        columns = lines.map { Inkchart::Width.of(it[/\A[^┤┌└]*/]) }
+        assert_equal(1, columns.uniq.size, lines.join)
+    end
+
+    def test_a_wide_title_is_centred_by_its_columns
+        chart = Inkchart.line([1, 2], title: "温度温度", width: 20)
+        title, top = chart.to_s.lines
+        offset = title.index("温") - top.index("┌")
+        assert_equal(6, offset) # (20 - 8 columns) / 2
+    end
+
+    def test_width_counts_wide_characters_as_two
+        assert_equal(6, Inkchart::Width.of("日本ab"))
+        assert_equal(1, Inkchart::Width.of("é"))
+    end
+end

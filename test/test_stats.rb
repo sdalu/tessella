@@ -118,3 +118,13 @@ class TestStats < Minitest::Test
         end
     end
 end
+
+# Constant data too large for a bin of width 1 to hold it.
+class TestStatsHugeConstant < Minitest::Test
+    def test_constant_huge_values_are_all_counted
+        [1e16, 3e18].each do |v|
+            hist = Inkchart::Stats.histogram([v, v, v])
+            assert_equal(3, hist.counts.sum)
+        end
+    end
+end

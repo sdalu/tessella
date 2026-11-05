@@ -281,10 +281,17 @@ module Inkchart
     # Lines from a file or stdin into fields: CSV, tabs or runs of
     # spaces; blank lines and # comments skipped (DESIGN.md's CLI
     # input rules, as the ascii-art skill's plot.rb helper reads
-    # them too).
+    # them too). A line holding a comma splits on commas only, one
+    # holding a tab on tabs only, so a label may hold spaces; only a
+    # line with neither splits on runs of spaces.
     class CLI
         class Reader
-            FIELD_SPLIT = /\s*,\s*|\s+/
+            def self.fields(line)
+                return line.split(/\s*,\s*/) if line.include?(",")
+                return line.split(/\s*\t\s*/) if line.include?("\t")
+
+                line.split
+            end
 
             def self.rows(path, stdin)
                 rows = text(path, stdin).each_line.filter_map { line(it) }
@@ -303,7 +310,7 @@ module Inkchart
                 stripped = raw.strip
                 return nil if stripped.empty? || stripped.start_with?("#")
 
-                stripped.split(FIELD_SPLIT)
+                fields(stripped)
             end
         end
     end

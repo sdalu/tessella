@@ -49,6 +49,81 @@ module Inkchart
         end
     end
 
+    # Bars over values of both signs: the bar area splits at a zero
+    # column into a negative zone and a positive one, each as wide as
+    # its share of the data's span; negative bars grow left from zero,
+    # positive ones right, and the value labels follow the whole area,
+    # so zero is one column on every row. Without a negative value Bar
+    # keeps unicode_plot's layout. A negative bar's fractional end, at
+    # its left, is a right half block (Unicode has no right eighths).
+    module SignedBars
+        RIGHT_HALF = "▐"
+
+        private
+
+        def signed? = @bars.any? { |_, value, _| @xscale.call(value).negative? }
+
+        def signed_rows
+            values = @bars.map { |_, value, _| @xscale.call(value) }
+            max_len = signed_label_width
+            ew = effective_width(max_len)
+            zones = signed_zones(values, [ew - 2 - max_len, 1].max)
+            @bars.each_with_index.map do |(_, value, color), i|
+                signed_row(values[i], value, color, zones, ew)
+            end
+        end
+
+        # scaled places the bar, value (as given) labels it.
+        def signed_row(scaled, value, color, zones, ew)
+            cells = signed_cells(scaled, color, zones)
+            pad_cells(cells + [Cell.blank] + label_cells(value), ew)
+        end
+
+        # Every label, not only the largest value's: "-12.5" can be the
+        # widest, and each row must end at the same column.
+        def signed_label_width
+            @bars.map { |_, value, _| Axis.label(value).length }.max
+        end
+
+        def signed_zones(values, area)
+            neg = -values.min
+            pos = [values.max, 0].max
+            neg_w = (area * neg.fdiv(neg + pos)).round
+            [neg_w, area - neg_w, neg, pos]
+        end
+
+        def signed_cells(value, color, zones)
+            neg_w, pos_w, neg, pos = zones
+            return left_bar(-value.fdiv(neg), neg_w, color) + gap(pos_w) if
+                value.negative?
+
+            fraction = pos.positive? ? value.fdiv(pos) : 0.0
+            gap(neg_w) + right_bar(fraction, pos_w, color)
+        end
+
+        def left_bar(fraction, width, color)
+            full, half = left_glyphs(fraction, width)
+            gap(width - full - half) +
+                Array.new(half) { cell(RIGHT_HALF, color) } +
+                Array.new(full) { cell(@fill, color) }
+        end
+
+        def left_glyphs(fraction, width)
+            return [(fraction * width).round, 0] unless @eighths
+
+            (fraction * width * 2).round.divmod(2)
+        end
+
+        def right_bar(fraction, width, color)
+            cells = bar_cells(*bar_glyphs(fraction, width), color)
+            cells + gap(width - cells.size)
+        end
+
+        def gap(count)
+            Array.new([count, 0].max) { @track ? cell(@track) : Cell.blank }
+        end
+    end
+
     # Horizontal bars for (label, value) pairs (DESIGN.md, "Chart and
     # kinds"): rows of cells laid out directly, one per bar, not on a
     # pixel canvas, handed to Frame with border :bar -- as
@@ -56,6 +131,7 @@ module Inkchart
     # ascii/colour handling; its canvas and draw_series go unused.
     class Bar < Chart
         include BarCells
+        include SignedBars
 
         OPTIONS = (Chart::OPTIONS + %i[fill eighths track]).freeze
         MIN_WIDTH = 10
@@ -74,7 +150,10 @@ module Inkchart
 
         def add(labels, values, color: nil)
             bar_color = color || auto_color
-            Array(labels).zip(Array(values)).each do |label, value|
+            labels = Array(labels)
+            values = Check.finite!(Array(values), "value")
+            Check.same_size!(labels, values, %w[labels values])
+            labels.zip(values).each do |label, value|
                 @bars << [label, value, bar_color]
             end
             self
@@ -84,14 +163,6 @@ module Inkchart
 
         def default_border = :bar
         def default_xlabel_basename = ""
-
-        def check_options!(opts)
-            unknown = opts.keys - OPTIONS
-            return if unknown.empty?
-
-            raise ArgumentError,
-                  "unknown option: #{unknown.map(&:inspect).join(", ")}"
-        end
 
         def fill_option(opts)
             fill = opts[:fill] || (@ascii ? ASCII_FILL : DEFAULT_FILL)
@@ -148,6 +219,8 @@ module Inkchart
         end
 
         def rows
+            return signed_rows if signed?
+
             max_val, max_len = reference
             ew = effective_width(max_len)
             @bars.map do |_, value, color|
@@ -171,6 +244,7 @@ module Inkchart
     # engine as Bar, fed bin labels and counts instead of given ones.
     class Histogram < Bar
         def add(values, bins: nil, closed: :left, color: nil)
+            values = Check.finite!(Array(values), "value")
             hist = Stats.histogram(values, bins: bins, closed: closed)
             super(bin_labels(hist), hist.counts, color: color)
         end

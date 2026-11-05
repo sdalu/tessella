@@ -50,7 +50,10 @@ width 40, height 15, canvas `:braille` (`:ascii` when `ascii: true`),
 `color: false`, border by kind. `xscale:` runs a series' x values
 through a transform (`:ln`, `:log2`, `:log10`; `nil` the identity)
 before limits and drawing. An unknown option, canvas, xscale name, or
-(for stairs) style raises `ArgumentError` naming it.
+(for stairs) style raises `ArgumentError` naming it, as do a width or
+height that is not a positive Integer, x and y of different lengths,
+and a value that is not a finite number (nil, a String, NaN,
+±Infinity, or what an `xscale:` makes of an x of 0 or below).
 
 `mark:` (on `add`, and on `Inkchart.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
@@ -67,14 +70,34 @@ the fractional last cell with `▏▎▍▌▋▊▉` (`true` by default, always
 of the bar's width (`·` by default, `.` under `ascii: true`; `nil` for
 none).
 
+Bar values may be negative. With at least one, the bar area splits at
+a zero column into a negative and a positive part, each as wide as
+its share of the values' span: negative bars grow left from zero,
+positive ones right, and every value label follows the whole area.
+A negative bar's fractional end is a half cell (`▐`), whole cells
+under `ascii: true` or `eighths: false`:
+
+```text
+     ┌                              ┐
+   a ┤█████████████████········· -6
+   b ┤·················█████████ 3
+   c ┤·························· 0
+     └                              ┘
+```
+
+`Inkchart.stem` refuses a scale that is not positive, and a plot
+that would need more than 1000 stems, one line each (raise `scale:`).
+
 ## The `inkchart` command
 
 ```text
 inkchart [options] [file]
 ```
 
-Reads one file argument or stdin (CSV, tabs, or runs of spaces; blank
-lines and `#` comments skipped), draws one chart, and prints it.
+Reads one file argument or stdin (blank lines and `#` comments
+skipped), draws one chart, and prints it. A line holding a comma
+splits on commas, one holding a tab on tabs, and any other line on
+runs of spaces, so a CSV or tab-separated label may hold spaces.
 Columns by kind: line/scatter/stairs/density take one column of y
 (against 1..n), two columns of x y, or more columns as x and one
 series per further column; bar takes label and value; histogram takes
@@ -177,7 +200,11 @@ A few places depart from unicode_plot on purpose: the density canvas
 honours sizes below 5 (unicode_plot clamps to 5); histogram labels
 survive bins of width 10 or more (unicode_plot crashes there); and an
 axis extreme prints `10`, not `10.0`, while a plotted value keeps its
-own form. See [DESIGN.md](DESIGN.md) for why.
+own form; stem leaves are exact (`0.3` at scale 1 is leaf 3, where
+unicode_plot prints 2); constant data of 1e16 or more draws (it
+crashes unicode_plot); negative bars draw (unicode_plot refuses
+them); and labels in wide characters (CJK) are measured in display
+columns. See [DESIGN.md](DESIGN.md) for why.
 
 ## Development
 
