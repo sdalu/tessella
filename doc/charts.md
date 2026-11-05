@@ -369,7 +369,29 @@ $ tessella chart --kind histogram --orientation vertical \
                 -3.0                  3.0
 ```
 
-Upright bars need values of 0 or more.
+Upright bars need values of 0 or more. `--fill` sets the glyph of
+their full cells; `--track` is for bars across only, and is refused
+here. A value above 0 always draws at least one step, so a bin that
+holds anything never looks empty, even in ASCII, where a step is a
+whole row:
+
+```text
+$ tessella chart --kind histogram --orientation vertical --ascii \
+    --width 18 --height 4 normal.txt
+                +-----------------+
+             72 |      ##         |
+   Frequency    |      ## ##      |
+                |   ## ## ## ##   |
+              0 |## ## ## ## ## ##|
+                +-----------------+
+                -3.0            3.0
+```
+
+```text
+$ tessella chart --kind bar --orientation vertical neg.csv
+tessella chart: a vertical eighths bar chart needs values of 0 or more
+Usage: tessella chart [options] [file]
+```
 
 ### Upright boxes
 
@@ -475,7 +497,12 @@ $ tessella chart --kind histogram --blocks half --width 24 normal.txt
 
 Every glyph set but the default `eighths` needs values of 0 or more,
 and `braille` and `block` take no `--ascii`, `--fill`,
-`--no-eighths` or `--track`:
+`--no-eighths` or `--track`. As upright, a value above 0 draws at
+least one step (a dot, a quadrant, a half cell); only the default
+eighths bars across round as unicode_plot does, so a small value can
+draw nothing there.
+
+A refused combination is a usage error:
 
 ```text
 $ tessella chart --kind bar --blocks braille --ascii langs.csv
