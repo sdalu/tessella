@@ -42,11 +42,22 @@ module Tessella
                                    .map { "#{it.join(", ")}," }
             parser.on("--style S", *styles,
                       "or a fill and a track glyph") { opts[:style] = it }
-            parser.on("--width N", Integer, "bar cells (default 20)") do |n|
-                opts[:width] = n
-            end
+            layout(parser, opts)
             titles(parser, opts)
             flags(parser, opts)
+        end
+
+        def self.layout(parser, opts)
+            parser.on("--width N", Integer, "horizontal bar cells " \
+                                            "(default 20)") do |n|
+                opts[:width] = n
+            end
+            parser.on("--orientation O", %w[horizontal vertical],
+                      "horizontal, or vertical: filled bottom-up") do |v|
+                opts[:orientation] = v.to_sym
+            end
+            parser.on("--height N", Integer,
+                      "vertical bar cells (default 8)") { opts[:height] = it }
         end
 
         def self.titles(parser, opts)

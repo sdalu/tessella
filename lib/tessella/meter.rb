@@ -8,23 +8,56 @@ module Tessella
     # block style fills its last cell by eighths. title: goes before
     # the bar, the percentage after it unless label: false;
     # title_width: pads the title to that many columns, so meters with
-    # titles of different lengths line up.
+    # titles of different lengths line up. orientation: :vertical
+    # stands the bar up (MeterUpright).
     module Meter
         EIGHTHS = " ▏▎▍▌▋▊▉".chars.freeze
 
-        # rubocop:disable-next Metrics/ParameterLists
-        def self.build(fraction, style: :block, width: 20, title: nil,
-                       label: true, brackets: true, ascii: false,
-                       title_width: nil)
+        DEFAULTS = { style: :block, title: nil, label: true,
+                     brackets: true, ascii: false, title_width: nil }.freeze
+
+        # orientation: :horizontal takes width: (20), :vertical height:
+        # (8); the other is refused.
+        def self.build(fraction, orientation: :horizontal, **opts)
             share = fraction!(fraction)
-            Check.positive_integer!(width, "width")
-            fill, track = pair!(ascii ? :classic : style, ascii)
-            eighths = Borders.name(style) == :block && !ascii
-            bar = bar(share, width, fill, track, eighths)
-            line = [title && title!(title, title_width, ascii),
-                    brackets ? "[#{bar}]" : bar,
-                    (percent(share) if label)].compact.join(" ")
-            Block.new([line])
+            opts = sized!(orientation, DEFAULTS.merge(opts))
+            return MeterUpright.build(share, opts) if orientation == :vertical
+
+            Block.new([line(share, opts)])
+        end
+
+        def self.sized!(orientation, opts)
+            sizes = { horizontal: [:width, 20], vertical: [:height, 8] }
+            own, default = sizes.fetch(orientation) do
+                raise ArgumentError, "orientation must be :horizontal or " \
+                                     ":vertical: #{orientation.inspect}"
+            end
+            other = (%i[width height] - [own]).first
+            raise ArgumentError, "a #{orientation} meter takes no #{other}:" if
+                opts.key?(other)
+
+            opts.merge(own => opts.fetch(own, default))
+        end
+
+        def self.line(share, opts)
+            Check.positive_integer!(opts[:width], "width")
+            bar = bar(share, opts[:width], glyphs(opts), eighths?(opts))
+            [title_of(opts), opts[:brackets] ? "[#{bar}]" : bar,
+             (percent(share) if opts[:label])].compact.join(" ")
+        end
+
+        # [fill, track]: the style's, or classic's under ascii:.
+        def self.glyphs(opts)
+            pair!(opts[:ascii] ? :classic : opts[:style], opts[:ascii])
+        end
+
+        def self.title_of(opts)
+            opts[:title] && title!(opts[:title], opts[:title_width],
+                                   opts[:ascii])
+        end
+
+        def self.eighths?(opts)
+            Borders.name(opts[:style]) == :block && !opts[:ascii]
         end
 
         # The title, padded to title_width: columns when given.
@@ -78,7 +111,8 @@ module Tessella
                                  "classes: #{classes.join(", ")}"
         end
 
-        def self.bar(share, width, fill, track, eighths)
+        def self.bar(share, width, glyphs, eighths)
+            fill, track = glyphs
             units = (share * width * (eighths ? 8 : 1)).round
             full, rem = eighths ? units.divmod(8) : [units, 0]
             cells = (fill * full) + (rem.zero? ? "" : EIGHTHS[rem])
@@ -89,6 +123,7 @@ module Tessella
     end
 
     # fraction (0..1, or "45%"), style: :block, width: 20, title: nil,
-    # label: true, brackets: true, ascii: false.
+    # label: true, brackets: true, ascii: false, title_width: nil,
+    # orientation: :horizontal (:vertical takes height: 8 instead).
     def self.meter(fraction, **) = Meter.build(fraction, **)
 end

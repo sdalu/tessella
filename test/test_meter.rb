@@ -62,4 +62,25 @@ class TestMeter < Minitest::Test
         assert_equal(2, cli.first)
         assert_equal(0, cli("--help").first)
     end
+
+    # Standing up: filled from the bottom, the block style topped by
+    # eighths (▁ to ▇), title over and percentage under, centred.
+    def test_a_vertical_meter
+        assert_equal("cpu\n ─\n ·\n ▃\n █\n █\n ─\n60 %",
+                     meter(0.6, orientation: :vertical, height: 4,
+                                title: "cpu"))
+        assert_equal("\n\n=\n=",
+                     meter(0.5, orientation: :vertical, height: 4,
+                                ascii: true, brackets: false, label: false))
+    end
+
+    def test_a_vertical_meter_takes_height_not_width
+        assert_raises(ArgumentError) do
+            meter(0.5, orientation: :vertical, width: 4)
+        end
+        assert_raises(ArgumentError) { meter(0.5, height: 4) }
+        assert_raises(ArgumentError) { meter(0.5, orientation: :diagonal) }
+        assert_equal([0, " ─\n ▄\n ─\n50 %\n"],
+                     cli("--orientation", "vertical", "--height", "1", "0.5"))
+    end
 end

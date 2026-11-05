@@ -285,6 +285,9 @@ a pair of one's own is refused when its two glyphs differ in width
 class, because such a bar changes length as it fills in a CJK
 terminal and the label after it drifts. It doubles as the gauge
 other libraries have: a gauge is a meter with a title.
+`orientation: :vertical` (`meter_upright.rb`) stands it up, a
+column filled from the bottom; several side by side are `compose
+beside`'s, not a meter option.
 `Tessella.rule` (`rule.rb`) is a divider in a registry rule style,
 an ornament centred by display width.
 

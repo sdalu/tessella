@@ -449,6 +449,12 @@ On the command line: `tessella meter [--style S] [--width N] [--title
 T] [--title-width N] [--no-label] [--no-brackets] [--ascii]
 FRACTION`; `title_width:` (`--title-width`) pads the title, so a
 column of meters with titles of different lengths lines up.
+`orientation: :vertical` (`--orientation vertical`) stands the bar
+up: a column of `height:` cells (8; `width:` is then refused) filled
+from the bottom, the block style topped by eighths (`▁` to `▇`),
+between `─` caps (`-` in ASCII, none under `brackets: false`), the
+title above and the percentage below, centred on the bar; `compose
+beside` sets several side by side.
 
 `Tessella.grid(*figures, columns: 2, gap: 2, row_gap: 1, align:
 :top)` sets figures out in rows of `columns`, a dashboard of charts,
