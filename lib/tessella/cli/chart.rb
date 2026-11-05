@@ -80,10 +80,32 @@ module Tessella
         end
     end
 
-    # The heatmap's flags, kept apart so Options stays under budget.
+    # Flags particular to some kinds (the axes' scales and dates, the
+    # histogram's bins, the heatmap's cells), kept apart so Options
+    # stays under budget.
     class ChartCLI
-        module HeatmapFlags
+        module KindFlags
             private
+
+            def add_axes
+                @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
+                @parser.on("--xdate [FMT]") { |v| @opts[:xdate] = v || true }
+            end
+
+            def add_histogram_specific
+                @parser.on("--bins N", Integer) { |v| @opts[:bins] = v }
+                @parser.on("--closed C") { |v| @opts[:closed] = v.to_sym }
+            end
+
+            def add_layout
+                @parser.on("--orientation O", %w[horizontal vertical]) do |v|
+                    @opts[:orientation] = v.to_sym
+                end
+                blocks = %w[eighths braille block quadrant half]
+                @parser.on("--blocks B", blocks) do |v|
+                    @opts[:blocks] = v.to_sym
+                end
+            end
 
             def add_heatmap
                 @parser.on("--cell-width N", Integer) do |n|
@@ -104,7 +126,7 @@ module Tessella
     # bad flag, missing argument, or disallowed value.
     class ChartCLI
         class Options
-            include HeatmapFlags
+            include KindFlags
 
             KINDS = %w[line scatter stairs density bar histogram box
                        stem heatmap].freeze
@@ -169,7 +191,7 @@ module Tessella
                 @parser.on("--style C") { |v| @opts[:style] = v.to_sym }
                 @parser.on("--scale N") { |v| @opts[:scale] = num(v) }
                 @parser.on("--xscale C") { |v| @opts[:xscale] = v.to_sym }
-                @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
+                add_axes
             end
 
             def add_area
@@ -177,21 +199,6 @@ module Tessella
                 @parser.on("--gradient C,C", Array) do |v|
                     @opts[:gradient] =
                         v == ["none"] ? false : v.map { Color.parse(it) }
-                end
-            end
-
-            def add_histogram_specific
-                @parser.on("--bins N", Integer) { |v| @opts[:bins] = v }
-                @parser.on("--closed C") { |v| @opts[:closed] = v.to_sym }
-            end
-
-            def add_layout
-                @parser.on("--orientation O", %w[horizontal vertical]) do |v|
-                    @opts[:orientation] = v.to_sym
-                end
-                blocks = %w[eighths braille block quadrant half]
-                @parser.on("--blocks B", blocks) do |v|
-                    @opts[:blocks] = v.to_sym
                 end
             end
 
@@ -232,6 +239,15 @@ module Tessella
         module Columns
             def self.numeric(rows, index, name)
                 rows.each_with_index.map { |row, i| field(row, index, name, i) }
+            end
+
+            # The x column under --xdate: ISO 8601 times, a bad one named.
+            def self.times(rows, index)
+                rows.each_with_index.map do |row, i|
+                    IsoTime.parse(row[index].to_s) or
+                        raise DataError, "row #{i + 1}: x is not an ISO 8601 " \
+                                         "date: #{row[index].inspect}"
+                end
             end
 
             def self.field(row, index, name, row_no)
@@ -287,10 +303,10 @@ module Tessella
                         ascii color xscale].freeze
 
             EXTRA = {
-                line: %i[area gradient orientation yscale],
-                scatter: %i[orientation yscale],
-                density: %i[orientation yscale],
-                stairs: %i[style area gradient orientation yscale],
+                line: %i[area gradient orientation yscale xdate],
+                scatter: %i[orientation yscale xdate],
+                density: %i[orientation yscale xdate],
+                stairs: %i[style area gradient orientation yscale xdate],
                 bar: %i[fill eighths track orientation blocks stacked],
                 histogram: %i[fill eighths track bins closed orientation
                               blocks],
@@ -316,6 +332,7 @@ module Tessella
                      gradient: "--gradient", orientation: "--orientation",
                      blocks: "--blocks", yscale: "--yscale",
                      stacked: "--stacked", cell_width: "--cell-width",
+                     xdate: "--xdate",
                      colormap: "--colormap", min: "--min", max: "--max",
                      eighths: "--no-eighths", track: "--track" }.freeze
 
@@ -409,13 +426,17 @@ module Tessella
             def self.build(kind, opts, rows)
                 header, data = Header.split(rows)
                 ncols = (header || data.first).size
-                columns = (0...ncols).map { column(data, header, it, ncols) }
+                columns = (0...ncols).map do |i|
+                    column(data, header, i, ncols, opts[:xdate])
+                end
                 chart = first_call(kind, opts, columns, header)
                 add_rest(chart, columns, header)
                 chart
             end
 
-            def self.column(data, header, i, ncols)
+            def self.column(data, header, i, ncols, xdate)
+                return Columns.times(data, i) if xdate && i.zero? && ncols > 1
+
                 Columns.numeric(data, i, field_name(header, i, ncols))
             end
 

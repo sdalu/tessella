@@ -392,6 +392,9 @@ Tessella.stairs(x = nil, y, style: :post, **opts)  # or style: :pre,
                                             #   as unicode_plot's stairs
 Tessella.line(y, area: true, gradient: %i[green yellow red]) # line,
                                             #   stairs: filled, btop-style
+    # x values that are times: a date axis in UTC (kinds/date_axis.rb),
+    #   xdate: its strftime format; `chart --xdate` parses ISO 8601 in
+    #   plain Ruby (cli/iso_time.rb), as the library requires only zlib
     # orientation: the direction the value axis runs, every kind but
     #   stem: plotted kinds :vertical by default, :horizontal swaps the
     #   axes (kinds/sideways.rb, each series stored swapped); bar,

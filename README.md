@@ -63,6 +63,17 @@ height that is not a positive Integer, x and y of different lengths,
 and a value that is not a finite number (nil, a String, NaN,
 ±Infinity, or what an `xscale:` makes of an x of 0 or below).
 
+Dates on x: give line, scatter, stairs or density x values that are
+times (a `Time`, or a `Date`/`DateTime`, a `Date` counting from
+midnight UTC). They are plotted as seconds and the axis is labelled as
+dates, in UTC, its format following the span (`%Y-%m-%d` for a day or
+more, `%m-%d %H:%M` for an hour or more, `%H:%M:%S` below) or set by
+`xdate: "%b %d"`; the axis spans the data exactly unless `xlim:`
+(which may hold times) says otherwise, and takes no `xscale:`. On the
+command line, `--xdate [FMT]` reads the x column as ISO 8601
+(`2026-11-05`, `2026-11-05T14:30`, with `Z` or `+hh:mm`, UTC when
+absent); a field that is not one is bad input.
+
 `mark:` (on `add`, and on `Tessella.line`, `.scatter`, `.stairs` and
 `.density` for the first series) draws that series as one glyph in
 the cell of each point, over whatever the cell holds, instead of the
@@ -553,8 +564,8 @@ line|scatter|stairs|density|bar|histogram|box|stem|heatmap` (default
 `--width N`, `--height N`, `--title S`, `--xlabel S`, `--ylabel S`,
 `--xlim A,B`, `--ylim A,B`,
 `--canvas braille|block|quadrant|half|dot|ascii|density`,
-`--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` for
-line, scatter, stairs and density).
+`--ascii`, `--color`, `--xscale ln|log2|log10` (and `--yscale` and
+`--xdate [FMT]` for line, scatter, stairs and density).
 
 Kind-specific: `--bins N` and `--closed left|right` (histogram only);
 `--style post|pre` (stairs only); `--stacked` (bar only); `--blocks

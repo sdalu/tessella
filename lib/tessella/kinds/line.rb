@@ -8,9 +8,10 @@ module Tessella
     # its cells take gradient:'s colours by height, bottom band first.
     class Line < Chart
         include Sideways
+        include DateAxis
 
         OPTIONS = (Chart::OPTIONS +
-                   %i[area gradient orientation yscale]).freeze
+                   %i[area gradient orientation yscale xdate]).freeze
         GRADIENT = %i[green yellow red].freeze
 
         def initialize(**opts)
@@ -59,8 +60,9 @@ module Tessella
     # no path drawn between points.
     class Scatter < Chart
         include Sideways
+        include DateAxis
 
-        OPTIONS = (Chart::OPTIONS + %i[orientation yscale]).freeze
+        OPTIONS = (Chart::OPTIONS + %i[orientation yscale xdate]).freeze
 
         private
 
