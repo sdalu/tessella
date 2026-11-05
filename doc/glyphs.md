@@ -101,9 +101,9 @@ for choosing one in their targets and notes:
 
 ```text
 $ tessella glyphs head
-head     full               N+A  term web      ►◄▲▼  mixed  (▴ ▾ for ▲ ▼ under cjk)
+head     full               N+A  term web      ►◄▲▼  mixed  (▴▾ under cjk)
 head     small              N    term cjk web  ▸◂▴▾
-head     emoji              A    term          ▶◀  (U+FE0E after it on the web)
+head     emoji              A    term          ▶◀  (+U+FE0E on web)
 ```
 
 `full` (`►◄▲▼`) is mixed: `► ◄` are narrow, `▲ ▼` ambiguous, so in a
