@@ -135,17 +135,59 @@ $ ruby cjk.rb
 
 ## web
 
-A browser may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide colour
-emoji. Under `web` the output carries U+FE0E, the text-presentation
-selector, after each such glyph, so it is drawn as a text glyph, not
-an emoji. It is invisible, and the one exception to tessella's rule
-of no invisible characters in its output.
+A figure read in a browser (a README on GitHub, a page of docs) is at
+risk where it draws an arrow head. The arrow glyphs fall in three
+groups:
 
-The selector fixes a glyph's form, not its width. A glyph the page's
-monospace font does not carry is drawn from a fallback font, at that
-font's width: in Chrome on GitHub's code fonts `▶` takes two columns
-and `↗` 1.4, with or without U+FE0E. On the web, then, only glyphs
-the monospace font carries line up: prefer `▸` to `▶`.
+| Glyphs             | On the web                                            |
+|--------------------|-------------------------------------------------------|
+| `▸ ◂ ▴ ▾`          | text glyphs most monospace fonts carry: they line up  |
+| `→ ← ↑ ↓`          | text glyphs most monospace fonts carry: they line up  |
+| `▶ ◀ ↔ ↕ ↗ ↘ ↙ ↖`  | emoji-capable: may become a wide colour emoji         |
+
+So on the web, end a drawn line with a small head, `────▸`, and keep
+`→ ← ↑ ↓` for arrows standing alone. tessella's own figures do: a
+sequence diagram's arrows end in `▸` and `◂`, and an asynchronous
+message in `→`.
+
+When a figure does carry an emoji-capable glyph, `--target web` puts
+U+FE0E, the text-presentation selector, right after it. The selector
+is invisible; here it is made visible as `[FE0E]`:
+
+```text
+$ tessella --target web rule --width 24 --ornament '▶ next' | \
+    ruby -pe 'gsub("\u{FE0E}", "[FE0E]")'
+──────── ▶[FE0E] next ────────
+```
+
+It stops the browser drawing the glyph as an emoji, and is the one
+exception to tessella's rule of no invisible characters in its
+output. It does not fix the glyph's width: a glyph the page's
+monospace font lacks is drawn from a fallback font, at that font's
+width. In Chrome on GitHub's code fonts `▶` takes two columns and
+`↗` 1.4, with or without the selector. On a row that must line up,
+the selector is not enough; `▸` is the arrow head that lines up.
+
+`tessella lint --target web` (the same as `--web`) checks a figure
+for this. It flags a bare emoji-capable glyph, and accepts one
+followed by U+FE0E:
+
+```text
+$ printf 'A ──▶ B\n' | tessella lint --target web
+stdin:1: emoji-capable U+25B6 ▶ (web target)
+```
+
+```text
+$ printf 'A ──▸ B\n' | tessella lint --target web && echo clean
+clean
+```
+
+To add the selector to a figure edited by hand, use a tool rather
+than typing an invisible character:
+
+```sh
+ruby -pi -e 'gsub(/([▶◀])(?!\u{FE0E})/, "\\1\u{FE0E}")' FIGURE.md
+```
 
 ## Checking for a target
 

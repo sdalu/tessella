@@ -82,6 +82,7 @@ All are shown with their output in
 | `drift.txt`    | `lint --border`         | a frame in a custom set, one side moved       |
 | `table-drift.txt` | `lint --ruler`       | a table whose verticals drift on one row      |
 | `notes.md`     | `lint --fences`         | Markdown: a table, prose, a flawed diagram    |
+| `notes-fixed.md` | `lint --target web`  | `notes.md`'s diagram redrawn for the web      |
 | `figure.c`     | `lint --forbid`         | a diagram in a C comment, holding `*/`        |
 | `wide.txt`     | `lint --no-wide`        | a CJK label                                   |
 | `disc.pgm`     | `image`                 | a 64 × 64 grey disc, bright at its centre     |

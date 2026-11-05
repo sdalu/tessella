@@ -138,6 +138,35 @@ $ tessella lint --fences --geometry notes.md
 notes.md:13: connector '│' at col 20 hangs from '─'
 ```
 
+A Markdown file is usually read on the web, so lint it for that
+target too. `--target web` also flags the `▶` at the end of the
+diagram's arrow, which a browser may draw as a wide emoji:
+
+```text
+$ tessella lint --fences --geometry --target web notes.md
+notes.md:11: emoji-capable U+25B6 ▶ (web target)
+notes.md:13: connector '│' at col 20 hangs from '─'
+```
+
+Redrawn with a small arrow head, `▸`, and the connector back on its
+`┬`, the figure in `notes-fixed.md` is clean for the web:
+
+```text
+$ sed -n 10,16p notes-fixed.md
+┌───────┐     ┌───────┐
+│ parse │────▸│ draw  │
+└───────┘     └───┬───┘
+                  │
+              ┌───┴───┐
+              │ print │
+              └───────┘
+```
+
+```text
+$ tessella lint --fences --geometry --target web notes-fixed.md && echo clean
+clean
+```
+
 ## The target
 
 The options describe where the figure is going:
