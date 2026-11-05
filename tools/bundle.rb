@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # bundle.rb -- the library and its command line as one file, for
-# vendoring (the ascii-art skill carries this output). Concatenates the
+# vendoring where the gem cannot be installed. Concatenates the
 # files lib/tessella.rb requires, in its order, then the ones
 # lib/tessella/cli.rb requires, in its order, with their require lines
 # and per-file magic comments dropped; the standard library requires

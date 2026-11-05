@@ -21,10 +21,6 @@ break is caught before the slow oracle run.
   the require order of `lib/tessella.rb` then `lib/tessella/cli.rb`; a new
   file or a changed load order
   needs it even when `make check` is silent.
-- [ ] `env TESSELLA_SRC=$PWD sh /home/sdalu/skills/docs/ascii-art/tests/check-plot.sh`
-  — passes after `dist/tessella.rb` has been copied over the ascii-art
-  skill's `scripts/tessella.rb`. That tree is not this project's: hand
-  the copy to its owner rather than committing it from here.
 
 ## Documents
 
