@@ -13,6 +13,7 @@ module Tessella
                 refuse!(opts)
                 _header, data = Header.split(rows, bar_like: true)
                 two!(data)
+                ChartCLI.fills!(data.size, "slices")
                 Tessella.pie(data.map(&:first),
                              Columns.numeric(data, 1, "value"),
                              **ChartOpts.for(opts).except(*REFUSED.keys))

@@ -505,6 +505,14 @@ module Tessella
     # bar: label value; histogram: one column of samples, over
     # Stats.histogram's bins (DESIGN.md's CLI input rules).
     class ChartCLI
+        # More series (or slices) than fills is input that cannot be
+        # drawn: exit 1, as Legend.fills! would raise.
+        def self.fills!(count, what)
+            Legend.fills!(count, what)
+        rescue ArgumentError => e
+            raise DataError, e.message
+        end
+
         class BarKind
             def self.build(kind, opts, rows)
                 header, data = Header.split(rows, bar_like: kind == :bar)
@@ -518,6 +526,7 @@ module Tessella
             def self.bar(opts, data, header)
                 labels = data.map { it[0] }
                 ncols = same_width!(data)
+                ChartCLI.fills!(ncols - 1, "series")
                 if ncols == 2
                     return Tessella.bar(labels,
                                         Columns.numeric(data, 1, "value"),

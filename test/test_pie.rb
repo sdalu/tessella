@@ -83,4 +83,11 @@ class TestPie < Minitest::Test
         assert_equal(1, status)
         assert_includes(err, "pie reads label value")
     end
+
+    def test_the_command_refuses_a_thirteenth_slice
+        rows = (1..13).map { "s#{it} 1\n" }.join
+        status, _, err = run_cli(%w[chart --kind pie], rows)
+        assert_equal(1, status)
+        assert_includes(err, "at most 12 slices")
+    end
 end
