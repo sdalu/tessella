@@ -285,12 +285,21 @@ module Tessella
             [top, mid, bot]
         end
 
+        HEADS = {
+            term: { call: { right: "▸", left: "◂" },
+                    async: { right: "→", left: "←" } },
+            # Bolder heads for a browser, where ▸ reads small (not
+            # emoji-capable, though a font lacking them gives them a
+            # fallback width); async a double head, as ->> writes it.
+            web: { call: { right: "►", left: "◄" },
+                   async: { right: "►►", left: "◄◄" } }
+        }.freeze
+
         def self.arrowhead(kind, dir, style)
             return dir == :right ? ">" : "<" if style[:ascii]
 
-            small = { right: "▸", left: "◂" }
-            open = { right: "→", left: "←" }
-            (kind == :async ? open : small)[dir]
+            heads = HEADS[Target.web? ? :web : :term]
+            heads[kind == :async ? :async : :call][dir]
         end
 
         def self.alt_dashes(n) = (0...n).map { |i| i.even? ? "-" : " " }.join
@@ -336,12 +345,13 @@ module Tessella
         def self.fill_arrow_row(row, spec, style, dashed)
             lo, hi, kind, dir = spec.values_at(:lo, :hi, :kind, :dir)
             gap = dash_run(hi - lo - 2, dashed, style)
+            head = arrowhead(kind, dir, style)
             if dir == :right
-                place!(row, hi - 1, arrowhead(kind, :right, style))
                 place!(row, lo + 1, gap)
+                place!(row, hi - Width.of(head), head)
             else
-                place!(row, lo + 1, arrowhead(kind, :left, style))
                 place!(row, lo + 2, gap)
+                place!(row, lo + 1, head)
             end
         end
 
@@ -389,9 +399,9 @@ module Tessella
 
         def self.self_loop_bot(lay, style, kind, col)
             row = lifeline_row(lay, style)
-            place!(row, col + 1, arrowhead(kind, :left, style))
             place!(row, col + 2, dash_run(LOOP_WIDTH - 2, kind == :reply,
                                           style))
+            place!(row, col + 1, arrowhead(kind, :left, style))
             place!(row, col + LOOP_WIDTH, style[:br])
             row
         end

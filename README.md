@@ -368,7 +368,9 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
 - **seq**: `participant A`, `A -> B: call`, `A --> B: reply`, `A ->>
   B: async`, `A -> A: self`, `note over A[,B]: text`; columns widen
   to fit every label, and `numbered:` / `footer:` number the messages
-  and repeat the participant boxes below.
+  and repeat the participant boxes below. Heads are `▸ ◂` for calls
+  and replies and `→ ←` for async; under target `:web`, where `▸`
+  reads small in a browser, the bolder `► ◄`, and `►► ◄◄` for async.
 
 Every one refuses bad input with an `ArgumentError` naming the line,
 and under `ascii: true` draws ASCII glyphs and refuses non-ASCII text.
@@ -575,7 +577,9 @@ its width: a glyph missing from the viewer's monospace font is drawn
 from a fallback font at that font's width (in Chrome on GitHub's code
 fonts, `▶` takes two columns and `↗` 1.4, with or without U+FE0E), so
 on the web only glyphs the monospace font carries line up -- `▸`, not
-`▶`. On the command line:
+`▶`. A sequence diagram draws the bolder `► ◄` there (see the
+diagrams), chosen for their look: not emoji-capable, but a font
+without them gives them a fallback width too. On the command line:
 `tessella --target term|cjk|web COMMAND ...`, or `TESSELLA_TARGET`.
 `tessella lint --target` checks a figure for a target, and `tessella
 glyphs` says which sets are safe for which.

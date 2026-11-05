@@ -99,4 +99,16 @@ class TestTarget < Minitest::Test
         assert_equal("┌───┐\n", cli(%w[--target cjk compose frame
                                        --no-ascii -])[1].lines.first)
     end
+
+    # seq under web: bolder heads ► ◄, an async one doubled; the
+    # terminal keeps ▸ ◂ and →.
+    def test_web_sequence_arrowheads
+        text = "participant A\nparticipant B\nA -> B: go\nB ->> A: back\n"
+        web = T.with(:web) { Tessella.seq(text).to_s }
+        assert_includes(web, "─►│")
+        assert_includes(web, "│◄◄─")
+        term = Tessella.seq(text).to_s
+        assert_includes(term, "─▸│")
+        assert_includes(term, "│←─")
+    end
 end
