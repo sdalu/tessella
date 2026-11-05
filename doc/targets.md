@@ -152,40 +152,9 @@ never turn into emoji, but a font without them still draws them at a
 fallback width: they trade a little of `▸`'s safety for a head that
 reads at a glance.
 
-A sequence diagram drawn for the web takes the bolder heads: `►` and
-`◄` end calls and replies, and a double `►►` marks an asynchronous
-message, where the terminal draws `▸`, `◂` and `→`:
-
-```text
-$ tessella --target web seq login.txt
-┌─────────┐    ┌─────────┐        ┌─────┐
-│ Browser │    │ Server  │        │ DB  │
-└────┬────┘    └────┬────┘        └──┬──┘
-     │              │                │
-     │ POST /login  │                │
-     │─────────────►│                │
-     │              │                │
-     │              │  SELECT user   │
-     │              │───────────────►│
-     │              │                │
-     │              │      row       │
-     │              │◄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
-     │              │                │
-     │              │──┐             │
-     │              │  │ check hash  │
-     │              │◄─┘             │
-     │              │                │
-     │              ┌────────────────┐
-     │              │bcrypt, cost 12 │
-     │              └────────────────┘
-     │              │                │
-     │              │  log attempt   │
-     │              │──────────────►►│
-     │              │                │
-     │ 200 + cookie │                │
-     │◄┄┄┄┄┄┄┄┄┄┄┄┄┄│                │
-     │              │                │
-```
+tessella's sequence diagrams use the bolder heads in every target,
+terminal included: `►` and `◄` for calls and replies, `►►` and `◄◄`
+for asynchronous messages ([sequence diagrams](seq.md#arrow-heads)).
 
 When a figure does carry an emoji-capable glyph, `--target web` puts
 U+FE0E, the text-presentation selector, right after it. The selector

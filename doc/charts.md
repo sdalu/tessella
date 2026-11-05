@@ -664,6 +664,29 @@ $ tessella chart --kind pie --ascii --height 8 langs.csv
         ========
 ```
 
+By default a cell belongs whole to one slice, so the disc's edge is
+stepped. `--rim smooth` (`rim: :smooth`) draws each cell the disc, or
+a donut's hole, only partly covers as the shape glyph that fits it
+best (`◢◣◤◥`, halves, quadrants, quarter blocks), in its slice's
+colour:
+
+```text
+$ tessella chart --kind pie --donut --rim smooth --height 8 langs.csv
+      ▁▂▄▆█▒██▆▄▂▁
+     ▗█▒▒▒▒▒██████▖
+    ◢▓▓▓█▀▔  ▔▀████◣ █ ruby 24 %
+    █▓▓▓▘      ▝████ ▓ c 61 %
+    █▓▓▓▖      ▗▓▓▓█ ▒ rust 15 %
+    ◥▓▓▓█▄▁  ▁▄█▓▓▓◤
+     ▝█▓▓▓▓▓▓▓▓▓▓█▘
+      ▔🮂▀🮅█▓▓█🮅▀🮂▔
+```
+
+The rim glyphs are solid, so without colour they draw the edge as an
+outline in the nearest slice's fill. `--rim basic` leaves out `🮊 🮂
+🮅`, which older fonts lack. `--rim cells` is the default; `--ascii`
+refuses the other two, and only a pie takes `--rim`.
+
 A pie takes no `--width`, `--xlim`, `--ylim`, `--canvas` or
 `--xscale` (usage errors, exit 2), and reads exactly a label and a
 value a row:
@@ -676,7 +699,7 @@ tessella chart: row 1 has 4 columns: pie reads label value
 In Ruby:
 
 ```ruby
-Tessella.pie(labels, values, donut: false, **opts)
+Tessella.pie(labels, values, donut: false, rim: :cells, **opts)
 ```
 
 ## Orientation
@@ -1003,6 +1026,7 @@ corner-and-tick frame bar charts use, or `:none`.
 | `--colormap C,C,...`        | `colormap: [...]`  | heatmap              |
 | `--min A`, `--max B`        | `min:`, `max:`     | heatmap              |
 | `--donut`                   | `donut: true`      | pie                  |
+| `--rim cells\|smooth\|basic` | `rim: :cells`      | pie                  |
 
 The bar defaults are `fill: "█"`, `eighths: true`, `track: "·"`;
 under `ascii: true`, `#`, no eighths, and `.`.

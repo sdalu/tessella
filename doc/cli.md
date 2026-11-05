@@ -91,7 +91,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
                [--cell-width N] [--colormap C,C,...] [--min A] [--max B]
-               [--donut]
+               [--donut] [--rim cells|smooth|basic]
                [file]
 ```
 
@@ -120,6 +120,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--colormap C,...`     | heatmap, with --color: colour stops    | viridis-like    |
 | `--min A`, `--max B`   | heatmap: fix the range                 | the data's      |
 | `--donut`              | pie: a ring, not a disc                | off             |
+| `--rim R`              | pie: `cells smooth basic` edge         | `cells`         |
 | `--stacked`            | bar: series end to end, not grouped    | grouped         |
 | `--blocks B`           | bar, histogram: `eighths half block quadrant braille` | `eighths` |
 | `--area`               | line, stairs: fill under each series   | off             |

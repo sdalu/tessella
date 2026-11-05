@@ -21,7 +21,7 @@ One statement per line; blank lines and `#` comments are skipped.
 | `participant A`         | declares A, fixing its column           |
 | `A -> B: text`          | a call, solid arrow                     |
 | `A --> B: text`         | a reply, dashed arrow                   |
-| `A ->> B: text`         | an asynchronous message, open arrowhead |
+| `A ->> B: text`         | an asynchronous message, double head    |
 | `A -> A: text`          | a self call, a loop right of A          |
 | `note over A: text`     | a note on A's lifeline                  |
 | `note over A,B: text`   | a note spanning A to B                  |
@@ -51,35 +51,38 @@ $ tessella seq login.txt
 └────┬────┘    └────┬────┘        └──┬──┘
      │              │                │
      │ POST /login  │                │
-     │─────────────▸│                │
+     │─────────────►│                │
      │              │                │
      │              │  SELECT user   │
-     │              │───────────────▸│
+     │              │───────────────►│
      │              │                │
      │              │      row       │
-     │              │◂┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
+     │              │◄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
      │              │                │
      │              │──┐             │
      │              │  │ check hash  │
-     │              │◂─┘             │
+     │              │◄─┘             │
      │              │                │
      │              ┌────────────────┐
      │              │bcrypt, cost 12 │
      │              └────────────────┘
      │              │                │
      │              │  log attempt   │
-     │              │───────────────→│
+     │              │──────────────►►│
      │              │                │
      │ 200 + cookie │                │
-     │◂┄┄┄┄┄┄┄┄┄┄┄┄┄│                │
+     │◄┄┄┄┄┄┄┄┄┄┄┄┄┄│                │
      │              │                │
 ```
 
-## On the web
+## Arrow heads
 
-Under `--target web` the arrow heads are bolder: `►` and `◄` for calls
-and replies, `►►` for an asynchronous message. See
-[width targets](targets.md#web) for why, and what it costs.
+Calls and replies end in `►` or `◄`, asynchronous messages in a
+double head, `►►` or `◄◄`, in every [width target](targets.md). These
+heads read at a glance and never turn into emoji in a browser, but a
+font that lacks them draws them at a fallback width
+([on the web](targets.md#web)). Under `--ascii` every head is `>` or
+`<`, so there an asynchronous message looks like a call.
 
 ## Options
 
@@ -93,27 +96,27 @@ $ tessella seq --numbered --footer login.txt
 └────┬────┘       └────┬────┘           └──┬──┘
      │                 │                   │
      │ 1. POST /login  │                   │
-     │────────────────▸│                   │
+     │────────────────►│                   │
      │                 │                   │
      │                 │  2. SELECT user   │
-     │                 │──────────────────▸│
+     │                 │──────────────────►│
      │                 │                   │
      │                 │      3. row       │
-     │                 │◂┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
+     │                 │◄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│
      │                 │                   │
      │                 │──┐                │
      │                 │  │ 4. check hash  │
-     │                 │◂─┘                │
+     │                 │◄─┘                │
      │                 │                   │
      │                 ┌───────────────────┐
      │                 │  bcrypt, cost 12  │
      │                 └───────────────────┘
      │                 │                   │
      │                 │  5. log attempt   │
-     │                 │──────────────────→│
+     │                 │─────────────────►►│
      │                 │                   │
      │ 6. 200 + cookie │                   │
-     │◂┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│                   │
+     │◄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄│                   │
      │                 │                   │
 ┌────┴────┐       ┌────┴────┐           ┌──┴──┐
 │ Browser │       │ Server  │           │ DB  │

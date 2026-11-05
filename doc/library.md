@@ -24,7 +24,7 @@ Tessella.stem(values, other = nil, scale: nil, **opts)
 Tessella.heatmap(matrix, xlabels: nil, ylabels: nil, cell_width: 2,
                  colormap: nil, min: nil, max: nil, **opts)
 Tessella.candlestick(x, open:, high:, low:, close:, **opts)
-Tessella.pie(labels, values, donut: false, **opts)
+Tessella.pie(labels, values, donut: false, rim: :cells, **opts)
 
 chart.add(x = nil, y, name: nil, color: nil, mark: nil)  # => chart
 chart.to_s                  # => String, framed, "\n"-terminated
