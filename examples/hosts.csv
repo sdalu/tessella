@@ -1,0 +1,4 @@
+host,cpu,io,net
+web,40,15,20
+db,25,50,5
+cache,10,5,30

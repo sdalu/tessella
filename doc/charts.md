@@ -60,7 +60,7 @@ What each kind reads:
 | Kind                                  | Columns                                                         |
 |---------------------------------------|-----------------------------------------------------------------|
 | `line`, `scatter`, `stairs`, `density` | one column: y against 1..n; two: x y; more: x, then one series each |
-| `bar`                                 | label, value; a row with more is refused                        |
+| `bar`                                 | label, value; or label and one value per series                 |
 | `histogram`                           | one column of samples (further columns are ignored)             |
 | `box`                                 | one or more columns, one box per column                         |
 | `stem`                                | one column; two for the back-to-back form                       |
@@ -242,6 +242,103 @@ $ tessella chart --kind bar --width 30 neg.csv
    b ┤·················█████████ 3
    c ┤·························· 0
      └                              ┘
+```
+
+#### Several series
+
+A row with more than one value draws one bar per series; the header
+names the series, and a legend right of the frame shows each one's
+fill. `hosts.csv` holds a load per host for three resources:
+
+```text
+$ cat hosts.csv
+host,cpu,io,net
+web,40,15,20
+db,25,50,5
+cache,10,5,30
+```
+
+By default the bars are grouped: each label gets one bar per series,
+with a blank row between labels.
+
+```text
+$ tessella chart --kind bar --width 30 hosts.csv
+         ┌                              ┐
+     web ┤████████████████████▊····· 40  █ cpu
+         ┤▓▓▓▓▓▓▓▓·················· 15  ▓ io
+         ┤▒▒▒▒▒▒▒▒▒▒················ 20  ▒ net
+         ┤
+      db ┤█████████████············· 25
+         ┤▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 50
+         ┤▒▒▒······················· 5
+         ┤
+   cache ┤█████▎···················· 10
+         ┤▓▓▓······················· 5
+         ┤▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒·········· 30
+         └                              ┘
+```
+
+`--stacked` (`stacked: true`) sets them end to end in one bar, its
+total as the label:
+
+```text
+$ tessella chart --kind bar --stacked --width 30 hosts.csv
+         ┌                              ┐
+     web ┤█████████████▓▓▓▓▓▒▒▒▒▒▒·· 75  █ cpu
+      db ┤████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ 80  ▓ io
+   cache ┤███▓▓▒▒▒▒▒▒▒▒▒▒··········· 45  ▒ net
+         └                              ┘
+```
+
+Both stand upright with `--orientation vertical`:
+
+```text
+$ tessella chart --kind bar --stacked --orientation vertical \
+    --width 20 --height 6 hosts.csv
+      ┌────────────────────┐
+   80 │▒▒▒▒▒▒ ▓▓▓▓▓▓       │ █ cpu
+      │▒▒▒▒▒▒ ▓▓▓▓▓▓       │ ▓ io
+      │▓▓▓▓▓▓ ▓▓▓▓▓▓       │ ▒ net
+      │██████ ▓▓▓▓▓▓ ▒▒▒▒▒▒│
+      │██████ ██████ ▒▒▒▒▒▒│
+    0 │██████ ██████ ██████│
+      └────────────────────┘
+         web    db    cache
+```
+
+With more series than labels the legend no longer fits beside the
+bars, so it goes on one line under the frame (for upright columns,
+whose names take that line, on the x-label line, unless `--xlabel`
+is given). Here the first two hosts only:
+
+```text
+$ head -3 hosts.csv | tessella chart --kind bar --stacked --width 30
+       ┌                              ┐
+   web ┤█████████████▓▓▓▓▓▒▒▒▒▒▒·· 75
+    db ┤████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒ 80
+       └                              ┘
+        █ cpu  ▓ io  ▒ net
+```
+
+The series are filled `█ ▓ ▒` in turn, `# = +` under `--ascii`; only
+a `█` series ends in an eighth. Bars of several series need values
+of 0 or more.
+
+```text
+$ tessella chart --kind bar --stacked --ascii --width 30 hosts.csv
+         +                              +
+     web |#############=====++++++.. 75  # cpu
+      db |########================++ 80  = io
+   cache |###==++++++++++........... 45  + net
+         +                              +
+```
+
+In Ruby, the values are an Array of Arrays, one per label, and
+`series:` names them:
+
+```ruby
+Tessella.bar(%w[web db cache], [[40, 15, 20], [25, 50, 5], [10, 5, 30]],
+             series: %w[cpu io net], stacked: true, width: 30)
 ```
 
 ### histogram
@@ -727,12 +824,11 @@ $ printf '1\nx\n' | tessella chart
 tessella chart: row 2: y is not a number: "x"
 ```
 
-A bar chart takes exactly a label and a value; a row with more
-columns is refused rather than read in part:
+Every row of a bar chart must have as many columns as the first:
 
 ```text
-$ tessella chart --kind bar trig.txt
-tessella chart: row 1 has 3 columns: bar takes label and value
+$ printf 'a,1,2\nb,3\n' | tessella chart --kind bar
+tessella chart: row 2 has 2 columns, row 1 has 3
 ```
 
 ## How tessella differs from unicode_plot

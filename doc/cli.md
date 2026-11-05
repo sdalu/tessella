@@ -79,7 +79,8 @@ tessella seq: output is 41 columns, over --max-width 30
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
                [--canvas C] [--xscale F] [--yscale F] [--ascii] [--color]
-               [--style post|pre] [--orientation horizontal|vertical]
+               [--style post|pre] [--stacked]
+               [--orientation horizontal|vertical]
                [--area] [--gradient C,C,...] [--blocks B]
                [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
@@ -103,6 +104,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
 | `--orientation O`      | all but stem: value axis direction     | by kind         |
+| `--stacked`            | bar: series end to end, not grouped    | grouped         |
 | `--blocks B`           | bar, histogram: `eighths half block quadrant braille` | `eighths` |
 | `--area`               | line, stairs: fill under each series   | off             |
 | `--gradient C,...`     | area: colours by height, or `none`     | green,yellow,red |
