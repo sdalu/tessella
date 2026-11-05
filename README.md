@@ -400,7 +400,9 @@ trade tone for resolution: `ramp` and `blocks` give one tone per cell,
 pixels into a cell (`octant` is Unicode 16, drawn by the newest
 terminals only, Ghostty and its like), `petscii` draws each cell
 with the glyph whose shape best fits its 4x8 tones, in the spirit of
-the Commodore character set -- halves, quadrants, eighth-lines,
+the Commodore character set -- halves, quadrants, quarter and
+three-quarter blocks (`▊ ▆`, and Legacy Computing's `🮊 🮅` for the
+right and upper ones), eighth-lines,
 diagonal triangles `◢ ◣ ◤ ◥` and lines, shades `░ ▒ ▓`, line pieces,
 discs `● ○` (threshold and dither do not apply to it) -- and `edges`
 draws Sobel contours as `─ │ ╱ ╲`. `ramp:` is glyphs light to dense, or a name

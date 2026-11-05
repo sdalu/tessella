@@ -5,9 +5,11 @@ module Tessella
     # cell is sampled as 4x8 tones and drawn with the glyph whose shape
     # fits them best (least squared error), from a set in the spirit of
     # the Commodore character ROM -- blocks, halves and quadrants,
-    # eighth-lines, diagonal triangles and lines, shades, line pieces,
-    # discs. A shape a glyph draws is a function of the cell's x and y
-    # (0..1, y down), so the set is one table. Threshold and dither do
+    # quarter and three-quarter blocks on every side (the upper and
+    # right ones from Symbols for Legacy Computing), eighth-lines,
+    # diagonal triangles and lines, shades, line pieces, discs. The
+    # shape a glyph draws is a function of the cell's x and y (0..1, y
+    # down), so the set is one table. Threshold and dither do
     # not apply: the match reads tones, not on/off pixels.
     module Image
         HLINE = ->(_x, y) { (y - 0.5).abs < 0.13 }
@@ -29,6 +31,11 @@ module Tessella
             "▟" => ->(x, y) { x >= 0.5 || y >= 0.5 },
             "▏" => ->(x, _y) { x < 0.25 }, "▕" => ->(x, _y) { x >= 0.75 },
             "▔" => ->(_x, y) { y < 0.125 }, "▁" => ->(_x, y) { y >= 0.875 },
+            "▊" => ->(x, _y) { x < 0.75 },
+            "\u{1FB8A}" => ->(x, _y) { x >= 0.25 },
+            "▂" => ->(_x, y) { y >= 0.75 }, "▆" => ->(_x, y) { y >= 0.25 },
+            "\u{1FB82}" => ->(_x, y) { y < 0.25 },
+            "\u{1FB85}" => ->(_x, y) { y < 0.75 },
             "◢" => ->(x, y) { x + y >= 1 }, "◣" => ->(x, y) { y >= x },
             "◤" => ->(x, y) { x + y < 1 }, "◥" => ->(x, y) { x > y },
             "╱" => ->(x, y) { (x + y - 1).abs < 0.22 },

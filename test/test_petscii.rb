@@ -23,6 +23,14 @@ class TestPetscii < Minitest::Test
         assert_equal("█", cell { true })
     end
 
+    # An edge a quarter of the way in is a three-quarter block, not a
+    # line piece whose stem happens to cover it.
+    def test_quarter_edges_find_three_quarter_blocks
+        assert_equal("\u{1FB8A}", cell { |x, _| x >= 0.25 })
+        assert_equal("▊", cell { |x, _| x < 0.75 })
+        assert_equal("▆", cell { |_, y| y >= 0.25 })
+    end
+
     def test_a_flat_tone_finds_a_shade
         pgm = "P5\n16 16\n255\n#{([128] * 256).pack("C*")}"
         assert_equal("▒", Tessella.image(pgm, style: :petscii, width: 1)
