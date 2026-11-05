@@ -66,11 +66,14 @@ Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
                edge_threshold: 0.3, ascii: false)
 Tessella.meter(fraction, style: :block, width: 20, title: nil,
                label: true, brackets: true, ascii: false)
+Tessella.rule(width: 78, ornament: nil, style: :light, ascii: false)
+Tessella.text(str, style:, strict: false, ascii: false)  # => String
 ```
 
-Each returns a `Block`. Pages: [tree](tree.md), [table](table.md),
+The figures return a `Block`. Pages: [tree](tree.md), [table](table.md),
 [bitfield](bitfield.md), [wave](wave.md), [seq](seq.md),
-[images](images.md), [meter](meter.md).
+[images](images.md), [meter](meter.md), [rule](rule.md),
+[text](text.md). `text` returns a String, not a Block.
 
 ### Lint
 

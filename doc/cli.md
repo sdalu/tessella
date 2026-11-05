@@ -22,6 +22,8 @@ figure on stdout. Each has its own `--help`.
 | `image`    | a picture as text                          | [images](images.md)            |
 | `lint`     | checks a text figure, drawn or hand-made   | [lint](lint.md)                |
 | `meter`    | a one-line progress bar or gauge           | [meter](meter.md)              |
+| `rule`     | a divider, with an optional ornament       | [rule](rule.md)                |
+| `text`     | letters in a Unicode style: bold, script…  | [text](text.md)                |
 | `glyphs`   | lists glyph sets and their width classes   | [glyphs](glyphs.md)            |
 
 ## Exit status
@@ -149,7 +151,7 @@ bot_t sep_l sep_t sep_r`): see
 [custom borders](composition.md#custom-borders). Table styles are `light heavy double
 rounded dashed dashed_fine heavy_dashed heavy_dashed_fine double_h
 double_v ascii minimal markdown`; image styles `ramp blocks half
-quadrant sextant braille edges`, dithers `fs atkinson bayer none`.
+quadrant sextant braille octant edges`, dithers `fs atkinson bayer none`.
 
 ## `tessella lint`
 

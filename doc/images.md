@@ -10,7 +10,7 @@ Tessella.image(source, style: :ramp, width: 78, ramp: nil, gamma: 1.0,
 ```
 
 ```text
-tessella image [--style S] [--width N] [--dither M] [--ramp STR]
+tessella image [--style S] [--width N] [--dither M] [--ramp STR|NAME]
                [--gamma F] [--threshold F] [--edge-threshold F]
                [--invert] [--ascii] [--max-width N] [file]
 ```
@@ -90,6 +90,7 @@ cell, using dithering for tone; `edges` draws outlines.
 | `quadrant` | 2 × 2           | `▘▝▀▖▌▞▛▗▚▐▜▄▙▟█`               |
 | `sextant`  | 2 × 3           | Unicode 13 sextants `🬀`…`🬻`      |
 | `braille`  | 2 × 4           | braille patterns                |
+| `octant`   | 2 × 4           | Unicode 16 octants (see below)  |
 | `edges`    | 1               | `─ │ ╱ ╲`, Sobel contours       |
 
 `disc.pgm` is a 64 × 64 grey disc, brightest at its centre:
@@ -160,6 +161,14 @@ four styles side by side ([output](cli.md#several-figures-one-result)).
 The sextant glyphs are recent (Unicode 13, 2020): check that the
 reader's font has them before using `sextant`.
 
+`octant` packs 2 × 4 pixels into a cell, as braille does, but as
+solid blocks rather than dots, so a picture keeps its tone where
+braille turns grey. Its glyphs are Unicode 16 (2024), and only the
+newest terminals draw them (Ghostty and its like); elsewhere each
+cell shows as a box or a blank. That is why this page shows no
+octant render: try `tessella image --style octant disc.pgm` in your
+own terminal.
+
 ## Tone
 
 - `--width N`: the picture's width in cells, 78 by default; the
@@ -170,7 +179,11 @@ reader's font has them before using `sextant`.
 - `--invert`: tones are drawn as 1 − t. By default a bright pixel
   gets a dense glyph, which suits light text on a dark terminal;
   invert for dark text on a light page.
-- `--ramp STR`: the tone glyphs for `ramp`, from empty to full.
+- `--ramp STR`: the tone glyphs for `ramp`, from empty to full, or
+  the name of a ramp in the [registry](glyphs.md#the-registry):
+  `ramp` (the default), `blocks`, `long` (70 ASCII glyphs, for finer
+  tone) or `hatch`. A name wins over the same letters taken as
+  glyphs.
 - `--threshold F`: the tone at which a pixel is on, in the pixel
   styles (0.5 by default).
 - `--dither M`: how the pixel styles render tone: `fs`
@@ -204,6 +217,37 @@ $ tessella image --ramp ' .oO@' --width 20 disc.pgm
    .oooOOOOOOooo..
     ..oooooooo..
       ........
+```
+
+```text
+$ tessella image --ramp long --width 30 disc.pgm
+
+          .`^",:,"`'
+       ',!<_?][[]?-~i;`
+     ':<]{(/fjrrjft\)}_l^
+    ^i-1/rucYUJJJYXvxf(]~I.
+   ^i?1tnzJQOmqqwZ0CYvj([~;.
+  .I+}\xzJ0wdhooakpZLYut)?>^
+  '!-1/nYQmdh#8%WokqOJcj|[~:
+  .l_{\xXCOqba##*hdmQUvf(]<"
+   ">])fuXC0mqddpwZQUcr|}_l.
+    :<](fxcXJCLQLCUzur\}_!`
+     ^l_}(/frxnnnxjt|1?>:.
+       ^l<_]}{11{}[-+i,.
+         .`,;Il!l;:^'
+```
+
+```text
+$ tessella image --ramp hatch --width 20 disc.pgm
+
+       ·······
+    ··∘∘∘∘∘∘∘∘··
+   ··∘∘∘╱╱╱╱╱∘∘∘·
+  ··∘∘╱╱╱╳╳╱╱╱∘∘··
+  ··∘∘╱╱╱╳╳╱╱╱∘∘··
+   ·∘∘∘╱╱╱╱╱╱∘∘∘··
+    ··∘∘∘∘∘∘∘∘··
+      ········
 ```
 
 ## ASCII
