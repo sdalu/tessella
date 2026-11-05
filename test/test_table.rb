@@ -396,8 +396,10 @@ end
 
 # Multi-line cells, fitting a width, colour in cells (climat's Render
 # needs): a cell's "\n" draws on several lines, the row top-aligned;
-# width: narrows the widest column and wraps it, refusing below
-# min_width; colour is zero width and survives padding and wrapping.
+# width: narrows the widest column step by step, then the next widest,
+# wrapping each, refusing only with every column at min_width (or its
+# natural width if smaller); colour is zero width and survives padding
+# and wrapping.
 class TestTableCells < Minitest::Test
     ROWS = [%w[zone devices], ["living", "thermostat\nvalve"],
             ["bed", "one two three four five"]].freeze
@@ -426,7 +428,7 @@ class TestTableCells < Minitest::Test
 
     def test_too_narrow_a_width_is_refused_naming_the_least
         error = assert_raises(ArgumentError) { lines(width: 10) }
-        assert_includes(error.message, "needs 17 columns")
+        assert_includes(error.message, "needs 15 columns")
     end
 
     def test_colour_is_zero_width_and_reopened_across_a_wrap
@@ -514,5 +516,38 @@ class TestNamedBorderStyles < Minitest::Test
                                    stdin: StringIO.new("a,b\n"),
                                    stdout: StringIO.new, stderr: StringIO.new)
         assert_equal(0, status)
+    end
+end
+
+# The climat case that "widest only" refused: narrowing Devices alone
+# leaves 102 columns; narrowing By too fits 100.
+class TestTableFitConverges < Minitest::Test
+    ROWS = [%w[Zone Now Band Strategy By Devices],
+            ["bathroom", "21.1 °C", "+18.0..+28.0", "cheapest",
+             "timetable:bath-work until 20:00", "tado 17.0 °C"],
+            ["living", "20.9 °C", "+20.0..+26.0", "quick",
+             "timetable:living-work until 23:00",
+             "tado ×6 20.0 °C, airzone off"],
+            ["yellow-room", "20.1 °C", "+7.0..", "cheapest", "fallback",
+             "tado 7.0 °C, airzone heat 20.0 °C held until 22:51"]].freeze
+
+    def test_the_next_widest_column_narrows_too
+        out = Tessella.table(ROWS, style: :rounded, width: 100,
+                                   min_width: 12).to_s.lines(chomp: true)
+        assert(out.all? { Tessella::Width.of(it) <= 100 }, out.join("\n"))
+        assert_equal(100, Tessella::Width.of(out.first))
+    end
+
+    def test_a_table_that_fits_is_untouched
+        assert_equal(Tessella.table(ROWS).to_s,
+                     Tessella.table(ROWS, width: 200).to_s)
+    end
+
+    def test_refused_only_with_every_column_at_its_floor
+        error = assert_raises(ArgumentError) do
+            Tessella.table(ROWS, width: 40, min_width: 12)
+        end
+        assert_match(/needs \d+ columns at the least \(min_width 12\)/,
+                     error.message)
     end
 end

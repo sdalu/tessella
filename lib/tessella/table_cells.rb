@@ -61,30 +61,45 @@ module Tessella
                 narrow(grid, widths, total - width, min_width)
             end
 
-            # The widest column loses over columns; the table needs, at
-            # the least, everything else plus min_width and its padding.
+            # Over columns come off the widest column still above its
+            # floor, one at a time, so widths converge downwards and a
+            # narrow column is never narrowed first. A column's floor is
+            # min_width, or its natural width when that is smaller; the
+            # table is refused only when every column is at its floor.
             def self.narrow(grid, widths, over, min_width)
-                i = widths.index(widths.max)
-                text = widths[i] - 2 - over
-                check_room!(text, min_width, least(widths, i, min_width))
-                [grid.map { wrap_column(it, i, text) },
-                 widths.dup.tap { it[i] = text + 2 }]
+                texts = widths.map { it - 2 }
+                floors = texts.map { [it, min_width].min }
+                target = texts.sum - over
+                check_room!(floors, target, min_width)
+                fitted = level(texts, floors, target)
+                [grid.map { wrap_columns(it, texts, fitted) },
+                 fitted.map { it + 2 }]
             end
 
-            def self.least(widths, index, min_width)
-                Render.span_width(widths) + 4 - widths[index] + min_width
+            def self.level(texts, floors, target)
+                fitted = texts.dup
+                while fitted.sum > target
+                    i = fitted.each_index.select { fitted[it] > floors[it] }
+                              .max_by { fitted[it] }
+                    fitted[i] -= 1
+                end
+                fitted
             end
 
-            def self.check_room!(text, min_width, least)
-                return if text >= min_width
+            def self.check_room!(floors, target, min_width)
+                return if floors.sum <= target
 
+                least = Render.span_width(floors.map { it + 2 }) + 2
                 raise ArgumentError, "table needs #{least} columns at the " \
                                      "least (min_width #{min_width})"
             end
 
-            def self.wrap_column(row, index, text)
+            # Every narrowed column's cells wrapped to its new width.
+            def self.wrap_columns(row, texts, fitted)
                 row.each_with_index.map do |cell, i|
-                    i == index ? cell.flat_map { Wrap.line(it, text) } : cell
+                    next cell if fitted[i] == texts[i]
+
+                    cell.flat_map { Wrap.line(it, fitted[i]) }
                 end
             end
         end

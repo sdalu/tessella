@@ -168,9 +168,14 @@ rule:
   standard library, so a dependency; `Table.parse` is a short RFC 4180
   reader instead, held to `CSV.parse`'s records by test.
 - **Tables past the script.** Beyond the port, a table takes
-  multi-line cells, fits a width by narrowing only its widest column
-  (wrapping its cells, refusing below `min_width:` rather than
-  returning something narrower than asked), and keeps ANSI colour in
+  multi-line cells, fits a width by narrowing the widest column a
+  column at a time, so the widest ones converge downwards and a narrow
+  one is never cut first (wrapping their cells, refusing only when
+  every column is at `min_width:` or its natural width, rather than
+  returning something wider than asked). It narrowed the widest column
+  alone at first; a real climat table, whose two long columns together
+  held the overflow, was refused for no reason, so the rule changed.
+  It keeps ANSI colour in
   cells, closing and reopening it across a wrap so every line stands
   alone: what climat's tables need to move off tty-table. The script
   printed a newline in a CSV field raw, breaking the frame.

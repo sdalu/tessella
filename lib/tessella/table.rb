@@ -505,8 +505,9 @@ module Tessella
     end
 
     # width: fits the framed table to that many columns by narrowing
-    # its widest column (wrapping its cells), refusing below min_width
-    # columns of text; color: true makes the header bold.
+    # the widest column a column at a time (wrapping its cells),
+    # refusing only with every column at min_width or its natural
+    # width; color: true makes the header bold.
     # rubocop:disable-next Metrics/ParameterLists
     def self.table(rows, header: true, style: nil, ascii: false, align: nil,
                    title: nil, width: nil, min_width: Table::MIN_WIDTH,

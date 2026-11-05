@@ -301,11 +301,14 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   `:center`. `Table.parse` reads CSV (RFC 4180 quoting) or, with `tsv:
   true`, tab-separated text. A cell holding `"\n"` draws on several
   lines within its row, top-aligned. `width: N` fits the framed table
-  to N columns by narrowing its widest column and word-wrapping that
-  column's cells (a word too long breaks inside); below `min_width:`
-  columns of text (4 by default) it is refused, naming the width it
-  needs. ANSI colour in a cell takes no column and survives padding and
-  wrapping, closed and reopened on each wrapped line; `color: true`
+  to N columns by narrowing its widest column a column at a time --
+  then whichever is widest, so wide columns converge and a narrow one
+  is never cut first -- and word-wrapping the narrowed cells (a word
+  too long breaks inside). With every column at `min_width:` (4 by
+  default), or its natural width when smaller, and still too wide, it
+  is refused, naming the width it needs. ANSI colour in a cell takes
+  no column and survives padding and wrapping, closed and reopened on
+  each wrapped line; `color: true`
   sets the header in bold. Markdown refuses multi-line cells and
   `width:`.
 - **bitfield**: `name:bits` lines or `[name, bits]` pairs, drawn as
