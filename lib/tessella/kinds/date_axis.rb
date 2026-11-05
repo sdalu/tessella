@@ -12,6 +12,10 @@ module Tessella
     # midnight UTC. A date axis takes no xscale:. Sideways (an
     # orientation: :horizontal chart) the dates label the vertical axis.
     module DateAxis
+        DAY = 86_400
+
+        # One time, or one repeated, spans a day either side: a zero
+        # span has no scale.
         SPANS = [[86_400, "%Y-%m-%d"], [3600, "%m-%d %H:%M"],
                  [0, "%H:%M:%S"]].freeze
 
@@ -55,7 +59,8 @@ module Tessella
         def date_limits(axis, dated)
             return nil unless dated && date_axis? && !@opts[:xlim]
 
-            @series.flat_map(&axis).minmax
+            lo, hi = @series.flat_map(&axis).minmax
+            lo == hi ? [lo - DAY, hi + DAY] : [lo, hi]
         end
 
         def date_axis? = @xdate || @opts[:xdate]

@@ -87,6 +87,16 @@ module Tessella
         module KindFlags
             private
 
+            # --xdate's optional FMT took the word after it: a word with
+            # no % in it is no strftime format but the file, given back.
+            def unformat!(argv)
+                format = @opts[:xdate]
+                return unless format.is_a?(String) && !format.include?("%")
+
+                argv.unshift(format)
+                @opts[:xdate] = true
+            end
+
             def add_axes
                 @parser.on("--yscale C") { |v| @opts[:yscale] = v.to_sym }
                 @parser.on("--xdate [FMT]") { |v| @opts[:xdate] = v || true }
@@ -161,6 +171,7 @@ module Tessella
 
             def parse(argv)
                 @parser.parse!(argv)
+                unformat!(argv)
                 raise ChartCLI::UsageError, "one file argument at most" if
                     argv.size > 1
 
@@ -288,8 +299,9 @@ module Tessella
     # value field).
     class ChartCLI
         module Header
-            def self.split(rows, bar_like: false)
-                return [nil, rows] unless header?(rows.first, bar_like)
+            def self.split(rows, bar_like: false, dates: false)
+                return [nil, rows] unless
+                    header?(rows.first, bar_like, dates: dates)
 
                 [rows.first, rest(rows)]
             end
@@ -301,10 +313,14 @@ module Tessella
                 data
             end
 
-            def self.header?(row, bar_like)
+            # Under --xdate a date in the first field is data too.
+            def self.header?(row, bar_like, dates: false)
                 return !numeric?(row[1]) if bar_like
 
-                !row.all? { numeric?(it) }
+                first = dates && IsoTime.parse(row.first.to_s)
+                !row.each_with_index.all? do |field, i|
+                    numeric?(field) || (i.zero? && first)
+                end
             end
 
             def self.numeric?(field) = !field.nil? && !Num.parse(field).nil?
@@ -453,7 +469,7 @@ module Tessella
     class ChartCLI
         class SeriesKind
             def self.build(kind, opts, rows)
-                header, data = Header.split(rows)
+                header, data = Header.split(rows, dates: opts[:xdate])
                 ncols = (header || data.first).size
                 columns = (0...ncols).map do |i|
                     column(data, header, i, ncols, opts[:xdate])

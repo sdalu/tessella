@@ -87,12 +87,21 @@ module Tessella
         def add_halo
             @parser.on("--[no-]halo [H]", "blanks kept by text: sides,",
                        "around or none") do |h|
-                @opts[:halo] = h == false ? false : halo!(h || "sides")
+                @opts[:halo] = h == false ? false : (h || "sides")
             end
         end
 
-        def halo!(mode)
-            HALO.fetch(mode) { usage!("--halo must be sides, around or none") }
+        # --halo's optional H took the word after it: one that names no
+        # halo is the block, given back.
+        def unhalo!(argv)
+            mode = @opts[:halo]
+            return unless mode.is_a?(String)
+
+            unless HALO.key?(mode)
+                argv.unshift(mode)
+                mode = "sides"
+            end
+            @opts[:halo] = HALO[mode]
         end
 
         def add_columns
@@ -169,6 +178,7 @@ module Tessella
 
         def parse(argv)
             @parser.parse!(argv)
+            unhalo!(argv)
             check_required!
             check_style!
             [@opts, argv]
