@@ -91,7 +91,8 @@ tessella seq: output is 41 columns, over --max-width 30
 tessella chart [--kind K] [--width N] [--height N] [--title S]
                [--xlabel S] [--ylabel S] [--xlim A,B] [--ylim A,B]
                [--canvas C] [--xscale F] [--ascii] [--color]
-               [--style post|pre] [--area] [--gradient C,C,...]
+               [--style post|pre] [--orientation horizontal|vertical]
+               [--area] [--gradient C,C,...] [--blocks B]
                [--bins N] [--closed left|right]
                [--scale N] [--fill G] [--no-eighths] [--track G|none]
                [file]
@@ -107,11 +108,13 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--ylabel S`           | a label left of the y axis             |                 |
 | `--xlim A,B`           | x limits                               | from the data   |
 | `--ylim A,B`           | y limits                               | from the data   |
-| `--canvas C`           | `braille block dot ascii density`      | `braille`       |
+| `--canvas C`           | `braille block quadrant half dot ascii density` | `braille` |
 | `--xscale F`           | `ln log2 log10`                        |                 |
 | `--ascii`              | ASCII only                             | off             |
 | `--color`              | ANSI colour in the plot area           | off             |
 | `--style S`            | stairs: `post pre`                     | `post`          |
+| `--orientation O`      | all but stem: value axis direction     | by kind         |
+| `--blocks B`           | bar, histogram: `eighths half block quadrant braille` | `eighths` |
 | `--area`               | line, stairs: fill under each series   | off             |
 | `--gradient C,...`     | area: colours by height, or `none`     | green,yellow,red |
 | `--bins N`             | histogram: number of bins              | Sturges' rule   |

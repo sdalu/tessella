@@ -326,6 +326,163 @@ The decimal is 1 digit(s) to the right of |
 A plot that would need more than 1000 stems is refused: raise
 `--scale`.
 
+## Orientation
+
+`--orientation horizontal|vertical` (`orientation:`) is the direction
+the value axis runs. Every kind but stem takes it; bar, histogram and
+box are horizontal by default, the plotted kinds vertical.
+
+### Upright bars
+
+`--orientation vertical` draws a bar chart as columns rising from a
+floor, the value axis on the left from 0 to the largest value. The
+names go under their columns when each fits, else the first and last
+name go at the two ends:
+
+```text
+$ tessella chart --kind bar --orientation vertical --width 20 --height 5 \
+    langs.csv
+      ┌────────────────────┐
+   30 │       ██████       │
+      │       ██████       │
+      │       ██████       │
+      │██████ ██████ ▂▂▂▂▂▂│
+    0 │██████ ██████ ██████│
+      └────────────────────┘
+        ruby     c    rust
+```
+
+A histogram stands its bins up the same way, with its axis's two ends
+under them:
+
+```text
+$ tessella chart --kind histogram --orientation vertical \
+    --width 24 --height 6 normal.txt
+                ┌───────────────────────┐
+             72 │        ███ ▁▁▁        │
+                │        ███ ███        │
+   Frequency    │        ███ ███        │
+                │    ▃▃▃ ███ ███ ▃▃▃    │
+                │    ███ ███ ███ ███    │
+              0 │▅▅▅ ███ ███ ███ ███ ▂▂▂│
+                └───────────────────────┘
+                -3.0                  3.0
+```
+
+Upright bars need values of 0 or more.
+
+### Upright boxes
+
+A vertical box stands three columns wide, its whiskers running up and
+down: `╶┬╴` at the maximum, `┌┴┐` at the third quartile, `├─┤` at the
+median, `└┬┘` at the first quartile, `╶┴╴` at the minimum. The value
+axis on the left shows its two ends and middle (`--ylim` sets the
+range), the names go under the boxes, and where the median shares a
+row with an edge of the box, the median is drawn.
+
+```text
+$ tessella chart --kind box --orientation vertical --height 10 samples.txt
+      ┌────────────┐
+   30 │        ╶┬╴ │
+      │         │  │
+      │         │  │
+      │         │  │
+   15 │         │  │
+      │         │  │
+      │    ╶┬╴  │  │
+      │     │  ├─┤ │
+      │├─┤ ├─┤ ╶┴╴ │
+    0 │╶┴╴         │
+      └────────────┘
+        a   b   c
+```
+
+### Sideways plots
+
+For line, scatter, stairs and density, `--orientation horizontal`
+swaps the axes: values run along the horizontal axis and x runs up,
+so a horizontal chart of (x, y) is the vertical chart of (y, x).
+`--xlim`, `--ylim`, `--xlabel` and `--ylabel` keep their meaning and
+move with their axis; an area fills from the left edge, its gradient
+running left to right.
+
+```text
+$ tessella chart --orientation horizontal --area --width 24 --height 8 cpu.txt
+      ┌────────────────────────┐
+   60 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣦⣤⣤⣄⣀⣀⣀   │
+      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡶│
+      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠟⠛⠛⠋⠉⠁ │
+      │⣿⣿⣿⠿⠟⠛⠛⠉⠉⠉⠁             │
+      │⣿⣿⣷⣦⣤⣄⣀⣀                │
+      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣤⣤⣤⣀⣀    │
+      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡦│
+    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠛⠛⠛⠉⠉⠁ │
+      └────────────────────────┘
+      0                       90
+```
+
+## Bar glyphs
+
+`--blocks` (`blocks:`) picks the glyphs bars and histograms are built
+of:
+
+| Blocks    | Upright                            | Across                             |
+|-----------|------------------------------------|------------------------------------|
+| `eighths` | `▁`…`█`, 8 steps a cell (default)  | `▏`…`█`, 8 steps a cell (default)  |
+| `half`    | `▄` `█`, one bar a column          | `▌` `█`, one bar a row             |
+| `block`   | quadrants, two bars a column       | quadrants, two bars a row          |
+| `braille` | dots, two bars a column            | dots, four bars a row              |
+
+`quadrant` is another name for `block`. The finer glyphs pack more
+bars into the same width; across, a row that holds several bars is
+named by its first and last, `ruby..c`:
+
+```text
+$ tessella chart --kind bar --orientation vertical --blocks braille \
+    --width 20 --height 5 langs.csv
+      ┌────────────────────┐
+   30 │      ⢸⣿⣿⣿⣿⣿⡇       │
+      │      ⢸⣿⣿⣿⣿⣿⡇       │
+      │      ⢸⣿⣿⣿⣿⣿⡇       │
+      │⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⣿⣿⡇⣀⣀⣀⣀⣀⣀ │
+    0 │⣿⣿⣿⣿⣿⣿⢸⣿⣿⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿ │
+      └────────────────────┘
+      ruby              rust
+```
+
+```text
+$ tessella chart --kind bar --blocks block --width 30 langs.csv
+           ┌──────────────────────────────┐
+   ruby..c │████████████▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄│
+      rust │▀▀▀▀▀▀▀▘                      │
+           └──────────────────────────────┘
+           0                             30
+```
+
+```text
+$ tessella chart --kind histogram --blocks half --width 24 normal.txt
+              ┌────────────────────────┐
+   -3.0..-2.0 │██▌                     │
+   -2.0..-1.0 │█████████▌              │
+    -1.0..0.0 │████████████████████████│
+     0.0..1.0 │████████████████████▌   │
+     1.0..2.0 │█████████▌              │
+     2.0..3.0 │█                       │
+              └────────────────────────┘
+              0                       72
+                      Frequency
+```
+
+Every glyph set but the default `eighths` needs values of 0 or more,
+and `braille` and `block` take no `--ascii`, `--fill`,
+`--no-eighths` or `--track`:
+
+```text
+$ tessella chart --kind bar --blocks braille --ascii langs.csv
+tessella chart: blocks: braille conflicts with ascii: true
+Usage: tessella chart [options] [file]
+```
+
 ## Canvases
 
 The line, scatter and stairs kinds draw on a canvas, a grid of cells
@@ -334,7 +491,8 @@ each holding a few pixels. `--canvas` picks it:
 | Canvas    | Pixels per cell | Glyphs                       |
 |-----------|-----------------|------------------------------|
 | `braille` | 2 × 4           | braille patterns (default)   |
-| `block`   | 2 × 2           | quadrant blocks `▘▝▀▖▌▞▛…`   |
+| `block`   | 2 × 2           | quadrant blocks `▘▝▀▖▌▞▛…` (also named `quadrant`) |
+| `half`    | 1 × 2           | half blocks `▀ ▄ █`          |
 | `dot`     | 1 × 2           | `'` `.` `:`                  |
 | `ascii`   | 3 × 3           | ASCII strokes `- \| / \ "`…  |
 | `density` | 1 × 2           | shades by hit count          |
@@ -425,6 +583,8 @@ corner-and-tick frame bar charts use, or `:none`.
 | `--fill G`                  | `fill: "G"`        | bar, histogram       |
 | `--no-eighths`              | `eighths: false`   | bar, histogram       |
 | `--track G\|none`           | `track: "G"`/`nil` | bar, histogram       |
+| `--orientation O`          | `orientation: :o`  | all but stem         |
+| `--blocks B`                | `blocks: :b`       | bar, histogram       |
 
 The bar defaults are `fill: "█"`, `eighths: true`, `track: "·"`;
 under `ascii: true`, `#`, no eighths, and `.`.
