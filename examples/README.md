@@ -19,6 +19,7 @@ RUBYLIB=../lib ruby load.rb
 | `datasheet.rb`   | a register layout stacked over its timing diagram  | [composition](../doc/composition.md) |
 | `comment.rb`     | an ASCII tree indented as a source comment         | [composition](../doc/composition.md) |
 | `fit.rb`         | a table fitted to a width, with a multi-line cell  | [table](../doc/table.md)            |
+| `floors.rb`      | a table's per-column width floors, against one     | [table](../doc/table.md)            |
 | `gradient.rb`    | a `Raster` built in Ruby, drawn in three styles    | [images](../doc/images.md)          |
 | `refusals.rb`    | what the library refuses, and its messages         | [library](../doc/library.md)        |
 | `cjk.rb`         | a Unicode table and frame drawn for a CJK terminal | [targets](../doc/targets.md)        |

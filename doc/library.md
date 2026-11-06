@@ -61,7 +61,7 @@ Each takes any figure (a `Block`, a `String`, a chart) and returns a
 Tessella.tree(outline, style: nil, ascii: false, root: nil)
 Tessella.table(rows, header: true, style: nil, ascii: false,
                align: nil, title: nil, width: nil, min_width: 4,
-               color: false)
+               color: false)                # min_width: N, or [N, ...]
 Tessella::Table.parse(text, tsv: false)        # => Array of rows
 Tessella.bitfield(fields, word: 32, octets: false, ruler: true,
                   abbrev: false)
