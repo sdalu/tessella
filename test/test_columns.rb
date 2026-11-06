@@ -93,9 +93,7 @@ class TestColumns < Minitest::Test
     end
 
     def cli(argv, input = "a 3\nb 5\n")
-        Tessella::CLI.run(["chart", *argv], stdin: StringIO.new(input),
-                                            stdout: StringIO.new,
-                                            stderr: StringIO.new)
+        run_command(["chart", *argv], input).first
     end
 
     def test_the_command_takes_orientation_and_blocks_for_bar_kinds

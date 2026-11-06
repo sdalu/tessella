@@ -10,13 +10,7 @@ require_relative "test_helper"
 # exit 1, an overflowing sparkline value, a misspelt ramp, a bad PNM
 # sample.
 class TestCliInputFixes < Minitest::Test
-    def cli(argv, input)
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(argv, stdin: StringIO.new(input),
-                                         stdout: out, stderr: err)
-        [status, err.string]
-    end
+    def cli(argv, input) = run_command(argv, input).values_at(0, 2)
 
     COMMANDS = [%w[chart], %w[table], %w[compose frame -], %w[tree],
                 %w[seq], %w[wave], %w[bitfield], %w[sparkline],

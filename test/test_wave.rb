@@ -161,11 +161,7 @@ end
 # in the skill).
 class TestWaveCLI < Minitest::Test
     def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::WaveCLI.run(argv, stdin: StringIO.new(stdin),
-                                             stdout: out, stderr: err)
-        [status, out.string, err.string]
+        run_command(argv, stdin, runner: Tessella::WaveCLI)
     end
 
     def test_draws_from_stdin

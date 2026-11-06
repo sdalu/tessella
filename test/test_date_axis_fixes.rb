@@ -8,13 +8,7 @@ require_relative "test_helper"
 # Date-axis regressions from the blind bug hunt: one date, a file after
 # --xdate or --halo, and a first row of dates.
 class TestDateAxisFixes < Minitest::Test
-    def cli(argv, input = "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(argv, stdin: StringIO.new(input),
-                                         stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def cli(argv, input = "") = run_command(argv, input)
 
     def test_one_date_spans_a_day_either_side
         t = Time.utc(2026, 11, 5)

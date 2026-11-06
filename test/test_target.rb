@@ -47,13 +47,7 @@ class TestTarget < Minitest::Test
         assert_raises(ArgumentError) { Tessella.target = :mars }
     end
 
-    def cli(argv, env: {})
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(argv, stdin: StringIO.new("a\n  b\n"),
-                                         stdout: out, stderr: err, env: env)
-        [status, out.string, err.string]
-    end
+    def cli(argv, env: {}) = run_command(argv, "a\n  b\n", env: env)
 
     def test_the_command_line_takes_a_target
         assert_equal([0, "a\n`-- b\n", ""], cli(%w[--target cjk tree]))

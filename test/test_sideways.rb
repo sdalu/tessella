@@ -53,11 +53,7 @@ class TestSideways < Minitest::Test
         assert_raises(ArgumentError) { Tessella.line(YS, orientation: :up) }
     end
 
-    def cli(argv)
-        Tessella::CLI.run(["chart", *argv], stdin: StringIO.new("1\n2\n"),
-                                            stdout: StringIO.new,
-                                            stderr: StringIO.new)
-    end
+    def cli(argv) = run_command(["chart", *argv], "1\n2\n").first
 
     def test_the_command_takes_orientation_for_every_kind_but_stem
         assert_equal(0, cli(%w[--orientation horizontal --area]))

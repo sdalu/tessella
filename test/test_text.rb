@@ -59,13 +59,7 @@ class TestText < Minitest::Test
         assert_raises(ArgumentError) { text("x", style: :gothic) }
     end
 
-    def cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["text", *argv], stdin: StringIO.new(stdin),
-                                                    stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def cli(*argv, stdin: "") = run_command(["text", *argv], stdin)
 
     def test_the_command
         assert_equal([0, "𝐇𝐢\n", ""], cli("--style", "bold", "Hi"))

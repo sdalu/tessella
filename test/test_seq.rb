@@ -260,13 +260,7 @@ end
 class TestSeqCLI < Minitest::Test
     include SeqFixtures
 
-    def run_cli(argv, input = "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["seq", *argv], stdin: StringIO.new(input),
-                                                   stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(argv, input = "") = run_command(["seq", *argv], input)
 
     def test_draws_from_stdin
         status, out, = run_cli([], "A -> B: hi\nB --> A: ok\n")

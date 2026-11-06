@@ -35,13 +35,7 @@ class TestGlyphs < Minitest::Test
         assert_match(/unknown meter: :rocket \(arrow, chevron/, error.message)
     end
 
-    def glyphs(*argv)
-        out = StringIO.new
-        status = Tessella::CLI.run(["glyphs", *argv], stdin: StringIO.new,
-                                                      stdout: out,
-                                                      stderr: StringIO.new)
-        [status, out.string]
-    end
+    def glyphs(*argv) = run_command(["glyphs", *argv]).first(2)
 
     def test_the_command_lists_details_and_checks
         assert_match(/^meter\s+arrow\s+N\s+term cjk web\s+▸▹$/, glyphs.last)

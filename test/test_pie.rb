@@ -79,13 +79,7 @@ class TestPie < Minitest::Test
         assert_raises(ArgumentError) { Tessella.pie(%w[a], [1], width: 9) }
     end
 
-    def run_cli(argv, input)
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(argv, stdin: StringIO.new(input),
-                                         stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(argv, input) = run_command(argv, input)
 
     def test_the_command
         status, out, = run_cli(%w[chart --kind pie --donut --height 8],

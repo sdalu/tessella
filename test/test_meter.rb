@@ -47,13 +47,7 @@ class TestMeter < Minitest::Test
         assert_match(/mixes width classes: A, N/, error.message)
     end
 
-    def cli(*argv)
-        out = StringIO.new
-        status = Tessella::CLI.run(["meter", *argv], stdin: StringIO.new,
-                                                     stdout: out,
-                                                     stderr: StringIO.new)
-        [status, out.string]
-    end
+    def cli(*argv) = run_command(["meter", *argv]).first(2)
 
     def test_the_command
         assert_equal([0, "[▸▸▸▹▹▹▹▹▹▹] 30 %\n"],

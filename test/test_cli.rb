@@ -9,15 +9,7 @@ require_relative "test_helper"
 # Tessella::CLI.run, in process,
 # against StringIO rather than real files or a real stdin.
 module CLIHelper
-    def run_cli(argv, input = "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(
-            ["chart",
-             *argv], stdin: StringIO.new(input), stdout: out, stderr: err
-        )
-        [status, out.string, err.string]
-    end
+    def run_cli(argv, input = "") = run_command(["chart", *argv], input)
 end
 
 # Tessella::ChartCLI (DESIGN.md, "Command line"): every kind drawn through

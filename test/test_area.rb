@@ -81,11 +81,7 @@ class TestLineArea < Minitest::Test
         assert_raises(ArgumentError) { area(gradient: []) }
     end
 
-    def cli(argv)
-        Tessella::CLI.run(["chart", *argv], stdin: StringIO.new("1\n2\n3\n"),
-                                            stdout: StringIO.new,
-                                            stderr: StringIO.new)
-    end
+    def cli(argv) = run_command(["chart", *argv], "1\n2\n3\n").first
 
     def test_the_command_takes_area_for_line_and_stairs_only
         assert_equal(0, cli(%w[--area --gradient blue,red]))
@@ -122,11 +118,8 @@ class TestColorGradient < Minitest::Test
     end
 
     def cli(argv)
-        out = StringIO.new
-        status = Tessella::CLI.run(["chart", "--area", "--color", *argv],
-                                   stdin: StringIO.new("1\n2\n3\n"),
-                                   stdout: out, stderr: StringIO.new)
-        [status, out.string]
+        run_command(["chart", "--area", "--color", *argv], "1\n2\n3\n")
+            .first(2)
     end
 
     def test_the_command_takes_indexes_and_hex_stops

@@ -167,14 +167,7 @@ class TestTreeRefusals < Minitest::Test
 end
 
 class TestTreeCLI < Minitest::Test
-    def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["tree", *argv],
-                                   stdin: StringIO.new(stdin),
-                                   stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(*argv, stdin: "") = run_command(["tree", *argv], stdin)
 
     def test_drawing_from_stdin
         status, out, = run_cli(stdin: "a\n  b\n")

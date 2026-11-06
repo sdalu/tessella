@@ -312,14 +312,7 @@ class TestTableCSVReader < Minitest::Test
 end
 
 class TestTableCLI < Minitest::Test
-    def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["table", *argv],
-                                   stdin: StringIO.new(stdin),
-                                   stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(*argv, stdin: "") = run_command(["table", *argv], stdin)
 
     def test_draws_from_stdin_and_exits_zero
         status, out, = run_cli(stdin: "a,b\n1,2\n")

@@ -270,11 +270,7 @@ class TestImageCLI < Minitest::Test
     GRADIENT = TestImage::GRADIENT
 
     def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::ImageCLI.run(argv, stdin: StringIO.new(stdin),
-                                              stdout: out, stderr: err)
-        [status, out.string, err.string]
+        run_command(argv, stdin, runner: Tessella::ImageCLI)
     end
 
     def test_draws_from_stdin

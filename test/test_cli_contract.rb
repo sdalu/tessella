@@ -14,13 +14,7 @@ class TestCLIContract < Minitest::Test
                 %w[bitfield], %w[wave], %w[seq], %w[image],
                 %w[lint]].freeze
 
-    def run_cli(argv)
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(argv, stdin: StringIO.new(""),
-                                         stdout: out, stderr: err)
-        [status, err.string]
-    end
+    def run_cli(argv) = run_command(argv).values_at(0, 2)
 
     def test_every_command_is_listed_in_the_help
         out = StringIO.new

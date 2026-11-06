@@ -134,14 +134,7 @@ CD X
 end
 
 class TestComposeCLI < Minitest::Test
-    def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["compose", *argv],
-                                   stdin: StringIO.new(stdin),
-                                   stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(*argv, stdin: "") = run_command(["compose", *argv], stdin)
 
     def with_files(files)
         Dir.mktmpdir do |dir|

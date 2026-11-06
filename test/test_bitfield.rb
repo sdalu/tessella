@@ -148,14 +148,7 @@ end
 class TestBitfieldCLI < Minitest::Test
     RECIPE = TestBitfield::RECIPE
 
-    def run_cli(*argv, stdin: "")
-        out = StringIO.new
-        err = StringIO.new
-        status = Tessella::CLI.run(["bitfield", *argv],
-                                   stdin: StringIO.new(stdin),
-                                   stdout: out, stderr: err)
-        [status, out.string, err.string]
-    end
+    def run_cli(*argv, stdin: "") = run_command(["bitfield", *argv], stdin)
 
     def test_draws_the_recipe_from_stdin
         status, out, = run_cli(stdin: RECIPE)
