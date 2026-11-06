@@ -171,7 +171,7 @@ horizontal|vertical` and `--blocks
 eighths|braille|block|quadrant|half|sextant|octant`.
 
 ```text
-$ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' |
+$ printf 'ruby 12\nc 30\nrust 7.5\ngo 18\n' | \
   tessella chart --kind bar --orientation vertical --height 5 --width 20
       ┌───────────────────┐
    30 │     ████          │
@@ -208,7 +208,7 @@ so the boundary stays on a whole cell). Values must be 0 or more, and the
 braille, block and half layouts draw one series only.
 
 ```text
-$ printf 'q cpu io net\nq1 3 5 2\nq2 4 2 6\n' |
+$ printf 'q cpu io net\nq1 3 5 2\nq2 4 2 6\n' | \
   tessella chart --kind bar --stacked --width 24
       ┌                        ┐
    q1 ┤█████▓▓▓▓▓▓▓▓▒▒▒▒··· 10
@@ -235,7 +235,7 @@ then its values, a header naming the columns, with `--cell-width N`,
 `--colormap C,C,...`, `--min A` and `--max B`.
 
 ```text
-$ printf 'host mon tue wed thu\nalpha 1 3 5 2\nbeta 4 6 8 9\n' |
+$ printf 'host mon tue wed thu\nalpha 1 3 5 2\nbeta 4 6 8 9\n' | \
   tessella chart --kind heatmap --cell-width 4
          ┌────────────────┐
    alpha │    ░░░░▒▒▒▒░░░░│ █ 9
@@ -276,7 +276,8 @@ must be 0 or more, not all 0. On the command line `--kind pie` reads
 `label value` rows, `--donut` for the ring:
 
 ```console
-$ printf 'ruby,12\nc,30\nrust,7\n' | tessella chart --kind pie --donut --height 8
+$ printf 'ruby,12\nc,30\nrust,7\n' | \
+  tessella chart --kind pie --donut --height 8
 ```
 
 Box takes `orientation: :vertical` (`--orientation vertical`) too:
@@ -681,7 +682,7 @@ braille chart's rows would not line up on this page.
 
 ```text
 $ ruby -e 'puts "x sin cos"; 0.step(10, 0.1) { puts [it.round(1),
-    Math.sin(it), Math.cos(it)].join(" ") }' |
+    Math.sin(it), Math.cos(it)].join(" ") }' | \
   tessella --target web chart --title trig --width 30 --height 6
                    trig
       ┌──────────────────────────────┐
