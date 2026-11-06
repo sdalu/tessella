@@ -12,9 +12,9 @@ cleanup() { [ -z "$tmpdir" ] || rm -rf -- "$tmpdir"; }
 trap cleanup EXIT INT HUP TERM
 tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/gallery.XXXXXX") || exit 1
 
-for style in ramp quadrant braille edges; do
+for style in ramp half quadrant edges; do
     tessella image --style "$style" --width 14 -- "$image" |
         tessella compose caption --text "$style" - > "$tmpdir/$style"
 done
 tessella compose beside --gap 3 --align bottom \
-    "$tmpdir/ramp" "$tmpdir/quadrant" "$tmpdir/braille" "$tmpdir/edges"
+    "$tmpdir/ramp" "$tmpdir/half" "$tmpdir/quadrant" "$tmpdir/edges"

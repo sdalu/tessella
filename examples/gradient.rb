@@ -9,7 +9,7 @@ luma = (0...h).flat_map do |y|
     (0...w).map { |x| Math.hypot(x - 24, y - 24) < 22 ? x / 47.0 : 0 }
 end
 raster = Tessella::Raster.new(width: w, height: h, luma: luma)
-figs = %i[ramp blocks braille].map do |style|
+figs = %i[ramp blocks quadrant].map do |style|
     Tessella.caption(Tessella.image(raster, style: style, width: 16),
                      text: style.to_s)
 end

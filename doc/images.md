@@ -57,7 +57,7 @@ luma = (0...h).flat_map do |y|
     (0...w).map { |x| Math.hypot(x - 24, y - 24) < 22 ? x / 47.0 : 0 }
 end
 raster = Tessella::Raster.new(width: w, height: h, luma: luma)
-figs = %i[ramp blocks braille].map do |style|
+figs = %i[ramp blocks quadrant].map do |style|
     Tessella.caption(Tessella.image(raster, style: style, width: 16),
                      text: style.to_s)
 end
@@ -66,16 +66,16 @@ puts Tessella.beside(*figs, gap: 3)
 
 ```text
 $ ruby gradient.rb
-     .:::-:.             ░░░░░░            ⢀⠠⡠⡠⡠⡄⡀
-   .:-==++*#*-        ░░░▒▒▒▒▓▓▓░        ⠠⡈⡢⢱⠱⡱⣹⡪⡯⣧⢆
-  .::-==++*##%*      ░░░░▒▒▒▒▓▓▓▓▓       ⠅⡂⡊⡢⡣⡫⡲⣝⢽⣺⣟⣧
- ..::-==++*##%%-     ░░░░▒▒▒▒▓▓▓▓█░     ⢁⠂⠢⡑⢌⢎⢎⢞⢮⣻⣺⡽⣟⡇
- ..::-==++*##%%-     ░░░░▒▒▒▒▓▓▓▓█░     ⡐⠨⠨⢨⠢⡣⡣⣫⡺⣺⢮⢿⡿⡇
- ..::-==++*##%#      ░░░░▒▒▒▒▓▓▓▓▓      ⠐⡈⢌⠢⡱⡸⡸⡜⡮⣳⣻⢯⡿⠁
-  .::-==++*##+        ░░░▒▒▒▒▓▓▓▒       ⠐⠐⠄⠕⡌⢎⢎⢮⣫⡳⡯⡏⠁
-    .::--=--            ░░░░▒░░           ⠁⠑⠸⠸⠸⠪⠚⠊⠁
+     .:::-:.             ░░░░░░             ▖▖▖▖▖▖
+   .:-==++*#*-        ░░░▒▒▒▒▓▓▓░         ▝▖▚▐▐▞▛▟▙▄
+  .::-==++*##%*      ░░░░▒▒▒▒▓▓▓▓▓       ▘▚▝▞▞▞▞▛▟▟▜▙
+ ..::-==++*##%%-     ░░░░▒▒▒▒▓▓▓▓█░      ▘▖▚▝▞▞▞▛▟▜▛█▌
+ ..::-==++*##%%-     ░░░░▒▒▒▒▓▓▓▓█░     ▘▘▝▖▚▚▚▜▞▛▙██▌
+ ..::-==++*##%#      ░░░░▒▒▒▒▓▓▓▓▓      ▗▝▖▞▐▗▚▚▜▜▙▛▛
+  .::-==++*##+        ░░░▒▒▒▒▓▓▓▒        ▗▗▝▖▌▙▜▚▙▙▀
+    .::--=--            ░░░░▒░░            ▘▘▘▝▝▘▘
 
-      ramp              blocks            braille
+      ramp              blocks            quadrant
 ```
 
 ## Styles
@@ -127,6 +127,10 @@ $ tessella image --style blocks --width 24 disc.pgm
       ░░░▒▒▒▒▒▒░░░░
         ░░░░░░░░
 ```
+
+The braille renders on this page line up only in a terminal: on
+GitHub braille is drawn about 1.2 columns wide
+([width targets](targets.md#web)).
 
 ```text
 $ tessella image --style braille --width 24 disc.pgm

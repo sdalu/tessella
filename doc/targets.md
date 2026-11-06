@@ -178,6 +178,13 @@ width. In Chrome on GitHub's code fonts `▶` takes two columns and
 `↗` 1.4, with or without the selector. On a row that must line up,
 the selector is not enough; `▸` is the arrow head that lines up.
 
+The same holds beyond arrows. Measured in Chrome on GitHub's code
+fonts, box drawing, quadrant and half blocks, eighths and shades are
+exactly one column, but braille is about 1.2 and `◆` two. So under
+`--target web` a chart defaults to quadrant blocks instead of braille
+(`--canvas braille` still asks for it), the fill pattern that was `◆`
+is `■`, and `tessella lint --target web` flags a row of braille.
+
 `tessella lint --target web` (the same as `--web`) checks a figure
 for this. It flags a bare emoji-capable glyph, and accepts one
 followed by U+FE0E:

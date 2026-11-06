@@ -105,7 +105,7 @@ tessella chart [--kind K] [--width N] [--height N] [--title S]
 | `--ylabel S`           | a label left of the y axis             |                 |
 | `--xlim A,B`           | x limits                               | from the data   |
 | `--ylim A,B`           | y limits                               | from the data   |
-| `--canvas C`           | `braille block quadrant half eighths dot ascii density` | `braille` |
+| `--canvas C`           | `braille block quadrant half eighths dot ascii density` | `braille` (`block` under `--target web`) |
 | `--xscale F`           | `ln log2 log10`                        |                 |
 | `--yscale F`           | plotted kinds: `ln log2 log10`         |                 |
 | `--xdate [FMT]`        | plotted kinds: x as ISO 8601 dates     | format by span  |
@@ -233,19 +233,20 @@ awk 'BEGIN {
     for (i = 0; i <= 100; i++)
         printf "%g %g %g\n", i / 10, sin(i / 10), cos(i / 10)
 }' |
-    tessella chart --title trig --xlabel x --width 30 --height 6
+    tessella chart --title trig --xlabel x --width 30 --height 6 \
+        --canvas block
 ```
 
 ```text
 $ sh trig.sh
                    trig
       ┌──────────────────────────────┐
-    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
-      │ ⡴⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⣄   ⠱⡀  │ cos
-      │⡜  ⠈⢆   ⠸⡄    ⡜⠁  ⢀⠞  ⠈⡆   ⠱⡀ │
-      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡍⠉⠉⡽⠉⠉⠉⢉⡝⠉⠉⠉⠉⠙⢏⠉⠉⠉⠹⡉│
-      │     ⠈⢇   ⠙⡄⡜   ⢀⠎      ⠘⢄   ⠱│
-   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+    1 │▀▜▄▀▀▀▚▖        ▗▀▀▀▚▟▀▀▀▚    │ sin
+      │ ▟▀▙   ▝▖      ▟▘   ▞▀▄   ▀▖  │ cos
+      │▞  ▝▚   ▝▖    ▞▘  ▗▞  ▝▖   ▜▖ │
+      │▀▀▀▀▀█▀▀▀▀▛▀▀█▀▀▀▀▛▀▀▀▀▀▛▀▀▀▜▛│
+      │      ▙   ▝▖▞   ▗▛      ▝▄   ▀│
+   -1 │       ▜▄▄▄▛▚▄▄▟▀        ▝▚▄▄▄│
       └──────────────────────────────┘
       0                             10
                      x
@@ -312,26 +313,26 @@ cleanup() { [ -z "$tmpdir" ] || rm -rf -- "$tmpdir"; }
 trap cleanup EXIT INT HUP TERM
 tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/gallery.XXXXXX") || exit 1
 
-for style in ramp quadrant braille edges; do
+for style in ramp half quadrant edges; do
     tessella image --style "$style" --width 14 -- "$image" |
         tessella compose caption --text "$style" - > "$tmpdir/$style"
 done
 tessella compose beside --gap 3 --align bottom \
-    "$tmpdir/ramp" "$tmpdir/quadrant" "$tmpdir/braille" "$tmpdir/edges"
+    "$tmpdir/ramp" "$tmpdir/half" "$tmpdir/quadrant" "$tmpdir/edges"
 ```
 
 <!-- tessella: allow-mixed -->
 ```text
 $ sh gallery.sh
-      ..                                            ────
-   .--===-:.        ▖▞▞▞▖▚        ⠠⡐⡌⡎⡜⡌⡔⡀⡀       ╱──────╲╲
-  :=+*##*+=-.     ▗▚▚▛▟▙▛▌▌▚     ⡐⢕⢕⡵⣯⢾⢵⢕⢕⢄      ╱╱╱╱───╲╲╲╲
- .-+*#%%#*+-:     ▘▌▛▟█▙█▜▐▗     ⡊⡎⣗⢿⣽⣿⢯⢯⡪⡢⠂    │││       ││
- .:=+*##*+=-.     ▘▚▀▛▟▜▞▌▌▚     ⠌⡪⡪⡻⡺⡽⣝⠵⡱⠐⠁     ╲╲╲╲──╱╱╱╱╱
-   :-====-:.       ▘▘▚▘▌▘▚▝       ⠨⠘⠌⢇⢇⠣⢃⠊       ╲╲──────╱╱
-     ....               ▘           ⠁  ⠈           ──────
+      ..                                           ────
+   .--===-:.        ▄ █ ▀▄         ▖▞▞▞▖▚        ╱──────╲╲
+  :=+*##*+=-.      █ █▀█▀▄▀▄     ▗▚▚▛▟▙▛▌▌▚     ╱╱╱╱───╲╲╲╲
+ .-+*#%%#*+-:     ▄▀█▀███▀▄▄     ▘▌▛▟█▙█▜▐▗    │││       ││
+ .:=+*##*+=-.      ▀▄▀█▀█▀▄      ▘▚▀▛▟▜▞▌▌▚     ╲╲╲╲──╱╱╱╱╱
+   :-====-:.       ▀ ▀▄▀ ▀        ▘▘▚▘▌▘▚▝      ╲╲──────╱╱
+     ....               ▀              ▘          ──────
 
-    ramp          quadrant        braille          edges
+    ramp            half         quadrant         edges
 ```
 
 ### Figures for source files and plain-text documents

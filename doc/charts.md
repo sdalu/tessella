@@ -18,7 +18,13 @@ above and a legend on the right. There are eleven kinds:
 | `candlestick` | open, high, low, close per x, as candles | x, four prices  |
 | `pie`       | shares of a whole, as a disc or a ring     | labels, values  |
 
-Every example on this page is the command's output, byte for byte;
+Most charts on this page are drawn with `--target web`, which uses
+quadrant blocks instead of braille: these pages are read on GitHub,
+where braille is drawn about 1.2 columns wide and a braille chart
+does not line up ([width targets](targets.md#web)). The few that stay
+in braille, because braille is their subject, say so; read them in a
+terminal. Every example on this page is the command's output, byte
+for byte;
 the input files are in [examples/](../examples/), and every command
 runs there.
 
@@ -28,15 +34,15 @@ runs there.
 prints one chart. `--kind` picks the kind; `line` is the default.
 
 ```text
-$ tessella chart --title trig --width 30 --height 6 trig.txt
+$ tessella --target web chart --title trig --width 30 --height 6 trig.txt
                    trig
       ┌──────────────────────────────┐
-    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
-      │ ⡴⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⣄   ⠱⡀  │ cos
-      │⡜  ⠈⢆   ⠸⡄    ⡜⠁  ⢀⠞  ⠈⡆   ⠱⡀ │
-      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡍⠉⠉⡽⠉⠉⠉⢉⡝⠉⠉⠉⠉⠙⢏⠉⠉⠉⠹⡉│
-      │     ⠈⢇   ⠙⡄⡜   ⢀⠎      ⠘⢄   ⠱│
-   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+    1 │▀▜▄▀▀▀▚▖        ▗▀▀▀▚▟▀▀▀▚    │ sin
+      │ ▟▀▙   ▝▖      ▟▘   ▞▀▄   ▀▖  │ cos
+      │▞  ▝▚   ▝▖    ▞▘  ▗▞  ▝▖   ▜▖ │
+      │▀▀▀▀▀█▀▀▀▀▛▀▀█▀▀▀▀▛▀▀▀▀▀▛▀▀▀▜▛│
+      │      ▙   ▝▖▞   ▗▛      ▝▄   ▀│
+   -1 │       ▜▄▄▄▛▚▄▄▟▀        ▝▚▄▄▄│
       └──────────────────────────────┘
       0                             10
 ```
@@ -80,14 +86,14 @@ draws a step path. Each series gets the next colour of the cycle
 (used only under `--color`) and, when it has a name, a legend entry.
 
 ```text
-$ tessella chart --kind scatter --width 30 --height 6 trig.txt
+$ tessella --target web chart --kind scatter --width 30 --height 6 trig.txt
       ┌──────────────────────────────┐
-    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
-      │ ⡰⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⢄   ⠑⡀  │ cos
-      │⠜  ⠈⢂   ⠐⡄    ⠔⠁  ⢀⠜  ⠈⡄   ⠱⡀ │
-      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡉⠉⠉⡹⠉⠉⠉⠉⡍⠉⠉⠉⠉⠉⠏⠉⠉⠉⠩⡉│
-      │      ⢅   ⠘⡄⡜   ⢀⠎      ⠘⢄   ⠱│
-   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+    1 │▀▜▄▀▀▀▚▖        ▗▀▀▀▚▟▀▀▀▚    │ sin
+      │ ▟▀▙   ▝▖      ▟▘   ▞▀▄   ▀▖  │ cos
+      │▞  ▝▚   ▝▖    ▞▘  ▗▞  ▝▖   ▜▖ │
+      │▀▀▀▀▀█▀▀▀▀▛▀▀█▀▀▀▀▛▀▀▀▀▀▛▀▀▀▜▛│
+      │      ▙   ▝▖▞   ▗▛      ▝▄   ▜│
+   -1 │       ▜▄▄▄▛▚▄▄▟▀        ▝▚▄▄▄│
       └──────────────────────────────┘
       0                             10
 ```
@@ -97,12 +103,13 @@ pre` steps before it:
 
 ```text
 $ printf '1 1\n2 3\n3 2\n4 4\n' | \
-    tessella chart --kind stairs --style pre --width 20 --height 4
+    tessella --target web chart --kind stairs --style pre \
+    --width 20 --height 4
      ┌────────────────────┐
-   4 │             ⡏⠉⠉⠉⠉⠉⠉│
-     │⡖⠒⠒⠒⠒⠒⢲      ⡇      │
-     │⡇     ⠸⠤⠤⠤⠤⠤⠤⠇      │
-   1 │⡇                   │
+   4 │             ▛▀▀▀▀▀▀│
+     │▛▀▀▀▀▀▜      ▌      │
+     │▌     ▐▄▄▄▄▄▄▌      │
+   1 │▌                   │
      └────────────────────┘
      1                    4
 ```
@@ -111,29 +118,13 @@ $ printf '1 1\n2 3\n3 2\n4 4\n' | \
 
 `--area` (`area: true`) fills under each line or stairs series, from
 the floor up, as btop draws its graphs. Every pixel column is a bar
-of its own, so a braille cell holds two bars of 0 to 4 dots, and a
-peak narrower than a cell still shows. The y axis starts at 0 unless
+of its own, so a block cell holds two bars of 0 to 2 (a braille cell
+two of 0 to 4), and a peak narrower than a cell still shows. The y axis starts at 0 unless
 `--ylim` says otherwise. `cpu.txt` is 60 load samples between 10 and
 90:
 
 ```text
-$ tessella chart --area --width 30 --height 6 cpu.txt
-      ┌──────────────────────────────┐
-   90 │  ⢀⣴⣾⣿⣷⣄             ⢀⣴⣿⣿⣶⣄   │
-      │ ⢠⣾⣿⣿⣿⣿⣿⣧⡀          ⣠⣿⣿⣿⣿⣿⣿⣦  │
-      │⢠⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀        ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀│
-      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄      ⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷│
-      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄   ⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
-    0 │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
-      └──────────────────────────────┘
-      0                             60
-```
-
-On the block canvas a cell holds two bars of 0 to 2; under `--ascii`
-the fill is drawn in ASCII strokes:
-
-```text
-$ tessella chart --area --canvas block --width 30 --height 6 cpu.txt
+$ tessella --target web chart --area --width 30 --height 6 cpu.txt
       ┌──────────────────────────────┐
    90 │   ▄██▙▄              ▟██▙▖   │
       │ ▗██████▙           ▗██████▙  │
@@ -141,6 +132,22 @@ $ tessella chart --area --canvas block --width 30 --height 6 cpu.txt
       │▐██████████▖      ▟██████████▙│
       │▐███████████▄   ▗▟████████████│
     0 │▐█████████████▄▟██████████████│
+      └──────────────────────────────┘
+      0                             60
+```
+
+The same in braille, finer, and aligned only in a terminal; under
+`--ascii` the fill is drawn in ASCII strokes:
+
+```text
+$ tessella chart --area --canvas braille --width 30 --height 6 cpu.txt
+      ┌──────────────────────────────┐
+   90 │  ⢀⣴⣾⣿⣷⣄             ⢀⣴⣿⣿⣶⣄   │
+      │ ⢠⣾⣿⣿⣿⣿⣿⣧⡀          ⣠⣿⣿⣿⣿⣿⣿⣦  │
+      │⢠⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀        ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀│
+      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄      ⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷│
+      │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄   ⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
+    0 │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿│
       └──────────────────────────────┘
       0                             60
 ```
@@ -179,12 +186,13 @@ $ tessella chart --area --canvas eighths --width 30 --height 6 cpu.txt
 With `--ylim` the floor moves up, so the variation fills the height:
 
 ```text
-$ tessella chart --area --ylim 30,100 --width 30 --height 4 cpu.txt
+$ tessella --target web chart --area --ylim 30,100 \
+    --width 30 --height 4 cpu.txt
        ┌──────────────────────────────┐
-   100 │   ⢀⣠⣤⣀               ⢀⣠⣤⣀    │
-       │  ⣴⣿⣿⣿⣿⣷⣄           ⢀⣴⣿⣿⣿⣿⣷⡄  │
-       │⢀⣾⣿⣿⣿⣿⣿⣿⣿⣦         ⢠⣾⣿⣿⣿⣿⣿⣿⣿⣆ │
-    30 │⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡀      ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧│
+   100 │    ▄▄▖                ▄▄▖    │
+       │  ▄█████▖            ▟████▙▖  │
+       │▗▟███████▙         ▗████████▄ │
+    30 │▐█████████▙▖      ▄██████████▙│
        └──────────────────────────────┘
        0                             60
 ```
@@ -805,16 +813,17 @@ move with their axis; an area fills from the left edge, its gradient
 running left to right.
 
 ```text
-$ tessella chart --orientation horizontal --area --width 24 --height 8 cpu.txt
+$ tessella --target web chart --orientation horizontal --area \
+    --width 24 --height 8 cpu.txt
       ┌────────────────────────┐
-   60 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣦⣤⣤⣄⣀⣀⣀   │
-      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡶│
-      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠟⠛⠛⠋⠉⠁ │
-      │⣿⣿⣿⠿⠟⠛⠛⠉⠉⠉⠁             │
-      │⣿⣿⣷⣦⣤⣄⣀⣀                │
-      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣤⣤⣤⣀⣀    │
-      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡦│
-    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠛⠛⠛⠉⠉⠁ │
+   60 │██████████████▙▄▄▄▄▄▄   │
+      │████████████████████████│
+      │█████████████████▛▀▀▀▀▘ │
+      │████▛▀▀▀▀▀▘             │
+      │███▙▄▄▄▄                │
+      │███████████████▄▄▄▄▖    │
+      │███████████████████████▙│
+    0 │█████████████████▀▀▀▀▀▘ │
       └────────────────────────┘
       0                       90
 ```
@@ -836,7 +845,8 @@ of:
 `quadrant` is another name for `block`. The finer glyphs pack more
 bars into the same width; across, a text row holds as many bars as
 its cell has pixel rows, and is named by its first and last bar,
-`ruby..c`. Every glyph set but `eighths` draws one series only (bars
+`ruby..c`. (The braille example below is aligned only in a
+terminal.) Every glyph set but `eighths` draws one series only (bars
 of [several series](#several-series) need `eighths`), and `sextant`
 and `octant` need a font that has them (see [canvases](#canvases)).
 
@@ -926,7 +936,21 @@ $ tessella chart --canvas sextant --width 24 --height 5 trig.txt
       0                       10
 ```
 
-Braille gives the finest line, ASCII survives any font:
+Braille gives the finest line, but only a terminal keeps it aligned;
+block lines up on the web too; ASCII survives any font:
+
+```text
+$ tessella chart --canvas braille --width 24 --height 5 trig.txt
+      ┌────────────────────────┐
+    1 │⠉⢢⡞⠉⠉⢢      ⢀⠔⠉⠉⢳⡔⠉⠉⢦   │ sin
+      │⢠⠃⠱⡀  ⢣     ⡎  ⢠⠊⠘⡄  ⠱⡀ │ cos
+      │⠧⠤⠤⠵⡤⠤⠤⢧⠤⠤⠤⡼⠤⠤⢤⠧⠤⠤⠵⡤⠤⠤⠵⡤│
+      │    ⠱⡀  ⢣⢀⠜  ⢠⠃    ⠱⡀  ⠱│
+   -1 │     ⠘⣄⣀⡠⠻⣄⣀⡴⠃      ⠙⢄⣀⣠│
+      └────────────────────────┘
+      0                       10
+```
+
 
 ```text
 $ tessella chart --canvas block --width 24 --height 5 trig.txt
@@ -990,15 +1014,15 @@ limits and drawing, so the axis reads in the transformed unit (1 to
 only:
 
 ```text
-$ tessella chart --xscale log10 --width 30 --height 6 \
+$ tessella --target web chart --xscale log10 --width 30 --height 6 \
     --xlabel 'log10 n' growth.txt
       ┌──────────────────────────────┐
-   10 │                           ⢀⣀⠴│ t
-      │                      ⣀⡠⠔⠒⠉⠁  │
-      │                ⢀⣀⠤⠒⠊⠉        │
-      │           ⣀⡠⠔⠒⠉⠁             │
-      │    ⢀⣀⡠⠤⠒⠊⠉                   │
-    0 │⠤⠒⠊⠉⠁                         │
+   10 │                           ▗▄▟│ t
+      │                      ▄▄▞▀▀▘  │
+      │                ▗▄▄▀▀▀        │
+      │           ▄▄▞▀▀▘             │
+      │    ▗▄▄▄▀▀▀                   │
+    0 │▄▀▀▀▘                         │
       └──────────────────────────────┘
       0                              4
                   log10 n
@@ -1056,13 +1080,13 @@ date temp
 ```
 
 ```text
-$ tessella chart --xdate --width 40 --height 6 temps.txt
+$ tessella --target web chart --xdate --width 40 --height 6 temps.txt
       ┌────────────────────────────────────────┐
-   20 │     ⣀⡠⠤⠤⠤⠤⣀⡀                           │ temp
-      │ ⣀⠤⠒⠉       ⠈⠑⠢⢄                    ⡠⠔⠊⠉│
-      │⠊⠁              ⠉⠲⢄              ⡠⠖⠉    │
-      │                   ⠉⠒⠤⣀⡀    ⢀⡠⠤⠒⠉       │
-      │                       ⠉⠉⠉⠉⠉⠉           │
+   20 │     ▄▄▄▄▄▄▄▖                           │ temp
+      │ ▄▄▀▀       ▝▀▚▄                    ▄▞▀▀│
+      │▀▘              ▀▜▄              ▄▛▀    │
+      │                   ▀▀▄▄▖    ▗▄▄▀▀       │
+      │                       ▀▀▀▀▀▀           │
     0 │                                        │
       └────────────────────────────────────────┘
       2026-10-01                      2026-10-30
@@ -1073,13 +1097,13 @@ for a day or more, `%m-%d %H:%M` for an hour or more, `%H:%M:%S`
 below. `--xdate FMT` sets it, in `strftime` form:
 
 ```text
-$ tessella chart --xdate %d/%m --width 40 --height 6 temps.txt
+$ tessella --target web chart --xdate %d/%m --width 40 --height 6 temps.txt
       ┌────────────────────────────────────────┐
-   20 │     ⣀⡠⠤⠤⠤⠤⣀⡀                           │ temp
-      │ ⣀⠤⠒⠉       ⠈⠑⠢⢄                    ⡠⠔⠊⠉│
-      │⠊⠁              ⠉⠲⢄              ⡠⠖⠉    │
-      │                   ⠉⠒⠤⣀⡀    ⢀⡠⠤⠒⠉       │
-      │                       ⠉⠉⠉⠉⠉⠉           │
+   20 │     ▄▄▄▄▄▄▄▖                           │ temp
+      │ ▄▄▀▀       ▝▀▚▄                    ▄▞▀▀│
+      │▀▘              ▀▜▄              ▄▛▀    │
+      │                   ▀▀▄▄▖    ▗▄▄▀▀       │
+      │                       ▀▀▀▀▀▀           │
     0 │                                        │
       └────────────────────────────────────────┘
       01/10                                30/10
@@ -1090,12 +1114,13 @@ is 22:00 UTC:
 
 ```text
 $ printf '%s\n' 't v' '2026-11-05T14:00 1' '2026-11-05T18:30 3' \
-    '2026-11-05T23:00+01:00 2' | tessella chart --xdate --width 30 --height 4
+    '2026-11-05T23:00+01:00 2' | \
+    tessella --target web chart --xdate --width 30 --height 4
      ┌──────────────────────────────┐
-   3 │             ⣀⠤⠒⠉⠉⠑⠒⠤⢄⣀⡀      │ v
-     │        ⢀⡠⠤⠒⠉          ⠈⠉⠒⠢⠤⣀⣀│
-     │    ⢀⡠⠔⠊⠁                     │
-   1 │⣀⡠⠔⠊⠁                         │
+   3 │             ▄▄▀▀▀▀▀▄▄▄▖      │ v
+     │        ▗▄▄▀▀          ▝▀▀▚▄▄▄│
+     │    ▗▄▞▀▘                     │
+   1 │▄▄▞▀▘                         │
      └──────────────────────────────┘
      11-05 14:00          11-05 22:00
 ```
@@ -1140,16 +1165,16 @@ dose effect err
 ```
 
 ```text
-$ tessella chart --yerr --width 30 --height 8 dose.txt
+$ tessella --target web chart --yerr --width 30 --height 8 dose.txt
      ┌──────────────────────────────┐
-   9 │                             ⢠│ effect
-     │                        ⡄⢀⣀⣀⡠⢼│
-     │                     ⣀⠤⠊⠏⠁   ⠸│
-     │                ⢀⣀⡧⠔⠉         │
-     │          ⣀⠤⠗⠒⠉⠉⠁ ⠇           │
-     │      ⣄⠤⠒⠉                    │
-     │⣄⡠⠤⠒⠊⠉⠇                       │
-   1 │⠃                             │
+   9 │                             ▗│ effect
+     │                        ▖▗▄▄▄▟│
+     │                     ▄▄▀▛▘   ▐│
+     │                ▗▄▙▞▀         │
+     │          ▄▄▛▀▀▀▘ ▌           │
+     │      ▄▄▀▀                    │
+     │▄▄▄▀▀▀▌                       │
+   1 │▘                             │
      └──────────────────────────────┘
      1                              6
 ```
@@ -1199,14 +1224,14 @@ given), each in any [colour form](#colour). Sideways the rule runs
 down the plot.
 
 ```text
-$ tessella chart --threshold 70 --width 30 --height 6 cpu.txt
+$ tessella --target web chart --threshold 70 --width 30 --height 6 cpu.txt
       ┌──────────────────────────────┐
-   90 │  ⢀⡔⠉⠉⠑⣄             ⢀⠖⠉⠉⠑⣄   │
-      │⠄⢄⠎⠄⠄⠄⠄⠌⢧⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢤⠏⠄⠄⠄⠄⠌⢆⠄⠤│
-      │⢠⠋       ⢣         ⣰⠃      ⠈⢦ │
-      │⠈        ⠈⢧       ⢠⠃        ⠈⢇│
-      │           ⢣⡀    ⡰⠃          ⠈│
-   10 │            ⠱⢄⣀⣀⠜⠁            │
+   90 │   ▞▀▀▀▄              ▞▀▀▀▄   │
+      │▖▖▞▖▖▖▖▖▙▖▖▖▖▖▖▖▖▖▖▖▄▛▖▖▖▖▖▙▖▄│
+      │▗▀       ▚         ▟▘       ▚ │
+      │▝        ▝▙       ▗▘        ▝▙│
+      │           ▚▖    ▗▘          ▝│
+   10 │            ▝▄▄▄▞▘            │
       └──────────────────────────────┘
       0                             60
 ```
@@ -1230,7 +1255,8 @@ require "tessella"
 
 xs = (0..20).map { it * 0.5 }
 fit = Tessella.line(xs, xs.map { (0.5 * it) + 1 },
-                    name: "fit", width: 30, height: 6, title: "calibration")
+                    name: "fit", width: 30, height: 6, title: "calibration",
+                    canvas: :block)
 fit.add([1, 3, 4.5, 7, 9], [1.4, 2.7, 3.0, 4.9, 5.4],
         name: "measured", mark: "●")
 puts fit
@@ -1240,12 +1266,12 @@ puts fit
 $ ruby calibration.rb
                calibration
      ┌──────────────────────────────┐
-   6 │                         ⢀⡠●⠒⠉│ fit
-     │                    ⢀●⠴⠒⠉⠁    │ ● measured
-     │               ⣀⡠⠤⠒⠉⠁         │
-     │         ●⢀⡠⠔●⠉⠁              │
-     │     ⢀⡠⠤⠒⠉⠁                   │
-   1 │⣀⡠⠤●⠉⠁                        │
+   6 │                         ▗▄●▀▀│ fit
+     │                    ▗●▟▀▀▘    │ ● measured
+     │               ▄▄▄▀▀▘         │
+     │         ●▗▄▞●▀▘              │
+     │     ▗▄▄▀▀▘                   │
+   1 │▄▄▄●▀▘                        │
      └──────────────────────────────┘
      0                             10
 ```

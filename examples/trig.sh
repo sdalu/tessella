@@ -9,4 +9,5 @@ awk 'BEGIN {
     for (i = 0; i <= 100; i++)
         printf "%g %g %g\n", i / 10, sin(i / 10), cos(i / 10)
 }' |
-    tessella chart --title trig --xlabel x --width 30 --height 6
+    tessella chart --title trig --xlabel x --width 30 --height 6 \
+        --canvas block
