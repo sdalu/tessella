@@ -99,6 +99,7 @@ lib/tessella/cli.rb        the command line's entry: loads the library,
 lib/tessella/cli/<name>.rb `tessella <name>`: one file per command
                            (compose_options.rb, lint_options.rb: their
                            commands' options)
+lib/tessella/cli/input.rb  a command's input: file or stdin, UTF-8
 lib/tessella/cli/main.rb   `tessella`: dispatches on the command
 exe/tessella               the command line
 tools/bundle.rb            single-file build for vendoring

@@ -32,7 +32,7 @@ module Tessella
         def self.run(argv, stdin:, stdout:, stderr:)
             draw(argv, stdin, stdout)
         rescue Halt => e
-            halt(e, stdout, stderr)
+            CLI.halt(e, stdout, stderr)
         rescue OptionParser::ParseError, UsageError => e
             fail_with(stderr, e.message, 2)
         rescue DataError => e
@@ -65,11 +65,6 @@ module Tessella
             raise DataError, e.message
         rescue ArgumentError => e
             raise UsageError, e.message
-        end
-
-        def self.halt(error, stdout, stderr)
-            (error.status.zero? ? stdout : stderr).print(error.text)
-            error.status
         end
 
         def self.fail_with(stderr, message, status)

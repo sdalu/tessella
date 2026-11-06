@@ -104,6 +104,13 @@ module Tessella
             0
         end
 
+        # A command's Halt (--help, --version, a usage message): its
+        # text on stdout when its status is 0, else on stderr.
+        def self.halt(error, stdout, stderr)
+            (error.status.zero? ? stdout : stderr).print(error.text)
+            error.status
+        end
+
         def self.refuse(command, stderr)
             what = command ? "unknown command: #{command}" : "no command"
             stderr.puts("tessella: #{what}")

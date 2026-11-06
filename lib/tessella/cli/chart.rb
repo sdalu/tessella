@@ -34,7 +34,7 @@ module Tessella
         def self.run(argv, stdin:, stdout:, stderr:)
             draw(argv, stdin, stdout)
         rescue Halt => e
-            halt(e, stdout, stderr)
+            CLI.halt(e, stdout, stderr)
         rescue DataError, Tessella::ValueError => e
             data_error(e, stderr)
         rescue OptionParser::ParseError, UsageError, ArgumentError => e
@@ -49,11 +49,6 @@ module Tessella
             chart = Kinds.build(opts, rows)
             stdout.print(chart.to_s)
             0
-        end
-
-        def self.halt(error, stdout, stderr)
-            (error.status.zero? ? stdout : stderr).print(error.text)
-            error.status
         end
 
         def self.usage_error(error, stderr)

@@ -29,7 +29,7 @@ module Tessella
         def self.run(argv, stdin:, stdout:, stderr:)
             draw(argv, stdin, stdout)
         rescue Halt => e
-            halt(e, stdout, stderr)
+            CLI.halt(e, stdout, stderr)
         rescue OptionParser::ParseError, UsageError => e
             usage_error(e, stderr)
         rescue DataError, ArgumentError => e
@@ -55,11 +55,6 @@ module Tessella
 
             raise DataError,
                   "output is #{w} columns, over --max-width #{max_width}"
-        end
-
-        def self.halt(error, stdout, stderr)
-            (error.status.zero? ? stdout : stderr).print(error.text)
-            error.status
         end
 
         def self.usage_error(error, stderr)
