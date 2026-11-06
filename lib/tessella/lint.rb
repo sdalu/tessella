@@ -30,6 +30,7 @@ module Tessella
         Section = Data.define(:lines, :first, :exempt)
 
         VERTICALS = "│┃║╎╏┆┇┊┋|"
+        BRAILLE = /[\u2801-\u28FF]/
         STRUCTURAL = /[─-╿|]/
         BOX_CHAR = /[─-╿]/
 

@@ -58,6 +58,12 @@ module Tessella
         # drawing two columns.
         def self.ascii? = cjk?
 
+        # A chart's canvas by default: braille, but quadrant blocks
+        # under :web, where a browser draws braille from a fallback
+        # font a fifth wider than a column (measured in Chrome on
+        # GitHub's code fonts), so a braille chart's rows run unequal.
+        def self.canvas = web? ? :block : :braille
+
         # Text under ascii: true must be ASCII, except under :cjk,
         # where ascii: only means the structure.
         def self.text_free? = cjk?

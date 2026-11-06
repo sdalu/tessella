@@ -189,7 +189,7 @@ value a series, and name the series with `series:`. They are grouped
 -- a bar a series under each label, a blank row between labels -- or,
 with `stacked: true`, end to end in one bar labelled with its total;
 both work upright too (`orientation: :vertical`). Series are told
-apart by fill (`█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆ ·`, `# = + @ * : . o % & ~ x`
+apart by fill (`█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ■ ·`, `# = + @ * : . o % & ~ x`
 in ASCII, so at most 12 series) and, under `color: true`, by colour;
 the legend sits right of the frame, or wrapped to the frame's width
 under it when there are more series than rows. Eighths end only the
@@ -642,20 +642,23 @@ field is not a number) names the columns.
 Three renders, byte for byte as printed.
 
 Two named series, from a header row `x sin cos` and 101 rows of data
-generated on the spot:
+generated on the spot. Drawn here for the web (`--target web`), where
+the chart takes quadrant blocks: a browser draws braille, the default
+canvas in a terminal, from a fallback font wider than a column, so a
+braille chart's rows would not line up on this page.
 
 ```text
 $ ruby -e 'puts "x sin cos"; 0.step(10, 0.1) { puts [it.round(1),
     Math.sin(it), Math.cos(it)].join(" ") }' |
-  tessella chart --title trig --width 30 --height 6
+  tessella --target web chart --title trig --width 30 --height 6
                    trig
       ┌──────────────────────────────┐
-    1 │⠉⠱⡤⠊⠉⠉⢢⡀        ⢠⠊⠉⠉⠢⡴⠊⠉⠙⢢    │ sin
-      │ ⡴⠉⢆   ⠘⡄      ⡰⠁   ⡔⠙⣄   ⠱⡀  │ cos
-      │⡜  ⠈⢆   ⠸⡄    ⡜⠁  ⢀⠞  ⠈⡆   ⠱⡀ │
-      │⠉⠉⠉⠉⠉⢏⠉⠉⠉⠙⡍⠉⠉⡽⠉⠉⠉⢉⡝⠉⠉⠉⠉⠙⢏⠉⠉⠉⠹⡉│
-      │     ⠈⢇   ⠙⡄⡜   ⢀⠎      ⠘⢄   ⠱│
-   -1 │       ⠱⣄⣀⣠⠎⠢⣀⣀⡰⠊        ⠈⠣⣄⣀⡠│
+    1 │▀▜▄▀▀▀▚▖        ▗▀▀▀▚▟▀▀▀▚    │ sin
+      │ ▟▀▙   ▝▖      ▟▘   ▞▀▄   ▀▖  │ cos
+      │▞  ▝▚   ▝▖    ▞▘  ▗▞  ▝▖   ▜▖ │
+      │▀▀▀▀▀█▀▀▀▀▛▀▀█▀▀▀▀▛▀▀▀▀▀▛▀▀▀▜▛│
+      │      ▙   ▝▖▞   ▗▛      ▝▄   ▀│
+   -1 │       ▜▄▄▄▛▚▄▄▟▀        ▝▚▄▄▄│
       └──────────────────────────────┘
       0                             10
 ```

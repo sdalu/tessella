@@ -7,7 +7,7 @@ module Tessella
     # wrapped into lines no wider than the frame's body, or than the
     # widest entry, which is never split.
     module Legend
-        FILLS = %w[█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆ ·].freeze
+        FILLS = %w[█ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ■ ·].freeze
         ASCII_FILLS = %w[# = + @ * : . o % & ~ x].freeze
 
         def self.fills!(count, what)

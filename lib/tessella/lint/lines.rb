@@ -64,11 +64,6 @@ module Tessella
                 end
             end
 
-            def check_target_row(sec, i, line)
-                check_web_row(sec, i, line) if @opts[:web]
-                check_cjk_row(sec, i, line) if @opts[:target] == :cjk
-            end
-
             def check_char(sec, i, ch)
                 wide = Lint.wide?(ch.ord)
                 report(sec, i, glyph("wide char", ch)) if wide && no_wide?
@@ -82,43 +77,6 @@ module Tessella
 
             def check_ascii_char(sec, i, ch)
                 report(sec, i, glyph("non-ASCII", ch)) if ch.ord > 0x7F
-            end
-
-            def check_web_char(sec, i, ch)
-                return unless Lint.emoji_risk?(ch.ord)
-
-                report(sec, i, "#{glyph("emoji-capable", ch)} (web target)")
-            end
-
-            def check_web_row(sec, i, line)
-                return unless line.match?(STRUCTURAL)
-
-                line.each_char do |ch|
-                    next unless Lint.wide?(ch.ord)
-
-                    report(sec, i, "#{glyph("wide", ch)} on aligned row " \
-                                   "(web target)")
-                end
-            end
-
-            # Under :cjk an ambiguous glyph that is not box drawing (·, é,
-            # ●) on a row that must line up takes two columns: named,
-            # as the drift and geometry checks measure it so.
-            def check_cjk_row(sec, i, line)
-                return unless line.match?(STRUCTURAL)
-
-                line.each_char.grep_v(BOX_CHAR).uniq.each do |ch|
-                    next unless Width.class_of(ch) == :A
-
-                    report(sec, i, "#{glyph("ambiguous", ch)} on aligned row " \
-                                   "(cjk target: 2 columns#{stand_in(ch)})")
-                end
-            end
-
-            # The small head that lines up in place of a full-size one.
-            def stand_in(ch)
-                small = { "▲" => "▴", "▼" => "▾" }[ch]
-                small ? "; #{small} lines up" : ""
             end
 
             def check_budget(sec, i, line)

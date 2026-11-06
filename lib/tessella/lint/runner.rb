@@ -9,6 +9,7 @@ module Tessella
         # findings and ruler rows.
         class Runner
             include Lines
+            include TargetRows
             include Shadows
             include Mixing
             include Drift

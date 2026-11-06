@@ -128,7 +128,7 @@ module Tessella
 
         def default_border = :box
         def draw_grid? = true
-        def default_canvas_type = @ascii ? :ascii : :braille
+        def default_canvas_type = @ascii ? :ascii : Target.canvas
 
         def auto_color
             name = Color::NAMES[@next_color % Color::NAMES.size]

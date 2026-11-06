@@ -26,8 +26,11 @@ module Tessella
              (:web unless chars.any? { web_risk?(it) })].compact
         end
 
+        # Wide, emoji-capable, or braille, which a browser draws from
+        # a fallback font wider than a column.
         def self.web_risk?(char)
-            Width.class_of(char) == :W || Target.emoji_risk?(char.ord)
+            Width.class_of(char) == :W || Target.emoji_risk?(char.ord) ||
+                char.ord.between?(0x2801, 0x28FF)
         end
 
         PATTERNS = {

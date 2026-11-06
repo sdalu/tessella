@@ -4,7 +4,7 @@ module Tessella
     # A pie, or with donut: true a ring (DESIGN.md, "Chart and kinds"):
     # labels and values as slices clockwise from the top, drawn on
     # character cells twice as wide as tall, so the disc reads round in
-    # a terminal. Slices are told apart by fill -- █ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ◆
+    # a terminal. Slices are told apart by fill -- █ ▓ ▒ ░ ╳ ╱ ╲ ∴ ● ○ ■
     # ·, one width class, or # = + @ * : . o % & ~ x in ASCII, so at
     # most 12 slices -- and, under color: true, by colour. The legend
     # right of the disc gives each slice's share, or under it, wrapped
