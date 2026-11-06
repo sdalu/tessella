@@ -244,4 +244,12 @@ class TestBitfieldCLI < Minitest::Test
         assert_equal(0, status)
         assert_includes(out, "Usage: tessella bitfield")
     end
+
+    # The tick line under a full row closes all of it, even when the
+    # row after it is shorter.
+    def test_a_short_last_row_leaves_no_row_open
+        lines = Tessella.bitfield("A:32\nB:16\n").to_s.lines.map(&:chomp)
+        assert_equal("#{"+-" * 32}+", lines[-3])
+        assert_equal("#{"+-" * 16}+", lines[-1])
+    end
 end

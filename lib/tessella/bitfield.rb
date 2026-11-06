@@ -171,15 +171,18 @@ module Tessella
             line
         end
 
+        # A tick line between two rows spans the wider of them, so a
+        # short last row does not leave the row above it open.
         def self.render(rows, word, show_ruler, octets)
             step = octets ? 8 : 1
             lines = show_ruler ? ruler_lines(word) : []
+            above = 0
             rows.each do |row|
-                lines << tick_line(row_bits(row), step)
+                lines << tick_line([above, row_bits(row)].max, step)
                 lines << content_line(row)
+                above = row_bits(row)
             end
-            lines << tick_line(row_bits(rows.last), step)
-            lines
+            lines << tick_line(above, step)
         end
     end
 
