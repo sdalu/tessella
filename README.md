@@ -371,9 +371,11 @@ Tessella.seq(text, ascii: false, numbered: false, footer: false)
   to N columns by narrowing its widest column a column at a time --
   then whichever is widest, so wide columns converge and a narrow one
   is never cut first -- and word-wrapping the narrowed cells (a word
-  too long breaks inside). With every column at `min_width:` (4 by
-  default), or its natural width when smaller, and still too wide, it
-  is refused, naming the width it needs. ANSI colour in a cell takes
+  too long breaks inside). `min_width:` is each column's floor (4 by
+  default), or an Array of one floor a column, so short identifiers
+  can stay whole while a long path takes the cut; with every column
+  at its floor, or its natural width when smaller, and still too
+  wide, the table is refused, naming the width it needs. ANSI colour in a cell takes
   no column and survives padding and wrapping, closed and reopened on
   each wrapped line; `color: true`
   sets the header in bold. Markdown refuses multi-line cells and

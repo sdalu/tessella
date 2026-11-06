@@ -57,4 +57,28 @@ class TestTableFixes < Minitest::Test
                                        stdout: out, stderr: StringIO.new)
         assert_includes(out.string, "│ a │")
     end
+
+    CONFIG = [%w[File From Path Mode Size Changed],
+              ["tado-pairing", "CLIMAT_PAIRING",
+               "/home/sdalu/.config/climat-control/tado-pairing.json",
+               "0600", "1.2 kB", "3 d"]].freeze
+
+    # min_width: an Array gives each column its own floor, so short
+    # identifiers stay whole and the long path takes the cut.
+    def test_min_width_per_column
+        flat = Tessella.table(CONFIG, width: 74).to_s
+        refute_includes(flat, "CLIMAT_PAIRING")
+        floors = [12, 14, 12, 4, 6, 7]
+        own = Tessella.table(CONFIG, width: 74, min_width: floors).to_s
+        assert_includes(own, "CLIMAT_PAIRING")
+    end
+
+    def test_min_width_per_column_refusals
+        assert_raises(ArgumentError) do
+            Tessella.table(CONFIG, width: 70, min_width: [12, 14, 12, 4, 6, 7])
+        end
+        assert_raises(ArgumentError) do
+            Tessella.table(CONFIG, min_width: [1, 2])
+        end
+    end
 end

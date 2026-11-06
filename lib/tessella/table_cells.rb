@@ -98,14 +98,28 @@ module Tessella
 
         # Fitting a width (width:, min_width:): when the framed table is
         # wider than width, the widest column narrows by the overflow
-        # and its cells wrap to it; below min_width columns of text it
+        # and its cells wrap to it -- min_width: one floor for every
+        # column, or an Array of one a column; below them it
         # is refused, naming the width the table needs at the least.
         module Fit
             def self.apply(grid, widths, width, min_width)
+                floors = min_widths!(min_width, widths.size)
                 total = Render.span_width(widths) + 2
                 return [grid, widths] if width.nil? || total <= width
 
-                narrow(grid, widths, total - width, min_width)
+                narrow(grid, widths, total - width, [floors, min_width])
+            end
+
+            # min_width: one floor for every column, or an Array of one a
+            # column; each a positive Integer.
+            def self.min_widths!(min_width, ncols)
+                floors = Array(min_width)
+                floors *= ncols unless min_width.is_a?(Array)
+                good = floors.all? { it.is_a?(Integer) && it.positive? }
+                return floors if good && floors.size == ncols
+
+                raise ArgumentError, "min_width must be a positive Integer " \
+                                     "or #{ncols} of them: #{min_width.inspect}"
             end
 
             # Over columns come off the widest column still above its
@@ -113,9 +127,10 @@ module Tessella
             # narrow column is never narrowed first. A column's floor is
             # min_width, or its natural width when that is smaller; the
             # table is refused only when every column is at its floor.
-            def self.narrow(grid, widths, over, min_width)
+            def self.narrow(grid, widths, over, mins)
+                per_column, min_width = mins
                 texts = widths.map { it - 2 }
-                floors = texts.map { [it, min_width].min }
+                floors = texts.zip(per_column).map(&:min)
                 target = texts.sum - over
                 check_room!(floors, target, min_width)
                 fitted = level(texts, floors, target)
