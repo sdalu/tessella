@@ -16,6 +16,13 @@ renders and runnable [examples](examples/), is in [doc/](doc/README.md);
 see [DESIGN.md](DESIGN.md) for the internal interfaces and the
 decisions behind them.
 
+> [!WARNING]
+> Where a figure is read changes how wide its glyphs are: a CJK
+> terminal draws box drawing two columns wide, and a browser may draw
+> `▶` as an emoji or braille from a wider fallback font. Draw for the
+> reader with `--target term|cjk|web`; see
+> [Width targets](#width-targets).
+
 ## Install
 
 tessella is not on rubygems.org, and it has no public remote. Install
@@ -574,36 +581,61 @@ tessella glyphs --check GLYPHS   # the classes of a set of one's own;
 
 ### Width targets
 
+> [!WARNING]
+> **A text figure lines up only where its glyphs are as wide as
+> tessella counted, and that is not the same everywhere.** Unicode
+> gives some glyphs no fixed width: box drawing, block elements,
+> `· ● ★`, Greek and accented Latin are *East Asian Ambiguous*, one
+> column in a Western terminal and two in one set up for Chinese,
+> Japanese or Korean. A browser adds two risks of its own: it may
+> draw an emoji-capable glyph (`▶ ☀ ✔`) as a two-column colour emoji,
+> and it draws any glyph its monospace font lacks from a fallback font
+> at that font's width (in Chrome on GitHub's code fonts braille is
+> about 1.2 columns, `▶` and `◆` two). A figure drawn for one of these
+> places shears in another: a frame that does not close, a column of
+> bars that drifts, a chart whose right edge wanders. Choose the
+> target where the figure will be read.
+
+tessella draws for three targets:
+
+| Target | Read in | What tessella does |
+|--------|---------|--------------------|
+| `term` (default) | a Western terminal or editor | ambiguous glyphs count one column, wide ones (CJK, emoji, an emoji sequence) two |
+| `cjk` | a terminal set up for CJK | ambiguous glyphs count two; structure defaults to ASCII, text is kept |
+| `web` | a browser: a README or docs on GitHub | U+FE0E after emoji-capable glyphs; charts in quadrant blocks, not braille; `■` for `◆` |
+
 ```ruby
 Tessella.target = :cjk                      # for the rest of the fiber
 Tessella::Target.with(:web) { Tessella.table(rows).to_s }
 ```
 
-A figure is aligned for where it is read, and widths differ there.
-`:term`, the default, is a Western terminal: ambiguous glyphs (box
-drawing, blocks, `·●★`, Greek, accented Latin) take one column, wide
-ones (CJK, emoji) two, an emoji sequence joined by ZWJ or skin-toned
-two. `:cjk` is a CJK-configured terminal, where ambiguous glyphs take
-two: every module's `ascii:` then defaults to `true`, so the
-structure is ASCII, while text stays as given (CJK labels, `é`) and
-is measured with ambiguous glyphs as two. `ascii: false` still asks
-for Unicode structure: a frame (`Compose.frame`) and a table then
-keep every inner width a whole number of border glyphs, so they close
-in a CJK terminal (and look a column wide here and there in a Western
-one); other figures' Unicode structure will not line up there. `:web` is a
-browser, which may draw an emoji-capable glyph (`▶ ☀ ✔`) as a wide
-emoji: the output carries U+FE0E, the text-presentation selector,
-after each one, so it stays a text glyph. That fixes its form, not
-its width: a glyph missing from the viewer's monospace font is drawn
-from a fallback font at that font's width (in Chrome on GitHub's code
-fonts, `▶` takes two columns and `↗` 1.4, with or without U+FE0E), so
-on the web only glyphs the monospace font carries line up -- `▸`, not
-`▶`. A sequence diagram's `► ◄` heads, chosen for their look, are
-not emoji-capable, but a font without them gives them a fallback
-width too. On the command line:
-`tessella --target term|cjk|web COMMAND ...`, or `TESSELLA_TARGET`.
-`tessella lint --target` checks a figure for a target, and `tessella
-glyphs` says which sets are safe for which.
+On the command line: `tessella --target term|cjk|web COMMAND ...`,
+or `TESSELLA_TARGET` (`--target` wins; an empty variable is `term`).
+
+**`cjk`.** Every module's `ascii:` defaults to `true`, since ASCII is
+one column everywhere: the structure is drawn in `+ - |`, while text
+stays as given (CJK labels, `é`) and is measured with ambiguous
+glyphs as two. `ascii: false` (`--no-ascii`) still asks for Unicode
+structure: a frame and a table then keep every inner width a whole
+number of border glyphs, so they close in a CJK terminal (and look a
+column wide here and there in a Western one); other figures' Unicode
+structure will not line up there.
+
+**`web`.** U+FE0E, the text-presentation selector, after an
+emoji-capable glyph keeps it a text glyph, but it fixes the glyph's
+form, not its width: in a browser only glyphs the monospace font
+carries line up. Measured in Chrome on GitHub's code fonts, box
+drawing, quadrant and half blocks, eighths and shades are exactly one
+column; so under `web` a chart defaults to quadrant blocks
+(`--canvas braille` still asks for braille), and arrows should end in
+`▸ ◂`, not `▶ ◀`. A sequence diagram's `► ◄` heads, chosen for their
+look, are not emoji-capable, but a font without them gives them a
+fallback width too.
+
+`tessella lint --target T` checks a figure, drawn or hand-made, with
+the target's widths, and `tessella glyphs --target T` lists the glyph
+sets safe for it. [doc/targets.md](doc/targets.md) has renders of
+each.
 
 ### The command line from Ruby
 
