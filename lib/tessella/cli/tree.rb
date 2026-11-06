@@ -24,7 +24,7 @@ module Tessella
         def self.run(argv, stdin:, stdout:, stderr:)
             opts, paths = TreeOptions.parse(argv.dup)
             check_arity!(paths)
-            stdout.print(draw(read(paths.first, stdin), opts))
+            stdout.print(draw(input(paths, stdin), opts))
             0
         rescue Help
             help(stdout)
@@ -32,6 +32,10 @@ module Tessella
             fail_with(stderr, e.message, 2)
         rescue ArgumentError => e
             fail_with(stderr, e.message, 1)
+        end
+
+        def self.input(paths, stdin)
+            CLI.read_text(paths.first, stdin, ArgumentError)
         end
 
         def self.help(stdout)
@@ -46,12 +50,6 @@ module Tessella
 
         def self.check_arity!(paths)
             raise UsageError, "too many arguments" if paths.size > 1
-        end
-
-        def self.read(path, stdin)
-            CLI.utf8!(path ? File.read(path) : stdin.read, ArgumentError)
-        rescue SystemCallError => e
-            raise ArgumentError, CLI.cannot_read(path, e)
         end
 
         # Usage is settled by now; style is ignored under --ascii, as

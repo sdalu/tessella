@@ -38,7 +38,7 @@ module Tessella
 
         def self.draw(argv, stdin, stdout)
             opts, path = Options.parse(argv.dup)
-            text = Reader.text(path, stdin)
+            text = CLI.read_text(path, stdin, DataError)
             block = Tessella.seq(text, ascii: opts[:ascii],
                                        numbered: opts[:numbered],
                                        footer: opts[:footer])
@@ -116,20 +116,6 @@ module Tessella
                 @parser.on("-h", "--help") do
                     raise SeqCLI::Halt.new(0, @parser.to_s)
                 end
-            end
-        end
-    end
-
-    # Reads the file argument, or stdin when none; a file that cannot
-    # be read is bad input (exit 1, as in every tessella command),
-    # named by the system error's message.
-    class SeqCLI
-        module Reader
-            def self.text(path, stdin)
-                CLI.utf8!(path ? File.read(path) : stdin.read,
-                          SeqCLI::DataError)
-            rescue SystemCallError => e
-                raise SeqCLI::DataError, CLI.cannot_read(path, e)
             end
         end
     end

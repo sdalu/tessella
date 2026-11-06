@@ -129,7 +129,8 @@ module Tessella
         end
 
         def self.draw(path, opts, stdin)
-            rows = Table.parse(read(path, stdin), tsv: opts[:tsv])
+            text = CLI.read_text(path == "-" ? nil : path, stdin, DataError)
+            rows = Table.parse(text, tsv: opts[:tsv])
             header = !opts[:no_header]
             block = build(rows, header, opts)
             check_max_width!(block, opts[:max_width])
@@ -144,13 +145,6 @@ module Tessella
             Tessella.table(rows, header: header, style: opts[:style],
                                  ascii: opts[:ascii], align: opts[:align],
                                  title: opts[:title])
-        end
-
-        def self.read(path, stdin)
-            CLI.utf8!(path && path != "-" ? File.read(path) : stdin.read,
-                      DataError)
-        rescue SystemCallError => e
-            raise DataError, CLI.cannot_read(path, e)
         end
 
         def self.check_align_length!(align, ncols)

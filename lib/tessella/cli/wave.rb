@@ -39,7 +39,7 @@ module Tessella
 
         def self.draw(argv, stdin, stdout)
             opts, path = Options.parse(argv.dup)
-            block = build(opts, Reader.text(path, stdin))
+            block = build(opts, CLI.read_text(path, stdin, DataError))
             Overflow.check!(block, opts[:max_width]) if opts[:max_width]
             stdout.print(block.to_s)
             0
@@ -129,20 +129,6 @@ module Tessella
                 @parser.on("--help", "print this help") do
                     raise WaveCLI::Halt.new(0, @parser.to_s)
                 end
-            end
-        end
-    end
-
-    # The file argument, or stdin when there is none; errors opening
-    # it (a missing file, a directory) are left to raise, as wave.rb's
-    # own usage errors.
-    class WaveCLI
-        module Reader
-            def self.text(path, stdin)
-                CLI.utf8!(path ? File.read(path) : stdin.read,
-                          WaveCLI::DataError)
-            rescue SystemCallError => e
-                raise WaveCLI::DataError, CLI.cannot_read(path, e)
             end
         end
     end

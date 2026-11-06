@@ -408,7 +408,8 @@ module Tessella
             end
 
             def self.rows(path, stdin)
-                rows = text(path, stdin).each_line.filter_map { line(it) }
+                rows = CLI.read_text(path, stdin, DataError).each_line
+                          .filter_map { line(it) }
                 raise DataError, "no data" if rows.empty?
 
                 rows
@@ -422,12 +423,6 @@ module Tessella
                 i = rows.index { |row| !row.join.ascii_only? } or return
 
                 raise DataError, "row #{i + 1} is non-ASCII under --ascii"
-            end
-
-            def self.text(path, stdin)
-                CLI.utf8!(path ? File.read(path) : stdin.read, DataError)
-            rescue SystemCallError => e
-                raise DataError, CLI.cannot_read(path, e)
             end
 
             def self.line(raw)

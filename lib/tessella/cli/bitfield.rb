@@ -50,7 +50,7 @@ module Tessella
             opts, paths = BitfieldOptions.parse(argv)
             raise UsageError, "too many arguments" if paths.size > 1
 
-            text = BitfieldReader.read(paths.first, stdin)
+            text = CLI.read_text(paths.first, stdin, DataError)
             finish(text, opts)
         end
 
@@ -116,16 +116,6 @@ module Tessella
                 end
                 @opts[:word] = n
             end
-        end
-    end
-
-    # The script's own input: one file argument, or stdin.
-    module BitfieldReader
-        def self.read(path, stdin)
-            CLI.utf8!(path ? File.read(path) : stdin.read,
-                      BitfieldCLI::DataError)
-        rescue SystemCallError => e
-            raise BitfieldCLI::DataError, CLI.cannot_read(path, e)
         end
     end
 end

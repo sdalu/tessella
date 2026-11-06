@@ -232,18 +232,13 @@ module Tessella
         end
 
         def self.block(path, ascii, stdin)
-            lines = read(path, stdin).lines(chomp: true)
+            text = CLI.read_text(path == "-" ? nil : path, stdin,
+                                 ComposeCLI::DataError, "#{path}:")
+            lines = text.lines(chomp: true)
             check!(path, lines, ascii)
             Block.new(lines)
         rescue ArgumentError
             raise ComposeCLI::DataError, "#{path}: empty block"
-        end
-
-        def self.read(path, stdin)
-            CLI.utf8!(path == "-" ? stdin.read : File.read(path),
-                      ComposeCLI::DataError, "#{path}:")
-        rescue SystemCallError => e
-            raise ComposeCLI::DataError, CLI.cannot_read(path, e)
         end
 
         def self.check!(path, lines, ascii)
