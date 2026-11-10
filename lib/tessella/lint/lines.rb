@@ -4,9 +4,9 @@ module Tessella
     module Lint
         # The checks one line at a time: invalid UTF-8, tabs, forbidden
         # sequences, trailing blanks, wide / invisible / emoji-capable /
-        # non-ASCII glyphs, wide glyphs on an aligned row (web) and
-        # ambiguous ones (cjk), and the column budget, which also
-        # records the line's ruler row.
+        # non-ASCII glyphs, spaces other than U+0020, wide glyphs on an
+        # aligned row (web) and ambiguous ones (cjk), and the column
+        # budget, which also records the line's ruler row.
         module Lines
             private
 
@@ -67,16 +67,26 @@ module Tessella
             def check_char(sec, i, ch)
                 wide = Lint.wide?(ch.ord)
                 report(sec, i, glyph("wide char", ch)) if wide && no_wide?
-                if Lint.invisible?(ch.ord)
-                    report(sec, i, format("invisible char U+%<code>04X",
-                                          code: ch.ord))
-                end
+                check_blank(sec, i, ch)
                 check_web_char(sec, i, ch) if @opts[:web]
                 check_ascii_char(sec, i, ch) if @opts[:ascii] && !wide
             end
 
+            # Names a glyph drawn as nothing, or as a blank that is not
+            # U+0020.
+            def check_blank(sec, i, ch)
+                if Lint.invisible?(ch.ord)
+                    report(sec, i, code_point("invisible char", ch))
+                elsif Lint.look_alike_space?(ch)
+                    report(sec, i, code_point("look-alike space", ch))
+                end
+            end
+
+            # A look-alike space is named by check_blank already.
             def check_ascii_char(sec, i, ch)
-                report(sec, i, glyph("non-ASCII", ch)) if ch.ord > 0x7F
+                return if ch.ord <= 0x7F || Lint.look_alike_space?(ch)
+
+                report(sec, i, glyph("non-ASCII", ch))
             end
 
             def check_budget(sec, i, line)
@@ -87,6 +97,10 @@ module Tessella
 
                 report(sec, i, "#{cols} columns rendered (budget " \
                                "#{@opts[:width]})")
+            end
+
+            def code_point(what, ch)
+                format("%<what>s U+%<code>04X", what: what, code: ch.ord)
             end
 
             def no_wide? = @opts[:no_wide] || @opts[:ascii]

@@ -247,7 +247,7 @@ any finding. The port was checked against artlint.rb itself over
 identical on stdout, stderr and exit status; the suite carries the
 skill's own lint fixtures and the eval fixtures' planted defects.
 
-Three departures, each an addition rather than a change:
+Four departures, each an addition rather than a change:
 
 - **`fences: true`.** A Markdown file linted whole reads its prose and
   tables as art; the shelf's README gate split out each fence by hand
@@ -278,6 +278,14 @@ Three departures, each an addition rather than a change:
   emoji-capable glyph followed by U+FE0E, as tessella writes it there,
   pass; `:cjk` names each ambiguous glyph other than box drawing on a
   row that must line up, since a CJK terminal gives it two columns.
+- **Look-alike spaces.** Every space separator (Zs) other than
+  U+0020 -- U+00A0, U+2009, U+202F, U+3000, ... -- is named. They are
+  a column wide, so the invisible check (zero width) never saw them,
+  and no display tells one from a space; in a figure one is always an
+  accident of retyped or pasted text. artlint did not name them, so a
+  file holding one is where the port and artlint now differ. Under
+  `ascii: true` it is named once, as a look-alike space, not also as
+  non-ASCII. Found by comparing with ai-tools' figure-file.rb.
 
 `--paranoid`, an older name for `--ascii`, was dropped. The display
 width tables are `Width`'s, so the lint and the figures it checks

@@ -42,6 +42,15 @@ class TestLintLines < Minitest::Test
         assert_equal(["1: invisible char U+200B"], findings("a\u200Bb\n"))
     end
 
+    def test_a_space_other_than_u0020_is_named
+        assert_equal(["1: look-alike space U+00A0",
+                      "1: look-alike space U+202F",
+                      "1: look-alike space U+3000"],
+                     findings("a\u00A0b\u202Fc\u3000d\n"))
+        assert_equal(["1: look-alike space U+2009"],
+                     findings("a\u2009b\n", ascii: true))
+    end
+
     def test_wide_glyphs_are_errors_only_under_no_wide
         assert_empty(findings("漢\n"))
         assert_equal(["1: wide char U+6F22 漢"], findings("漢\n", no_wide: true))

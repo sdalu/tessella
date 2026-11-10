@@ -445,7 +445,8 @@ Tessella.alphabet(source)  # => "ascii", or "utf-8 box-drawing(12) ..."
 
 `source` is a String or an IO. The lint checks a text figure for
 what breaks it on someone else's screen: tabs, invisible glyphs,
-trailing blanks, lines past `width` once `prefix` is drawn in front,
+spaces other than U+0020 (no-break, thin, ideographic, ...), trailing
+blanks, lines past `width` once `prefix` is drawn in front,
 invalid UTF-8, ASCII box structure mixed with Unicode box drawing in
 one figure, a vertical one column off its anchor on a few rows, and a
 drop shadow (`░`) missing from a row or misplaced. `web: true` adds

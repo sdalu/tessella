@@ -68,6 +68,11 @@ module Tessella
         def self.wide?(code) = Width.char(code) == 2
         def self.invisible?(code) = Width.char(code).zero?
 
+        # A space separator (Zs) other than U+0020: U+00A0, U+202F,
+        # U+3000, ... Drawn as a blank, so no display tells it from a
+        # space, yet a figure holding one is always an accident.
+        def self.look_alike_space?(ch) = ch != " " && ch.match?(/\p{Zs}/)
+
         def self.emoji_risk?(code) = Target.emoji_risk?(code)
 
         def self.width_of(text) = text.each_char.sum { Width.char(it.ord) }
