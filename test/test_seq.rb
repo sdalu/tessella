@@ -39,7 +39,7 @@ module SeqFixtures
           │  hi  │      │
           │─────►│      │
           │      │      │
-          │     go      │
+          │  go  │      │
           │────────────►│
           │      │      │
           │      ├──────┤
@@ -56,7 +56,7 @@ module SeqFixtures
           |  hi  |      |
           |----->|      |
           |      |      |
-          |     go      |
+          |  go  |      |
           |------------>|
           |      |      |
           |      +------+
@@ -83,6 +83,13 @@ class TestSeqRender < Minitest::Test
     def test_skipped_middle_participant_and_two_way_note
         text = "A -> B: hi\nA -> C: go\nnote over B,C: wait\n"
         assert_equal(SKIP, Tessella.seq(text).to_s)
+    end
+
+    def test_a_skipping_label_leaves_the_lifelines_it_passes
+        text = "A -> B: hi\nA -> C: go\nC -> A: a longer reply\n"
+        out = Tessella.seq(text).to_s
+        assert(Tessella.lint(out, geometry: true).clean?, out)
+        assert_includes(out, "│      │ a longer reply │")
     end
 
     def test_same_but_ascii

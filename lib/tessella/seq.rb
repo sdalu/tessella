@@ -228,10 +228,15 @@ module Tessella
             label = label_text(stmt)
             return grow_right!(state, i, self_loop_need(label)) if i == j
 
-            lo, hi = [i, j].minmax
+            seg = label_gap(i, j)
             required = Width.of(label) + 2
-            ensure_width!(state, lo, hi, required, -1)
+            ensure_width!(state, seg, seg + 1, required, -1)
         end
+
+        # The gap a message's label sits in: the one beside its
+        # sender, so a message that skips participants never writes
+        # its label over a lifeline it passes.
+        def self.label_gap(from, to) = from < to ? from : from - 1
 
         def self.widen_note!(state, participants, stmt)
             idx = stmt[:names].map { participants.index(it) }.sort
@@ -374,7 +379,7 @@ module Tessella
         end
 
         def self.arrow_rows(lay, spec, label, style)
-            lo, hi = spec.values_at(:lo, :hi)
+            lo, hi = spec[:label]
             lr = lifeline_row(lay, style)
             interior = hi - lo - 1
             start = lo + 1 + centered_start(interior, Width.of(label))
@@ -485,8 +490,10 @@ module Tessella
             lo, hi = idx_pair.minmax
             dir = i < j ? :right : :left
             pos = lay[:positions]
+            seg = label_gap(i, j)
             spec = { lo: pos[lo][:center], hi: pos[hi][:center],
-                     kind: kind, dir: dir }
+                     kind: kind, dir: dir,
+                     label: [pos[seg][:center], pos[seg + 1][:center]] }
             arrow_rows(lay, spec, label, style)
         end
 

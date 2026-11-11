@@ -29,7 +29,9 @@ One statement per line; blank lines and `#` comments are skipped.
 A name is a run of letters, digits, `_`, `.` or `-`, not ending in
 `-`, so `A-->B` reads as a reply with or without blanks. Participants
 take their columns in the order they are declared, or first appear;
-columns widen to fit every label, never truncating one.
+columns widen to fit every label, never truncating one. A message
+that skips participants carries its label in the gap beside its
+sender, so the label never covers a lifeline the arrow passes.
 
 ```text
 $ cat login.txt
