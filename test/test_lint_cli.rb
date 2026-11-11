@@ -59,6 +59,11 @@ class TestLintCLI < Minitest::Test
                      lint(["--ruler", "--prefix", "  "], stdin: "│ a │\n\n"))
     end
 
+    def test_suffix_is_charged_to_the_budget
+        assert_equal([1, "", "stdin:1: 6 columns rendered (budget 5)\n"],
+                     lint(["--width", "5", "--suffix", " -->"], stdin: "ab\n"))
+    end
+
     def test_alphabet_answers_on_stdout_and_exits_zero
         assert_equal([0, "stdin: ascii\n", ""],
                      lint(["--alphabet"], stdin: "a\tb \n"))
@@ -96,7 +101,7 @@ class TestLintCLI < Minitest::Test
         status, out, = lint(["--help"])
         assert_equal(0, status)
         assert(out.lines.all? { it.chomp.length <= 80 }, out)
-        %w[--width --prefix --ruler --forbid --web --no-wide --ascii
+        %w[--width --prefix --suffix --ruler --forbid --web --no-wide --ascii
            --alphabet --allow-mixed --fences --geometry].each do |flag|
             assert_match(/^\s+#{flag}\b.*\S\s{2,}\S/, out, flag)
         end

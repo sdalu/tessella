@@ -311,8 +311,9 @@ glyphs `tl tr bl br h v`, as in `style: "╓╖╙╜─║"`, or a
 `Tessella::Borders::Set`); `beside(*figs, gap:,
 align:)` sets figures side by side (align `:top`, `:middle`,
 `:bottom`); `stack(*figs, gap:, rule:, center:)` sets them one under
-another; `indent(fig, prefix:)` prefixes every line (an empty line
-gets the prefix without its trailing blank); `caption(fig, text:,
+another; `indent(fig, prefix:, suffix: nil)` prefixes every line (an empty
+line gets the prefix without its trailing blank) and, with `suffix:`,
+pads every row to the block's width and closes it with the suffix; `caption(fig, text:,
 above:)` adds a centred line; `shadow(fig, glyph:)` adds a drop
 shadow, `░` (`#` under `ascii: true`) one column right of every row
 but the first and a bottom bar one row down reaching that column --
@@ -434,8 +435,8 @@ lower.
 ### Linting
 
 ```ruby
-report = Tessella.lint(source, width: 78, prefix: "", web: false,
-                       forbid: [], no_wide: false, ascii: false,
+report = Tessella.lint(source, width: 78, prefix: "", suffix: "",
+                       web: false, forbid: [], no_wide: false, ascii: false,
                        allow_mixed: false, fences: false, geometry: false,
                        borders: [])
 report.findings   # => [#<data Tessella::Lint::Finding line=3, message="...">]
@@ -446,7 +447,8 @@ Tessella.alphabet(source)  # => "ascii", or "utf-8 box-drawing(12) ..."
 `source` is a String or an IO. The lint checks a text figure for
 what breaks it on someone else's screen: tabs, invisible glyphs,
 spaces other than U+0020 (no-break, thin, ideographic, ...), trailing
-blanks, lines past `width` once `prefix` is drawn in front,
+blanks, lines past `width` once `prefix` is drawn in front and
+`suffix` behind (a comment's closing ` -->` or ` */`),
 invalid UTF-8, ASCII box structure mixed with Unicode box drawing in
 one figure, a vertical one column off its anchor on a few rows, and a
 drop shadow (`░`) missing from a row or misplaced. `web: true` adds
@@ -782,7 +784,7 @@ structure (a frame or table then closes in a CJK terminal; see
 tessella compose frame   [--title T] [--style S] [--pad N] BLOCK
 tessella compose beside  [--gap N] [--align A] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
-tessella compose indent  --prefix STR BLOCK
+tessella compose indent  --prefix STR [--suffix STR] BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
 tessella compose fill    [--pattern P] [--halo sides|around|none] BLOCK
@@ -827,7 +829,8 @@ $ printf 'A -> B: request\nB --> A: ok\n' | tessella seq
 ### `tessella lint`
 
 ```text
-tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
+tessella lint [--width N] [--prefix STR] [--suffix STR] [--ruler]
+              [--forbid SEQ]...
               [--target T] [--web] [--no-wide] [--ascii]
               [--allow-mixed]
               [--fences] [--geometry] [--border GLYPHS]...

@@ -12,8 +12,8 @@ module Tessella
             end
 
             def initialize
-                @opts = { width: 78, prefix: "", ruler: false, forbid: [],
-                          borders: [] }
+                @opts = { width: 78, prefix: "", suffix: "", ruler: false,
+                          forbid: [], borders: [] }
                 @mode = :lint
                 @parser = OptionParser.new
                 @parser.banner = LintCLI::BANNER
@@ -40,6 +40,8 @@ module Tessella
                            "column budget (default 78)") { @opts[:width] = it }
                 @parser.on("--prefix STR", "string rendered before each line,",
                            "charged to the budget") { @opts[:prefix] = it }
+                @parser.on("--suffix STR", "string rendered after each line,",
+                           "charged to the budget") { @opts[:suffix] = it }
                 @parser.on("--ruler", "print each line's width and the",
                            "columns of its verticals") { @opts[:ruler] = true }
             end

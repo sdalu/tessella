@@ -14,8 +14,8 @@ module Tessella
         # is wrong there.
         Finding = Data.define(:line, :message)
 
-        # One --ruler row: a line's rendered width (the prefix
-        # included) and the display columns of its verticals.
+        # One --ruler row: a line's rendered width (the prefix and
+        # suffix included) and the display columns of its verticals.
         Ruler = Data.define(:line, :width, :verticals)
 
         # What Tessella.lint returns: every finding, in the order
@@ -60,7 +60,8 @@ module Tessella
             "markdown-fence" => ["```", "~~~"]
         }.freeze
 
-        DEFAULTS = { width: 78, prefix: "", web: false, target: nil,
+        DEFAULTS = { width: 78, prefix: "", suffix: "", web: false,
+                     target: nil,
                      forbid: [],
                      no_wide: false, ascii: false, allow_mixed: false,
                      fences: false, geometry: false, borders: [] }.freeze
@@ -100,21 +101,24 @@ module Tessella
     end
 
     # Validates Tessella.lint's options: width a positive Integer,
-    # prefix a String, and forbid a list of preset names or literal
+    # prefix and suffix Strings, and forbid a list of preset names or literal
     # sequences, resolved here to the sequences.
     module Lint
         module Options
             def self.resolve(opts)
                 Check.positive_integer!(opts[:width], "width")
-                unless opts[:prefix].is_a?(String)
-                    raise ArgumentError, "prefix must be a String: " \
-                                         "#{opts[:prefix].inspect}"
-                end
-
+                %i[prefix suffix].each { string!(opts, it) }
                 target = target(opts)
                 opts.merge(forbid: forbid(opts[:forbid]),
                            borders: borders(opts[:borders]),
                            target: target, web: target == :web)
+            end
+
+            def self.string!(opts, key)
+                return if opts[key].is_a?(String)
+
+                raise ArgumentError, "#{key} must be a String: " \
+                                     "#{opts[key].inspect}"
             end
 
             def self.target(opts)
@@ -144,9 +148,9 @@ module Tessella
         end
     end
 
-    # width: 78, prefix: "", web: false, forbid: [], no_wide: false,
-    # ascii: false, allow_mixed: false, fences: false, geometry: false,
-    # borders: [] (Lint::DEFAULTS); returns a Lint::Report.
+    # width: 78, prefix: "", suffix: "", web: false, forbid: [],
+    # no_wide: false, ascii: false, allow_mixed: false, fences: false,
+    # geometry: false, borders: [] (Lint::DEFAULTS); returns a Lint::Report.
     def self.lint(source, **opts) = Lint.run(source, opts)
 
     # "ascii", or "utf-8" and the glyph classes the source holds.

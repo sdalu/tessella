@@ -6,7 +6,8 @@ module Tessella
         # sequences, trailing blanks, wide / invisible / emoji-capable /
         # non-ASCII glyphs, spaces other than U+0020, wide glyphs on an
         # aligned row (web) and ambiguous ones (cjk), and the column
-        # budget, which also records the line's ruler row.
+        # budget (prefix and suffix charged), which also records the
+        # line's ruler row.
         module Lines
             private
 
@@ -90,7 +91,7 @@ module Tessella
             end
 
             def check_budget(sec, i, line)
-                cols = end_column(line)
+                cols = end_column(line) + @tail
                 @rulers << Ruler.new(line: sec.first + i, width: cols,
                                      verticals: vertical_columns(line))
                 return if cols <= @opts[:width]

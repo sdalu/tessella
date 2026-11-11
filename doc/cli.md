@@ -143,7 +143,7 @@ tessella compose frame   [--title T] [--style S] [--pad N] [--fill P]
                          [--halo H] BLOCK
 tessella compose beside  [--gap N] [--align top|middle|bottom] BLOCK...
 tessella compose stack   [--gap N] [--rule C] [--center] BLOCK...
-tessella compose indent  --prefix STR BLOCK
+tessella compose indent  --prefix STR [--suffix STR] BLOCK
 tessella compose caption --text T [--above] BLOCK
 tessella compose shadow  [--glyph G] BLOCK
 tessella compose fill    [--pattern P] [--halo H] BLOCK
@@ -180,7 +180,8 @@ quadrant sextant braille octant edges`, dithers `fs atkinson bayer none`.
 ## `tessella lint`
 
 ```text
-tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
+tessella lint [--width N] [--prefix STR] [--suffix STR] [--ruler]
+              [--forbid SEQ]...
               [--web] [--no-wide] [--ascii] [--allow-mixed]
               [--fences] [--geometry] [--border GLYPHS]... [file ...]
 tessella lint --alphabet [file ...]

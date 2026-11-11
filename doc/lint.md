@@ -7,8 +7,8 @@ side one column off. `lint` checks a figure for these before it ships,
 whether tessella drew it or a person did.
 
 ```ruby
-report = Tessella.lint(source, width: 78, prefix: "", web: false,
-                       forbid: [], no_wide: false, ascii: false,
+report = Tessella.lint(source, width: 78, prefix: "", suffix: "",
+                       web: false, forbid: [], no_wide: false, ascii: false,
                        allow_mixed: false, fences: false,
                        geometry: false, borders: [])
 report.findings   # => Array of Finding (line, message)
@@ -18,7 +18,8 @@ Tessella.alphabet(source)  # => "ascii", or "utf-8 <classes>"
 ```
 
 ```text
-tessella lint [--width N] [--prefix STR] [--ruler] [--forbid SEQ]...
+tessella lint [--width N] [--prefix STR] [--suffix STR] [--ruler]
+              [--forbid SEQ]...
               [--web] [--no-wide] [--ascii] [--allow-mixed]
               [--fences] [--geometry] [--border GLYPHS]...
               [--target T] [file ...]
@@ -54,11 +55,16 @@ broken.txt:2: trailing whitespace
 - **Characters that have no fixed width:** tabs, invisible glyphs
   (any character a terminal gives no column, such as a zero-width
   space), invalid UTF-8.
+- **Look-alike spaces:** a no-break, thin, ideographic or other space
+  that is not U+0020, drawn as a blank and told from a space by no
+  display.
 - **Trailing blanks**, which an editor or a formatter may strip,
   changing the figure behind the author's back.
 - **The column budget:** a line wider than `--width` (78 by default)
-  once `--prefix` is drawn before it. The prefix is what the figure
-  will sit behind: `// `, `# `, ` * `, four spaces of Markdown code.
+  once `--prefix` is drawn before it and `--suffix` after it. The
+  prefix is what the figure will sit behind: `// `, `# `, ` * `, four
+  spaces of Markdown code; the suffix is what closes a comment wrapped
+  around each row, ` -->` or ` */`.
 
 ```text
 $ tessella lint --width 16 --prefix '// ' note.txt

@@ -18,6 +18,7 @@ module Tessella
             def initialize(opts)
                 @opts = opts
                 @overhead = Lint.width_of(opts[:prefix])
+                @tail = Lint.width_of(opts[:suffix])
                 @findings = []
                 @rulers = []
             end

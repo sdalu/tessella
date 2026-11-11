@@ -83,6 +83,18 @@ class TestLintLines < Minitest::Test
                      findings("ok\nbad \xFF\n".b))
     end
 
+    def test_the_budget_counts_the_suffix
+        assert_equal(["1: 8 columns rendered (budget 7)"],
+                     findings("abc\nab\n",
+                              width: 7, prefix: "# ", suffix: " */"))
+        assert_equal(7, Tessella.lint("ab\n", prefix: "# ", suffix: " */")
+                                .rulers.first.width)
+    end
+
+    def test_a_suffix_that_is_not_a_string_is_refused
+        assert_raises(ArgumentError) { Tessella.lint("a\n", suffix: 1) }
+    end
+
     def test_rulers_carry_the_width_and_vertical_columns
         ruler = Tessella.lint("│ a │\n", prefix: "  ").rulers.first
         assert_equal([1, 7, [3, 7]],

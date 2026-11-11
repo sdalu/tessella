@@ -95,6 +95,24 @@ CD X
                      Tessella.indent("AB\n\nCD", prefix: "# ").to_s)
     end
 
+    def test_indent_with_a_suffix_closes_every_row_at_one_column
+        assert_equal("<!-- 漢字 -->\n<!--      -->\n<!-- ab   -->\n",
+                     Tessella.indent("漢字\n\nab",
+                                     prefix: "<!-- ", suffix: " -->").to_s)
+    end
+
+    def test_indent_refuses_a_suffix_ending_in_a_blank
+        assert_raises(ArgumentError) do
+            Tessella.indent("ab", prefix: "# ", suffix: " # ")
+        end
+    end
+
+    def test_indent_refuses_a_non_ascii_suffix_under_ascii
+        assert_raises(ArgumentError) do
+            Tessella.indent("ab", prefix: "# ", suffix: " ¶", ascii: true)
+        end
+    end
+
     def test_caption_above
         assert_equal("Fig\n\nAB\nCD\n",
                      Tessella.caption(AB, text: "Fig", above: true).to_s)
@@ -158,6 +176,12 @@ class TestComposeCLI < Minitest::Test
             status, out, = run_cli("beside", p["a"], p["b"])
             assert_equal([0, "AB X\nCD\n"], [status, out])
         end
+    end
+
+    def test_indent_with_a_suffix_from_stdin
+        status, out, = run_cli("indent", "--prefix", "/* ", "--suffix", " */",
+                               "-", stdin: "AB\nC\n")
+        assert_equal([0, "/* AB */\n/* C  */\n"], [status, out])
     end
 
     BAD = { "tab" => "A\tB\n", "empty" => "\n\n", "e" => "é\n" }.freeze

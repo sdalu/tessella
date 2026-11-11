@@ -70,6 +70,11 @@ module Tessella
             end
         end
 
+        def add_suffix
+            @parser.on("--suffix STR", "the text after every line,",
+                       "rows padded to one width") { @opts[:suffix] = it }
+        end
+
         def add_text = @parser.on("--text T", "caption") { @opts[:text] = it }
 
         def add_glyph
@@ -156,7 +161,7 @@ module Tessella
         FLAGS = {
             "frame" => %i[title style pad fill halo],
             "beside" => %i[gap align],
-            "stack" => %i[gap rule center], "indent" => %i[prefix],
+            "stack" => %i[gap rule center], "indent" => %i[prefix suffix],
             "caption" => %i[text above], "shadow" => %i[glyph],
             "fill" => %i[pattern halo],
             "grid" => %i[columns gap row_gap align]

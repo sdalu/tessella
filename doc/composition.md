@@ -167,7 +167,7 @@ Usage: tessella compose frame  [--title T] [--style S] [--pad N]
                               [--align A] BLOCK...
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
-       tessella compose indent --prefix STR BLOCK
+       tessella compose indent --prefix STR [--suffix STR] BLOCK
        tessella compose caption --text T [--above] BLOCK
 Every subcommand also takes --[no-]ascii and --max-width N.
 ```
@@ -291,7 +291,7 @@ c is the bulk
 ## indent
 
 ```ruby
-Tessella.indent(fig, prefix:, ascii: false)
+Tessella.indent(fig, prefix:, suffix: nil, ascii: false)
 ```
 
 Puts `prefix:` before every line. A line that is empty gets the
@@ -321,6 +321,20 @@ $ ruby comment.rb
 # |-- exe
 # |   `-- tessella     # the command
 # `-- test
+```
+
+With `suffix:` (`--suffix STR`), every row is padded to the block's
+width and closed by the suffix, a blank row too, so a comment wrapped
+around each row closes at one column; a suffix ending in a blank is
+refused. `tessella lint --prefix STR --suffix STR` charges both to
+the budget.
+
+```text
+$ printf 'a -> b\n\nc\n' | \
+    tessella compose indent --prefix '<!-- ' --suffix ' -->' -
+<!-- a -> b -->
+<!--        -->
+<!-- c      -->
 ```
 
 ## caption
@@ -579,7 +593,7 @@ Usage: tessella compose frame  [--title T] [--style S] [--pad N]
                               [--align A] BLOCK...
        tessella compose beside [--gap N] [--align A] BLOCK...
        tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
-       tessella compose indent --prefix STR BLOCK
+       tessella compose indent --prefix STR [--suffix STR] BLOCK
        tessella compose caption --text T [--above] BLOCK
 Every subcommand also takes --[no-]ascii and --max-width N.
 ```

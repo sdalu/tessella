@@ -197,15 +197,35 @@ module Tessella
     end
 
     # indent: prefix: on every line, a blank line taking the prefix
-    # without its trailing blank; caption: one centred line of text:,
+    # without its trailing blank -- or, with suffix:, every row padded
+    # to the block's width and closed by it; caption: one centred line of text:,
     # above: or below the block, a blank line between.
     module Compose
-        def self.indent(figure, prefix:, ascii: Target.ascii?)
+        def self.indent(figure, prefix:, suffix: nil, ascii: Target.ascii?)
             block, = blocks([figure], ascii)
             text!("prefix", prefix, ascii)
+            return suffixed(block, prefix, suffix!(suffix, ascii)) if suffix
+
             Block.new(block.lines.map do |l|
                 l.empty? ? prefix.rstrip : prefix + l
             end)
+        end
+
+        # Every row padded to the block's width, so the suffix closes
+        # them all at one column; a blank row carries it too.
+        def self.suffixed(block, prefix, suffix)
+            Block.new(block.lines.map do |l|
+                prefix + Width.ljust(l, block.width) + suffix
+            end)
+        end
+
+        # The suffix ends every row, so a trailing blank in it is
+        # refused rather than stripped.
+        def self.suffix!(suffix, ascii)
+            text!("suffix", suffix, ascii)
+            return suffix unless suffix.to_s.match?(/\s\z/)
+
+            raise ArgumentError, "suffix ends in a blank: #{suffix.inspect}"
         end
 
         def self.caption(figure, text:, above: false, ascii: Target.ascii?)

@@ -20,7 +20,7 @@ module Tessella
                                           [--align A] BLOCK...
                    tessella compose beside [--gap N] [--align A] BLOCK...
                    tessella compose stack  [--gap N] [--rule C] [--center] BLOCK...
-                   tessella compose indent --prefix STR BLOCK
+                   tessella compose indent --prefix STR [--suffix STR] BLOCK
                    tessella compose caption --text T [--above] BLOCK
             Every subcommand also takes --[no-]ascii and --max-width N.
         TEXT
@@ -127,7 +127,8 @@ module Tessella
         end
 
         def self.indent_call(blocks, o)
-            Compose.indent(blocks.first, prefix: o[:prefix], ascii: o[:ascii])
+            Compose.indent(blocks.first, prefix: o[:prefix],
+                                         suffix: o[:suffix], ascii: o[:ascii])
         end
 
         def self.grid_call(blocks, o)

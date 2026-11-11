@@ -119,7 +119,7 @@ Tessella.frame(fig, title: nil, style: nil, pad: 1, ascii: false)
 Tessella.beside(fig, fig, ..., gap: 1, align: :top, ascii: false)
 Tessella.stack(fig, fig, ..., gap: 0, rule: nil, center: false,
                ascii: false)
-Tessella.indent(fig, prefix:, ascii: false)
+Tessella.indent(fig, prefix:, suffix: nil, ascii: false)
 Tessella.caption(fig, text:, above: false, ascii: false)
 Tessella.shadow(fig, glyph: nil, ascii: false)  # ░ right and below
 Tessella.grid(fig, ..., columns: 2, gap: 2, row_gap: 1, align: :top)
@@ -247,7 +247,7 @@ any finding. The port was checked against artlint.rb itself over
 identical on stdout, stderr and exit status; the suite carries the
 skill's own lint fixtures and the eval fixtures' planted defects.
 
-Four departures, each an addition rather than a change:
+Five departures, each an addition rather than a change:
 
 - **`fences: true`.** A Markdown file linted whole reads its prose and
   tables as art; the shelf's README gate split out each fence by hand
@@ -286,6 +286,20 @@ Four departures, each an addition rather than a change:
   file holding one is where the port and artlint now differ. Under
   `ascii: true` it is named once, as a look-alike space, not also as
   non-ASCII. Found by comparing with ai-tools' figure-file.rb.
+- **`suffix:`** (`--suffix STR`): charged to the budget after each
+  row, as `prefix:` is before it, so a comment closed on every row
+  (` -->`, ` */`) cannot push a line past the budget unseen. It is
+  added only to the budget and the ruler width; no column in another
+  message moves, since those are counted from the left. A
+  `--comment SYNTAX` setting forbid, prefix and suffix from one table
+  was declined: the forbid sequences are the only part of a comment
+  syntax that is the syntax's (`FORBID_PRESETS`); the prefix and
+  suffix are the host's layout (indentation, one comment per row or
+  one around the block), and a table of them would bake one host's
+  layout into this contract and need rules against the explicit
+  flags. The open and close lines of a block comment are not the
+  figure and are not linted. `compose indent` takes the same
+  `suffix:` to write the per-row form.
 
 `--paranoid`, an older name for `--ascii`, was dropped. The display
 width tables are `Width`'s, so the lint and the figures it checks
