@@ -48,5 +48,7 @@ break is caught before the slow oracle run.
   never a session: a round that changes behaviour says so in its report
   and leaves the number alone.
 
-No round closes by publishing: there is no deploy or publish target,
-and nothing here pushes a gem or creates a public remote.
+No round closes by publishing: there is no deploy or publish target.
+A release is the user's, by hand: the tag, a GitHub release with the
+gem attached, and `gem push` (the gemspec requires MFA, so the user
+types the code).

@@ -2,13 +2,13 @@
 
 ## Install
 
-tessella is not on rubygems.org. Install it from a checkout:
-
 ```sh
-cd tessella
-make install      # builds the gem, installs it for this user
+gem install tessella
 ```
 
+Or from a checkout of
+[github.com/sdalu/tessella](https://github.com/sdalu/tessella):
+`make install` builds the gem and installs it for this user, and
 `make uninstall` removes it. Without installing, `exe/tessella` runs
 straight out of the checkout, and `ruby -I lib` finds the library.
 It needs Ruby 3.4 and nothing else.

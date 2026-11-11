@@ -651,8 +651,8 @@ Where tessella departs from unicode_plot, it does so on purpose:
   identical.
 
 The name: a tessella is one tile of a mosaic, as one character cell is
-one tile of every figure here. It is free on rubygems.org with no gem
-one edit or one `-`/`_` away, which rubygems.org would refuse as too
+one tile of every figure here. It was free on rubygems.org (registered
+with 0.3.0) with no gem one edit or one `-`/`_` away, which rubygems.org would refuse as too
 close; `ascii-art` was not (`ascii_art` exists), nor were `inkplot`
 and charts-only names once the library went past charts.
 

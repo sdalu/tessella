@@ -25,14 +25,14 @@ decisions behind them.
 
 ## Install
 
-tessella is not on rubygems.org, and it has no public remote. Install
-it from a checkout of this repository:
+tessella is on [rubygems.org](https://rubygems.org/gems/tessella):
 
 ```bash
-cd tessella
-make install
+gem install tessella
 ```
 
+From a checkout of this repository
+([github.com/sdalu/tessella](https://github.com/sdalu/tessella)),
 `make install` builds the gem and installs it for this user (`gem
 install --user-install --local`). `make uninstall` removes it again.
 Running `exe/tessella` directly out of a checkout, without installing,
