@@ -42,9 +42,9 @@ module SeqFixtures
           │     go      │
           │────────────►│
           │      │      │
-          │      ┌──────┐
+          │      ├──────┤
           │      │ wait │
-          │      └──────┘
+          │      ├──────┤
           │      │      │
     DIAGRAM
 
@@ -130,6 +130,17 @@ class TestSeqRender < Minitest::Test
         out = Tessella.seq("A -> B: hi\nnote over A,B: both\n").to_s
         assert_includes(out, "both")
         assert_includes(out, "┌")
+    end
+
+    def test_a_note_meets_each_lifeline_at_a_junction
+        text = "A -> B: hi\nB -> C: go\nnote over A,C: all\n" \
+               "note over B: one\n"
+        out = Tessella.seq(text).to_s
+        assert_includes(out, "├──────┴──────┤")
+        assert_includes(out, "├──────┬──────┤")
+        assert_includes(out, "┌──┴──┐")
+        assert_includes(out, "└──┬──┘")
+        assert(Tessella.lint(out, geometry: true).clean?, out)
     end
 
     def test_a_note_over_one_participant_is_centred_over_it

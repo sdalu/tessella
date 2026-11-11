@@ -28,9 +28,9 @@ module Tessella
                     \s*:\s*(.*)\z/x
 
         UNI_G = { h: "─", v: "│", tl: "┌", tr: "┐", bl: "└", br: "┘",
-                  td: "┬", tu: "┴", dash: "┄" }.freeze
+                  td: "┬", tu: "┴", tr_: "├", tl_: "┤", dash: "┄" }.freeze
         ASC_G = { h: "-", v: "|", tl: "+", tr: "+", bl: "+", br: "+",
-                  td: "+", tu: "+", dash: "-" }.freeze
+                  td: "+", tu: "+", tr_: "+", tl_: "+", dash: "-" }.freeze
 
         def self.bad!(lineno, msg)
             raise ArgumentError, "line #{lineno}: #{msg}"
@@ -435,10 +435,34 @@ module Tessella
             span_note(idx.first, idx.last, positions)
         end
 
+        # A note's box drawn over the lifelines: where a lifeline
+        # meets its top or bottom edge, the edge takes a junction
+        # (├ ┤ at a corner, ┴ ┬ along an edge), so the lifeline
+        # ends and resumes at a stroke rather than butting a plain
+        # corner or edge.
         def self.overlay_rows(lay, style, rows, left)
             canvas = rows.map { lifeline_row(lay, style) }
             rows.each_with_index { |s, r| place!(canvas[r], left, s) }
+            join_lifelines!(canvas, lay, note_joints(style))
             canvas.map(&:join)
+        end
+
+        def self.join_lifelines!(canvas, lay, joints)
+            lay[:positions].each do |p|
+                junction!(canvas.first, p[:center], joints[:top])
+                junction!(canvas.last, p[:center], joints[:bottom])
+            end
+        end
+
+        def self.note_joints(style)
+            { top: { style[:tl] => style[:tr_], style[:tr] => style[:tl_],
+                     style[:h] => style[:tu] },
+              bottom: { style[:bl] => style[:tr_], style[:br] => style[:tl_],
+                        style[:h] => style[:td] } }
+        end
+
+        def self.junction!(row, col, joints)
+            row[col] = joints.fetch(row[col], row[col])
         end
 
         def self.note_rows(stmt, lay, participants, style)
