@@ -174,14 +174,14 @@ module Tessella
                                    "hangs from '#{above}'")
                 end
 
-                # The ASCII glyphs that may carry this connector (an
-                # arrow head's, or a vertical's), or nil when the glyph
-                # is no connector: a vertical with a horizontal beside it
-                # is a junction drawn in two cells.
+                # The glyphs without a down arm that may carry this
+                # connector (an arrow head's, or a vertical's), or nil
+                # when the glyph is no connector: a vertical with a
+                # horizontal beside it is a junction drawn in two cells.
                 def connector_kind(row, ch, c)
                     return ABOVE_ARROW_A if arrow_head?(row, ch, c)
-                    return SIDE_A if arms?(ch, UP | DOWN, exact: true) &&
-                                     !beside_horizontal?(row, c)
+                    return ABOVE_SIDE_A if arms?(ch, UP | DOWN, exact: true) &&
+                                           !beside_horizontal?(row, c)
 
                     ABOVE_VERT_A if ch == "|" && !beside?(row, c, "-")
                 end

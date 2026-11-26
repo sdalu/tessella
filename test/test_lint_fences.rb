@@ -78,6 +78,13 @@ class TestLintGeometry < Minitest::Test
         assert_empty(geometry("│   │\n│──▸│\n│   │\n"))
     end
 
+    # The arrow row also holds a box edge, so its connectors are checked.
+    def test_a_vertical_under_an_upward_arrow_head_is_not_hanging
+        assert_empty(geometry("┌─┐ ┌─┐\n│ │ └─┘\n└─┘  ▴\n     │\n"))
+        assert_empty(geometry("┌─┐ ┌─┐\n│ │ └─┘\n└─┘  ▲\n     │\n"))
+        assert_empty(geometry("+-+ +-+\n| | +-+\n+-+  ^\n     |\n"))
+    end
+
     def test_columns_are_display_columns
         assert_empty(geometry("┌────┐\n│漢字│\n└────┘\n"))
     end

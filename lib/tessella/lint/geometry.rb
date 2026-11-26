@@ -46,7 +46,11 @@ module Tessella
             }.freeze
 
             SIDE_A = "|+"
-            ABOVE_VERT_A = "|+-"
+            # What a vertical may hang from besides a glyph reaching
+            # down: an ASCII side, or an arrow head pointing up the
+            # line (a box edge on the arrow's row gets it checked).
+            ABOVE_SIDE_A = "|+▴▲"
+            ABOVE_VERT_A = "|+-^"
             ABOVE_ARROW_A = "|+-v▼▾"
             ARROWS = "▼▾"
             # The second column of a wide glyph: structural to nothing.
