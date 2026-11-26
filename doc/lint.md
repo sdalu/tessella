@@ -32,9 +32,12 @@ when none is given.
 ## Output and exit status
 
 Each finding goes to stderr as `FILE:LINE: message` (`stdin` for
-stdin), one per line. The exit status is 0 when every input is clean,
-1 on any finding or a file that cannot be read (the other files are
-still linted), and 2 on a usage mistake. A clean file prints nothing:
+stdin), one per line. LINE is the input's own line; a column a message
+names (`col N`, `column N`) is where the glyph renders, counted from
+1 in display columns with `--prefix` included, as `--ruler` counts.
+The exit status is 0 when every input is clean, 1 on any finding or a
+file that cannot be read (the other files are still linted), and 2 on
+a usage mistake. A clean file prints nothing:
 
 ```text
 $ tessella lint plot.txt && echo clean
